@@ -192,6 +192,9 @@ struct _GstBinPrivate
   GstIndex *index;
 #endif
 
+  /* FIXME Document */
+  GstEvent *seek_event;
+
   /* forward messages from our children */
   gboolean message_forward;
 
@@ -519,6 +522,7 @@ gst_bin_dispose (GObject * object)
   gst_object_replace ((GstObject **) child_bus_p, NULL);
   gst_object_replace ((GstObject **) provided_clock_p, NULL);
   gst_object_replace ((GstObject **) clock_provider_p, NULL);
+  gst_event_replace (&bin->priv->seek_event, NULL);
   bin_remove_messages (bin, NULL, GST_MESSAGE_ANY);
   GST_OBJECT_UNLOCK (object);
 
@@ -1176,6 +1180,11 @@ gst_bin_add_func (GstBin * bin, GstElement * element)
   if (bin->priv->index)
     gst_element_set_index (element, bin->priv->index);
 #endif
+
+  if (bin->priv->seek_event) {
+    GST_LOG_OBJECT (element, "forwarding seek event");
+    gst_element_send_event (element, gst_event_ref (bin->priv->seek_event));
+  }
 
   ret = GST_STATE_RETURN (bin);
   /* no need to update the state if we are in error */
@@ -2829,7 +2838,12 @@ gst_bin_send_event (GstElement * element, GstEvent * event)
   gboolean done = FALSE;
   GValue data = { 0, };
 
-  if (GST_EVENT_IS_DOWNSTREAM (event)) {
+  if (GST_EVENT_TYPE (event) == GST_EVENT_SEEK) {
+    gst_event_replace (&bin->priv->seek_event, event);
+    iter = gst_bin_iterate_elements (bin);
+    GST_DEBUG_OBJECT (bin, "Sending %s event to all children",
+        GST_EVENT_TYPE_NAME (event));
+  } else if (GST_EVENT_IS_DOWNSTREAM (event)) {
     iter = gst_bin_iterate_sources (bin);
     GST_DEBUG_OBJECT (bin, "Sending %s event to src children",
         GST_EVENT_TYPE_NAME (event));
