@@ -41,6 +41,7 @@ G_DEFINE_ABSTRACT_TYPE (GstBaseAggregator, gst_base_aggregator,
 struct _GstBaseAggregatorPrivate
 {
   gpointer *nothing;
+  gint padcount;
 };
 
 static void
@@ -48,15 +49,93 @@ gst_base_aggregator_finalize (GObject * object)
 {
 }
 
+static GstPad *
+gst_base_aggregator_request_new_pad (GstElement * element,
+    GstPadTemplate * templ, const gchar * req_name, const GstCaps * caps)
+{
+  GstBaseAggregator *agg;
+  GstBaseAggregatorPad *agg_pad;
+  GstElementClass *klass = GST_ELEMENT_GET_CLASS (element);
+
+  agg = GST_BASE_AGGREGATOR (element);
+
+  if (templ == gst_element_class_get_pad_template (klass, "sink_%u")) {
+    gchar *name = NULL;
+
+    GST_OBJECT_LOCK (element);
+    /* create new pad with the name */
+    name = g_strdup_printf ("sink_%u", (agg->priv->padcount)++);
+    agg_pad =
+        g_object_new (GST_TYPE_BASE_AGGREGATOR_PAD, "name", name, "direction",
+        templ->direction, "template", templ, NULL);
+    g_free (name);
+    GST_OBJECT_UNLOCK (element);
+  } else {
+    return NULL;
+  }
+
+  GST_DEBUG_OBJECT (element, "Adding pad %s", GST_PAD_NAME (agg_pad));
+
+  /* add the pad to the element */
+  gst_element_add_pad (element, GST_PAD (agg_pad));
+
+  return GST_PAD (agg_pad);
+}
+
+static void
+gst_base_aggregator_release_pad (GstElement * element, GstPad * pad)
+{
+  gst_element_remove_pad (element, pad);
+}
+
+static GstStateChangeReturn
+gst_base_aggregator_change_state (GstElement * element,
+    GstStateChange transition)
+{
+  GstStateChangeReturn ret;
+
+  switch (transition) {
+    case GST_STATE_CHANGE_NULL_TO_READY:
+      break;
+    case GST_STATE_CHANGE_READY_TO_PAUSED:
+      break;
+    case GST_STATE_CHANGE_PAUSED_TO_PLAYING:
+      break;
+    case GST_STATE_CHANGE_PAUSED_TO_READY:
+      break;
+    default:
+      break;
+  }
+
+  ret =
+      GST_ELEMENT_CLASS (gst_base_aggregator_parent_class)->change_state
+      (element, transition);
+
+  switch (transition) {
+    default:
+      break;
+  }
+
+  return ret;
+}
+
 static void
 gst_base_aggregator_class_init (GstBaseAggregatorClass * klass)
 {
   GObjectClass *gobject_class = (GObjectClass *) klass;
+  GstElementClass *gstelement_class = (GstElementClass *) klass;
 
   g_type_class_add_private (klass, sizeof (GstBaseAggregatorPrivate));
 
   GST_DEBUG_CATEGORY_INIT (base_aggregator_debug, "baseaggregator", 0,
       "GstBaseAggregator");
+
+  gstelement_class->request_new_pad =
+      GST_DEBUG_FUNCPTR (gst_base_aggregator_request_new_pad);
+  gstelement_class->release_pad =
+      GST_DEBUG_FUNCPTR (gst_base_aggregator_release_pad);
+  gstelement_class->change_state =
+      GST_DEBUG_FUNCPTR (gst_base_aggregator_change_state);
 
   gobject_class->finalize = GST_DEBUG_FUNCPTR (gst_base_aggregator_finalize);
 }
@@ -67,6 +146,8 @@ gst_base_aggregator_init (GstBaseAggregator * self)
   self->priv =
       G_TYPE_INSTANCE_GET_PRIVATE (self, GST_TYPE_BASE_AGGREGATOR,
       GstBaseAggregatorPrivate);
+
+  self->priv->padcount = -1;
 }
 
 static GstFlowReturn
