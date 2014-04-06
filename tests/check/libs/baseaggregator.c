@@ -39,14 +39,23 @@ typedef struct _GstAggregatorClass GstAggregatorClass;
 
 static GType gst_aggregator_get_type (void);
 
+struct _GstAggregator
+{
+  GstBaseAggregator parent;
+  GstPad *srcpad;
+
+  gboolean send_segment;
+};
+
+struct _GstAggregatorClass
+{
+  GstBaseAggregatorClass parent_class;
+};
+
 static GstFlowReturn
 gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
 {
-  GSList *walk;
-  GstBuffer *inbuf;
-  GstIterator *iter;
   GstAggregator *aggregator;
-  GstBaseAggregatorPad *pad, *wanted_pad;
 
   aggregator = GST_AGGREGATOR (baseaggregator);
 
@@ -59,22 +68,9 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
     gst_pad_push_event (aggregator->srcpad, gst_event_new_segment (&segment));
     aggregator->send_segment = FALSE;
   }
+
+  return GST_FLOW_OK;
 }
-
-struct _GstAggregator
-{
-  GstBaseAggregator parent;
-  GstPad *srcpad;
-
-  gboolean send_segment;
-};
-
-struct _GstAggregatorClass
-{
-  GstElementClass parent_class;
-};
-
-static GType gst_aggregator_get_type (void);
 
 G_DEFINE_TYPE (GstAggregator, gst_aggregator, GST_TYPE_BASE_AGGREGATOR);
 
@@ -89,12 +85,9 @@ GST_STATIC_PAD_TEMPLATE ("sink_%u", GST_PAD_SINK, GST_PAD_REQUEST,
 static void
 gst_aggregator_class_init (GstAggregatorClass * klass)
 {
-  GObjectClass *gobject_class = (GObjectClass *) klass;
   GstElementClass *gstelement_class = (GstElementClass *) klass;
   GstBaseAggregatorClass *base_aggregator_class =
       (GstBaseAggregatorClass *) klass;
-
-  gobject_class->dispose = gst_aggregator_dispose;
 
   gst_element_class_add_pad_template (gstelement_class,
       gst_static_pad_template_get (&gst_aggregator_src_template));
@@ -103,19 +96,12 @@ gst_aggregator_class_init (GstAggregatorClass * klass)
   gst_element_class_set_static_metadata (gstelement_class, "Aggregator",
       "Testing", "Combine N buffers", "Stefan Sauer <ensonic@users.sf.net>");
 
-  gstelement_class->request_new_pad =
-      GST_DEBUG_FUNCPTR (gst_aggregator_request_new_pad);
-  gstelement_class->release_pad =
-      GST_DEBUG_FUNCPTR (gst_aggregator_release_pad);
-  gstelement_class->change_state =
-      GST_DEBUG_FUNCPTR (gst_aggregator_change_state);
-
-  base_aggregator_class->aggregare =
+  base_aggregator_class->aggregate =
       GST_DEBUG_FUNCPTR (gst_aggregator_aggregate);
 }
 
 static void
-gst_aggregator_init (GstAggregator * agregator)
+gst_aggregator_init (GstAggregator * aggregator)
 {
   GstPadTemplate *template;
 
@@ -124,7 +110,7 @@ gst_aggregator_init (GstAggregator * agregator)
   gst_object_unref (template);
 
   GST_PAD_SET_PROXY_CAPS (aggregator->srcpad);
-  gst_element_add_pad (GST_ELEMENT (agregator), aggregator->srcpad);
+  gst_element_add_pad (GST_ELEMENT (aggregator), aggregator->srcpad);
   aggregator->send_segment = TRUE;
 }
 
@@ -145,3 +131,48 @@ gst_aggregator_plugin_register (void)
       gst_aggregator_plugin_init,
       VERSION, GST_LICENSE, PACKAGE, GST_PACKAGE_NAME, GST_PACKAGE_ORIGIN);
 }
+
+GST_START_TEST (test_collect)
+{
+  GstElement *aggregator;
+  GstBuffer *buf1, *buf2;
+
+  GstPad *spad1, *spad2;
+
+  aggregator = gst_element_factory_make ("aggregator", NULL);
+
+  buf1 = gst_buffer_new ();
+  buf2 = gst_buffer_new ();
+
+  gst_element_set_state (aggregator, GST_STATE_PLAYING);
+
+  spad1 = gst_element_get_request_pad (aggregator, "sink_%u");
+
+  spad2 = gst_element_get_request_pad (aggregator, "sink_%u");
+
+  fail_unless (spad1 != NULL);
+  fail_unless (spad2 != NULL);
+  gst_buffer_unref (buf1);
+  gst_buffer_unref (buf2);
+}
+
+GST_END_TEST;
+
+static Suite *
+gst_base_aggregator_suite (void)
+{
+  Suite *suite;
+  TCase *general;
+
+  gst_aggregator_plugin_register ();
+
+  suite = suite_create ("GstBaseAggregator");
+
+  general = tcase_create ("general");
+  suite_add_tcase (suite, general);
+  tcase_add_test (general, test_collect);
+
+  return suite;
+}
+
+GST_CHECK_MAIN (gst_base_aggregator);
