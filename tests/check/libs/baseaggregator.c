@@ -132,28 +132,87 @@ gst_aggregator_plugin_register (void)
       VERSION, GST_LICENSE, PACKAGE, GST_PACKAGE_NAME, GST_PACKAGE_ORIGIN);
 }
 
+typedef struct
+{
+  GstEvent *event;
+  GstBuffer *buffer;
+  GstElement *aggregator;
+  GstPad *sinkpad, *srcpad;
+  GstFlowReturn expected_result;
+} TestData;
+
+static GstStaticPadTemplate srctemplate = GST_STATIC_PAD_TEMPLATE ("src",
+    GST_PAD_SRC,
+    GST_PAD_ALWAYS,
+    GST_STATIC_CAPS_ANY);
+
+static gpointer
+push_buffer (gpointer user_data)
+{
+  GstFlowReturn flow;
+  GstCaps *caps;
+  TestData *test_data = (TestData *) user_data;
+  GstSegment segment;
+
+  gst_pad_push_event (test_data->srcpad, gst_event_new_stream_start ("test"));
+
+  caps = gst_caps_new_empty_simple ("foo/x-bar");
+  gst_pad_push_event (test_data->srcpad, gst_event_new_caps (caps));
+  gst_caps_unref (caps);
+
+  gst_segment_init (&segment, GST_FORMAT_TIME);
+  gst_pad_push_event (test_data->srcpad, gst_event_new_segment (&segment));
+
+  flow = gst_pad_push (test_data->srcpad, test_data->buffer);
+  fail_unless (flow == test_data->expected_result, "got flow %s instead of OK",
+      gst_flow_get_name (flow));
+
+  return NULL;
+}
+
 GST_START_TEST (test_collect)
 {
-  GstElement *aggregator;
-  GstBuffer *buf1, *buf2;
+  GThread *thread1, *thread2;
 
-  GstPad *spad1, *spad2;
+  TestData data1 = { 0, };
+  TestData data2 = { 0, };
 
-  aggregator = gst_element_factory_make ("aggregator", NULL);
+  data1.srcpad = gst_pad_new_from_static_template (&srctemplate, "src1");
+  data2.srcpad = gst_pad_new_from_static_template (&srctemplate, "src2");
 
-  buf1 = gst_buffer_new ();
-  buf2 = gst_buffer_new ();
+  gst_pad_set_active (data1.srcpad, TRUE);
+  gst_pad_set_active (data2.srcpad, TRUE);
 
-  gst_element_set_state (aggregator, GST_STATE_PLAYING);
+  data1.aggregator = data2.aggregator =
+      gst_element_factory_make ("aggregator", NULL);
 
-  spad1 = gst_element_get_request_pad (aggregator, "sink_%u");
+  data1.buffer = gst_buffer_new ();
+  data2.buffer = gst_buffer_new ();
 
-  spad2 = gst_element_get_request_pad (aggregator, "sink_%u");
+  gst_element_set_state (data1.aggregator, GST_STATE_PLAYING);
 
-  fail_unless (spad1 != NULL);
-  fail_unless (spad2 != NULL);
-  gst_buffer_unref (buf1);
-  gst_buffer_unref (buf2);
+  data1.sinkpad = gst_element_get_request_pad (data1.aggregator, "sink_%u");
+  data2.sinkpad = gst_element_get_request_pad (data1.aggregator, "sink_%u");
+
+  fail_unless (gst_pad_link (data1.srcpad, data1.sinkpad) == GST_PAD_LINK_OK);
+  fail_unless (gst_pad_link (data2.srcpad, data2.sinkpad) == GST_PAD_LINK_OK);
+
+  fail_unless (GST_IS_PAD (data1.sinkpad));
+  fail_unless (GST_IS_PAD (data2.sinkpad));
+
+  thread1 = g_thread_try_new ("gst-check", push_buffer, &data1, NULL);
+  thread2 = g_thread_try_new ("gst-check", push_buffer, &data2, NULL);
+
+  /* these will return immediately as when the data is popped the threads are
+   * unlocked and will terminate */
+  g_thread_join (thread1);
+  g_thread_join (thread2);
+
+  gst_buffer_unref (data1.buffer);
+  gst_buffer_unref (data2.buffer);
+
+  gst_element_set_state (data1.aggregator, GST_STATE_NULL);
+  gst_object_unref (data1.aggregator);
 }
 
 GST_END_TEST;

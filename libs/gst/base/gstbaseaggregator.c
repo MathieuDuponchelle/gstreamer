@@ -173,13 +173,14 @@ _chain (GstBaseAggregator * base_aggregator)
 static gboolean
 _event (GstPad * pad, GstObject * parent, GstEvent * event)
 {
-  return TRUE;
+  return gst_pad_event_default (pad, parent, event);
 }
 
 static gboolean
 _query (GstPad * pad, GstObject * parent, GstQuery * query)
 {
-  return TRUE;
+
+  return gst_pad_query_default (pad, parent, query);
 }
 
 /***********************************
