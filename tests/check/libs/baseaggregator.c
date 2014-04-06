@@ -221,6 +221,35 @@ _aggegated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
   return GST_PAD_PROBE_REMOVE;
 }
 
+/*
+ * Not thread safe, will create a new TestData which contains
+ * an activated src pad linked to a requested sink pad of @agg, and
+ * a newly allocated buffer ready to be pushed. Caller needs to free
+ * after usage.
+ */
+static TestData *
+create_test_data (GstElement * agg)
+{
+  TestData *data;
+  static gint num_src_pads = 0;
+  gchar *pad_name = g_strdup_printf ("src%d", num_src_pads);
+
+  num_src_pads += 1;
+  data = (TestData *) g_malloc (sizeof (TestData));
+  fail_unless (data != NULL);
+
+  data->srcpad = gst_pad_new_from_static_template (&srctemplate, pad_name);
+  g_free (pad_name);
+  gst_pad_set_active (data->srcpad, TRUE);
+  data->aggregator = agg;
+  data->buffer = gst_buffer_new ();
+  data->sinkpad = gst_element_get_request_pad (agg, "sink_%u");
+  fail_unless (GST_IS_PAD (data->sinkpad));
+  fail_unless (gst_pad_link (data->srcpad, data->sinkpad) == GST_PAD_LINK_OK);
+
+  return data;
+}
+
 GST_START_TEST (test_collect)
 {
   GMainLoop *ml;
@@ -228,31 +257,14 @@ GST_START_TEST (test_collect)
   guint timeout_id;
   GstElement *aggregator;
   GThread *thread1, *thread2;
+  TestData *data1, *data2;
 
-  TestData data1 = { 0, };
-  TestData data2 = { 0, };
+  aggregator = gst_element_factory_make ("aggregator", NULL);
 
-  data1.srcpad = gst_pad_new_from_static_template (&srctemplate, "src1");
-  data2.srcpad = gst_pad_new_from_static_template (&srctemplate, "src2");
-
-  gst_pad_set_active (data1.srcpad, TRUE);
-  gst_pad_set_active (data2.srcpad, TRUE);
-
-  aggregator = data1.aggregator = data2.aggregator =
-      gst_element_factory_make ("aggregator", NULL);
-
-  data1.buffer = gst_buffer_new ();
-  data2.buffer = gst_buffer_new ();
+  data1 = create_test_data (aggregator);
+  data2 = create_test_data (aggregator);
 
   gst_element_set_state (aggregator, GST_STATE_PLAYING);
-
-  data1.sinkpad = gst_element_get_request_pad (aggregator, "sink_%u");
-  data2.sinkpad = gst_element_get_request_pad (aggregator, "sink_%u");
-  fail_unless (GST_IS_PAD (data1.sinkpad));
-  fail_unless (GST_IS_PAD (data2.sinkpad));
-
-  fail_unless (gst_pad_link (data1.srcpad, data1.sinkpad) == GST_PAD_LINK_OK);
-  fail_unless (gst_pad_link (data2.srcpad, data2.sinkpad) == GST_PAD_LINK_OK);
 
   ml = g_main_loop_new (NULL, TRUE);
 
@@ -262,8 +274,8 @@ GST_START_TEST (test_collect)
 
   timeout_id = g_timeout_add (1000, (GSourceFunc) _aggregate_timeout, ml);
 
-  thread1 = g_thread_try_new ("gst-check", push_buffer, &data1, NULL);
-  thread2 = g_thread_try_new ("gst-check", push_buffer, &data2, NULL);
+  thread1 = g_thread_try_new ("gst-check", push_buffer, data1, NULL);
+  thread2 = g_thread_try_new ("gst-check", push_buffer, data2, NULL);
 
   g_main_loop_run (ml);
 
@@ -274,8 +286,11 @@ GST_START_TEST (test_collect)
   g_thread_join (thread1);
   g_thread_join (thread2);
 
-  gst_buffer_unref (data1.buffer);
-  gst_buffer_unref (data2.buffer);
+  gst_buffer_unref (data1->buffer);
+  gst_buffer_unref (data2->buffer);
+
+  g_free (data1);
+  g_free (data2);
 
   gst_element_set_state (aggregator, GST_STATE_NULL);
   gst_object_unref (aggregator);
