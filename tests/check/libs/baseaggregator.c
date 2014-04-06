@@ -62,7 +62,6 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
 
   aggregator = GST_AGGREGATOR (baseaggregator);
 
-  GST_ERROR ("Aggregate");
   if (aggregator->send_segment) {
     GstSegment segment;
 
@@ -101,7 +100,6 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
   }
   gst_iterator_free (iter);
 
-  GST_ERROR ("Pushed buffer");
   gst_pad_push (aggregator->srcpad, gst_buffer_new ());
 
   return GST_FLOW_OK;
@@ -198,7 +196,6 @@ push_buffer (gpointer user_data)
   gst_segment_init (&segment, GST_FORMAT_TIME);
   gst_pad_push_event (test_data->srcpad, gst_event_new_segment (&segment));
 
-  GST_ERROR_OBJECT (test_data->srcpad, "Pushing buffer %p", test_data->buffer);
   flow = gst_pad_push (test_data->srcpad, test_data->buffer);
   fail_unless (flow == test_data->expected_result, "got flow %s instead of OK",
       gst_flow_get_name (flow));
