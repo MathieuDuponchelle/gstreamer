@@ -55,7 +55,10 @@ struct _GstAggregatorClass
 static GstFlowReturn
 gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
 {
+  GstIterator *iter;
   GstAggregator *aggregator;
+
+  gboolean done_iterating = FALSE;
 
   aggregator = GST_AGGREGATOR (baseaggregator);
 
@@ -68,6 +71,36 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
     gst_pad_push_event (aggregator->srcpad, gst_event_new_segment (&segment));
     aggregator->send_segment = FALSE;
   }
+
+  iter = gst_element_iterate_sink_pads (GST_ELEMENT (aggregator));
+  while (!done_iterating) {
+    GValue value = { 0, };
+    GstBaseAggregatorPad *pad;
+
+    switch (gst_iterator_next (iter, &value)) {
+      case GST_ITERATOR_OK:
+        pad = g_value_get_object (&value);
+
+        fail_unless (GST_IS_BUFFER (pad->buffer));
+        gst_buffer_replace (&pad->buffer, NULL);
+
+        g_value_reset (&value);
+        break;
+      case GST_ITERATOR_RESYNC:
+        gst_iterator_resync (iter);
+        break;
+      case GST_ITERATOR_ERROR:
+        GST_WARNING_OBJECT (aggregator, "Sinkpads iteration error");
+        done_iterating = TRUE;
+        break;
+      case GST_ITERATOR_DONE:
+        done_iterating = TRUE;
+        break;
+    }
+  }
+  gst_iterator_free (iter);
+
+  gst_pad_push (aggregator->srcpad, gst_buffer_new ());
 
   return GST_FLOW_OK;
 }
