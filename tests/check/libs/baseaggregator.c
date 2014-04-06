@@ -226,7 +226,6 @@ GST_START_TEST (test_collect)
   GMainLoop *ml;
   GstPad *srcpad;
   guint timeout_id;
-  gulong pad_probe_id;
   GstElement *aggregator;
   GThread *thread1, *thread2;
 
@@ -258,7 +257,7 @@ GST_START_TEST (test_collect)
   ml = g_main_loop_new (NULL, TRUE);
 
   srcpad = gst_element_get_static_pad (aggregator, "src");
-  pad_probe_id = gst_pad_add_probe (srcpad, GST_PAD_PROBE_TYPE_BUFFER,
+  gst_pad_add_probe (srcpad, GST_PAD_PROBE_TYPE_BUFFER,
       (GstPadProbeCallback) _aggegated_cb, ml, NULL);
 
   timeout_id = g_timeout_add (1000, (GSourceFunc) _aggregate_timeout, ml);
@@ -269,7 +268,6 @@ GST_START_TEST (test_collect)
   g_main_loop_run (ml);
 
   g_source_remove (timeout_id);
-  gst_pad_remove_probe (srcpad, pad_probe_id);
 
   /* these will return immediately as when the data is popped the threads are
    * unlocked and will terminate */
