@@ -38,35 +38,16 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
 G_DEFINE_ABSTRACT_TYPE (GstBaseAggregator, gst_base_aggregator,
     GST_TYPE_ELEMENT);
 
+#define AGGEGATE_LOCK(self)   g_rec_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
+#define AGGEGATE_UNLOCK(self) g_rec_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
+
 struct _GstBaseAggregatorPrivate
 {
   gint padcount;
 
-  /* Our state is >= PAUSED */
-  gboolean running;
-
-  GThread *aggregate_thread;
-  GCond aggregate_cond;
-  GMutex aggregate_mutex;
+  GstTask *aggregate_task;
+  GRecMutex aggregate_lock;
 };
-
-#define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
-  GST_INFO_OBJECT (agg, "Waiting for aggregate in thread %p",           \
-        g_thread_self());                                               \
-  g_mutex_lock(&(agg->priv->aggregate_mutex));                          \
-  g_cond_wait(&(agg->priv->aggregate_cond),                             \
-      &(agg->priv->aggregate_mutex));                                   \
-  g_mutex_unlock(&(agg->priv->aggregate_mutex));                        \
-  } G_STMT_END
-
-#define SIGNAL_AGGREGATE(agg) {                                         \
-  GST_INFO_OBJECT (agg, "signaling aggregate from thread %p",           \
-        g_thread_self());                                               \
-  g_mutex_lock(&(agg->priv->aggregate_mutex));                          \
-  g_cond_signal(&(agg->priv->aggregate_cond));                          \
-  g_mutex_unlock(&(agg->priv->aggregate_mutex));                        \
-  } G_STMT_END
-
 
 static void
 gst_base_aggregator_finalize (GObject * object)
@@ -102,7 +83,7 @@ gst_base_aggregator_request_new_pad (GstElement * element,
 
   GST_ERROR_OBJECT (element, "Adding pad %s", GST_PAD_NAME (agg_pad));
 
-  if (priv->running)
+  if (priv->aggregate_task->running)
     gst_pad_set_active (GST_PAD (agg_pad), TRUE);
   /* add the pad to the element */
   gst_element_add_pad (element, GST_PAD (agg_pad));
@@ -115,7 +96,7 @@ gst_base_aggregator_release_pad (GstElement * element, GstPad * pad)
 {
   GstBaseAggregatorPrivate *priv = GST_BASE_AGGREGATOR (element)->priv;
 
-  if (!priv->running)
+  if (!priv->aggregate_task->running)
     gst_pad_set_active (pad, FALSE);
   gst_element_remove_pad (element, pad);
 }
@@ -195,47 +176,31 @@ _reset_all_pads_data (GstBaseAggregator * self)
   return res;
 }
 
-static gpointer
+static void
 aggregate_func (GstBaseAggregator * self)
 {
-  while (self->priv->running) {
-    gboolean do_aggregate;
-    GstBaseAggregatorClass *klass;
+  gboolean do_aggregate;
+  GstBaseAggregatorClass *klass;
 
-    WAIT_FOR_AGGREGATE (self);
+  GstBaseAggregatorPrivate *priv = self->priv;
 
-    do_aggregate = _check_all_pads_with_data_or_eos (self);
-    GST_ERROR_OBJECT (self, "Checking for aggregation : %d", do_aggregate);
-    if (do_aggregate) {
-      klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
-
-      if (klass->aggregate) {
-        klass->aggregate (self);
-      }
-
-      _reset_all_pads_data (self);
-    }
+  if (priv->aggregate_task->running) {
+    GST_ERROR ("wait please");
+    GST_TASK_WAIT (priv->aggregate_task);
   }
 
-  return NULL;
-}
+  do_aggregate = _check_all_pads_with_data_or_eos (self);
+  GST_ERROR_OBJECT (self, "Checking for aggregation : %d", do_aggregate);
+  if (do_aggregate) {
+    klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
 
-static void
-_start (GstBaseAggregator * self)
-{
-  self->priv->running = TRUE;
-  self->priv->aggregate_thread =
-      g_thread_new ("aggregate_thread", (GThreadFunc) aggregate_func, self);
-  GST_ERROR_OBJECT (self, "I've started running");
-}
+    if (klass->aggregate) {
+      klass->aggregate (self);
+    }
 
-static void
-_stop (GstBaseAggregator * self)
-{
-  self->priv->running = FALSE;
-  SIGNAL_AGGREGATE (self);
-  g_thread_join (self->priv->aggregate_thread);
-  GST_ERROR_OBJECT (self, "I've stopped running");
+    _reset_all_pads_data (self);
+    GST_ERROR ("Aggregated");
+  }
 }
 
 static GstStateChangeReturn
@@ -244,16 +209,22 @@ gst_base_aggregator_change_state (GstElement * element,
 {
   GstStateChangeReturn ret;
 
+  GstBaseAggregatorPrivate *priv = GST_BASE_AGGREGATOR (element)->priv;
+
   switch (transition) {
     case GST_STATE_CHANGE_NULL_TO_READY:
       break;
     case GST_STATE_CHANGE_READY_TO_PAUSED:
-      _start (GST_BASE_AGGREGATOR (element));
+      gst_task_set_state (priv->aggregate_task, GST_TASK_STARTED);
       break;
     case GST_STATE_CHANGE_PAUSED_TO_PLAYING:
       break;
     case GST_STATE_CHANGE_PAUSED_TO_READY:
-      _stop (GST_BASE_AGGREGATOR (element));
+      GST_ERROR ("HERE");
+      gst_task_set_state (priv->aggregate_task, GST_TASK_STOPPED);
+      GST_TASK_BROADCAST (priv->aggregate_task);
+      gst_task_join (priv->aggregate_task);
+      GST_ERROR ("HERE");
       break;
     default:
       break;
@@ -300,18 +271,22 @@ gst_base_aggregator_init (GstBaseAggregator * self)
       GstBaseAggregatorPrivate);
 
   self->priv->padcount = -1;
+  self->priv->aggregate_task =
+      gst_task_new ((GstTaskFunction) aggregate_func, self, NULL);
+  GST_ERROR ("Setting lock");
+  gst_task_set_lock (self->priv->aggregate_task, &self->priv->aggregate_lock);
 }
 
 static GstFlowReturn
 _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
 {
-  GstBaseAggregator *self = GST_BASE_AGGREGATOR (object);
+  GstBaseAggregatorPrivate *priv = GST_BASE_AGGREGATOR (object)->priv;
   GstBaseAggregatorPad *bpad = GST_BASE_AGGREGATOR_PAD (pad);
 
   GST_ERROR ("chaining");
   gst_buffer_replace (&bpad->buffer, buffer);
 
-  SIGNAL_AGGREGATE (self);
+  GST_TASK_SIGNAL (priv->aggregate_task);
   return GST_FLOW_OK;
 }
 

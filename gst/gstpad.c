@@ -5572,7 +5572,7 @@ gst_pad_stop_task (GstPad * pad)
   if (task == NULL)
     goto no_task;
   GST_PAD_TASK (pad) = NULL;
-  res = gst_task_set_state (task, GST_TASK_STOPPED);
+  res = gst_lask_set_state (task, GST_TASK_STOPPED);
   GST_OBJECT_UNLOCK (pad);
 
   GST_PAD_STREAM_LOCK (pad);
