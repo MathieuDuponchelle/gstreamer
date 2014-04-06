@@ -38,6 +38,9 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
 G_DEFINE_ABSTRACT_TYPE (GstBaseAggregator, gst_base_aggregator,
     GST_TYPE_ELEMENT);
 
+#define AGGREGATE_LOCK(self) g_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
+#define AGGREGATE_UNLOCK(self) g_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
+
 struct _GstBaseAggregatorPrivate
 {
   gint padcount;
@@ -47,25 +50,22 @@ struct _GstBaseAggregatorPrivate
 
   GThread *aggregate_thread;
   GCond aggregate_cond;
-  GMutex aggregate_mutex;
+  GMutex aggregate_lock;
+  gboolean cookie;
 };
 
 #define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
   GST_INFO_OBJECT (agg, "Waiting for aggregate in thread %p",           \
         g_thread_self());                                               \
-  g_mutex_lock(&(agg->priv->aggregate_mutex));                          \
   g_cond_wait(&(agg->priv->aggregate_cond),                             \
-      &(agg->priv->aggregate_mutex));                                   \
-  g_mutex_unlock(&(agg->priv->aggregate_mutex));                        \
+      &(agg->priv->aggregate_lock));                                   \
   } G_STMT_END
 
 #define SIGNAL_AGGREGATE(agg) {                                         \
   GST_INFO_OBJECT (agg, "signaling aggregate from thread %p",           \
         g_thread_self());                                               \
-  g_mutex_lock(&(agg->priv->aggregate_mutex));                          \
   g_cond_signal(&(agg->priv->aggregate_cond));                          \
-  g_mutex_unlock(&(agg->priv->aggregate_mutex));                        \
-  } G_STMT_END
+  }
 
 
 static void
@@ -127,6 +127,7 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
   gboolean res = TRUE;
   gboolean done = FALSE;
   GValue data = { 0, };
+  gint numpads = 0;
 
   iter = gst_element_iterate_sink_pads (GST_ELEMENT (self));
 
@@ -139,6 +140,7 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
 
         if (!bpad->buffer)
           res = FALSE;
+        numpads++;
         g_value_reset (&data);
         break;
       }
@@ -154,6 +156,9 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
         break;
     }
   }
+
+  if (!numpads)
+    res = FALSE;
 
   return res;
 }
@@ -198,12 +203,20 @@ _reset_all_pads_data (GstBaseAggregator * self)
 static gpointer
 aggregate_func (GstBaseAggregator * self)
 {
-  while (self->priv->running) {
+  gboolean first = TRUE;
+
+  do {
     gboolean do_aggregate;
     GstBaseAggregatorClass *klass;
 
-    WAIT_FOR_AGGREGATE (self);
+    AGGREGATE_LOCK (self);
+    GST_ERROR ("I'm waiting for aggregation");
 
+    if (!first && !self->priv->cookie)
+      WAIT_FOR_AGGREGATE (self);
+
+    first = FALSE;
+    GST_ERROR ("I want the lock in check");
     do_aggregate = _check_all_pads_with_data_or_eos (self);
     GST_ERROR_OBJECT (self, "Checking for aggregation : %d", do_aggregate);
     if (do_aggregate) {
@@ -215,7 +228,10 @@ aggregate_func (GstBaseAggregator * self)
 
       _reset_all_pads_data (self);
     }
-  }
+    GST_ERROR ("releasing the lock in check");
+    self->priv->cookie = FALSE;
+    AGGREGATE_UNLOCK (self);
+  } while (self->priv->running);
 
   return NULL;
 }
@@ -232,8 +248,11 @@ _start (GstBaseAggregator * self)
 static void
 _stop (GstBaseAggregator * self)
 {
+  AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
+  self->priv->cookie = TRUE;
   SIGNAL_AGGREGATE (self);
+  AGGREGATE_UNLOCK (self);
   g_thread_join (self->priv->aggregate_thread);
   GST_ERROR_OBJECT (self, "I've stopped running");
 }
@@ -300,6 +319,8 @@ gst_base_aggregator_init (GstBaseAggregator * self)
       GstBaseAggregatorPrivate);
 
   self->priv->padcount = -1;
+  self->priv->cookie = FALSE;
+  g_mutex_init (&self->priv->aggregate_lock);
 }
 
 static GstFlowReturn
@@ -308,10 +329,12 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (object);
   GstBaseAggregatorPad *bpad = GST_BASE_AGGREGATOR_PAD (pad);
 
-  GST_ERROR ("chaining");
+  AGGREGATE_LOCK (self);
+  self->priv->cookie = TRUE;
   gst_buffer_replace (&bpad->buffer, buffer);
-
+  GST_ERROR ("ADDED BUFFER");
   SIGNAL_AGGREGATE (self);
+  AGGREGATE_UNLOCK (self);
   return GST_FLOW_OK;
 }
 
