@@ -170,8 +170,31 @@ push_buffer (gpointer user_data)
   return NULL;
 }
 
+static gboolean
+_aggregate_timeout (GMainLoop * ml)
+{
+  g_main_loop_quit (ml);
+
+  fail_unless ("No buffer found on aggregator.srcpad -> TIMEOUT" == NULL);
+
+  return FALSE;
+}
+
+static GstPadProbeReturn
+_aggegated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
+{
+  g_main_loop_quit (ml);
+
+  return GST_PAD_PROBE_REMOVE;
+}
+
 GST_START_TEST (test_collect)
 {
+  GMainLoop *ml;
+  GstPad *srcpad;
+  guint timeout_id;
+  gulong pad_probe_id;
+  GstElement *aggregator;
   GThread *thread1, *thread2;
 
   TestData data1 = { 0, };
@@ -183,25 +206,37 @@ GST_START_TEST (test_collect)
   gst_pad_set_active (data1.srcpad, TRUE);
   gst_pad_set_active (data2.srcpad, TRUE);
 
-  data1.aggregator = data2.aggregator =
+  aggregator = data1.aggregator = data2.aggregator =
       gst_element_factory_make ("aggregator", NULL);
 
   data1.buffer = gst_buffer_new ();
   data2.buffer = gst_buffer_new ();
 
-  gst_element_set_state (data1.aggregator, GST_STATE_PLAYING);
+  gst_element_set_state (aggregator, GST_STATE_PLAYING);
 
-  data1.sinkpad = gst_element_get_request_pad (data1.aggregator, "sink_%u");
-  data2.sinkpad = gst_element_get_request_pad (data1.aggregator, "sink_%u");
+  data1.sinkpad = gst_element_get_request_pad (aggregator, "sink_%u");
+  data2.sinkpad = gst_element_get_request_pad (aggregator, "sink_%u");
+  fail_unless (GST_IS_PAD (data1.sinkpad));
+  fail_unless (GST_IS_PAD (data2.sinkpad));
 
   fail_unless (gst_pad_link (data1.srcpad, data1.sinkpad) == GST_PAD_LINK_OK);
   fail_unless (gst_pad_link (data2.srcpad, data2.sinkpad) == GST_PAD_LINK_OK);
 
-  fail_unless (GST_IS_PAD (data1.sinkpad));
-  fail_unless (GST_IS_PAD (data2.sinkpad));
+  ml = g_main_loop_new (NULL, TRUE);
+
+  srcpad = gst_element_get_static_pad (aggregator, "src");
+  pad_probe_id = gst_pad_add_probe (srcpad, GST_PAD_PROBE_TYPE_BUFFER,
+      (GstPadProbeCallback) _aggegated_cb, ml, NULL);
+
+  timeout_id = g_timeout_add (1000, (GSourceFunc) _aggregate_timeout, ml);
 
   thread1 = g_thread_try_new ("gst-check", push_buffer, &data1, NULL);
   thread2 = g_thread_try_new ("gst-check", push_buffer, &data2, NULL);
+
+  g_main_loop_run (ml);
+
+  g_source_remove (timeout_id);
+  gst_pad_remove_probe (srcpad, pad_probe_id);
 
   /* these will return immediately as when the data is popped the threads are
    * unlocked and will terminate */
@@ -211,8 +246,8 @@ GST_START_TEST (test_collect)
   gst_buffer_unref (data1.buffer);
   gst_buffer_unref (data2.buffer);
 
-  gst_element_set_state (data1.aggregator, GST_STATE_NULL);
-  gst_object_unref (data1.aggregator);
+  gst_element_set_state (aggregator, GST_STATE_NULL);
+  gst_object_unref (aggregator);
 }
 
 GST_END_TEST;
