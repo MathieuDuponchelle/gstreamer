@@ -81,7 +81,7 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
       case GST_ITERATOR_OK:
         pad = g_value_get_object (&value);
 
-        fail_unless (GST_IS_BUFFER (pad->buffer));
+        fail_unless (GST_IS_BUFFER (pad->buffer) || pad->eos);
         gst_buffer_replace (&pad->buffer, NULL);
 
         g_value_reset (&value);
@@ -192,21 +192,32 @@ push_buffer (gpointer user_data)
 {
   GstFlowReturn flow;
   GstCaps *caps;
-  ChainData *test_data = (ChainData *) user_data;
+  ChainData *chain_data = (ChainData *) user_data;
   GstSegment segment;
 
-  gst_pad_push_event (test_data->srcpad, gst_event_new_stream_start ("test"));
+  gst_pad_push_event (chain_data->srcpad, gst_event_new_stream_start ("test"));
 
   caps = gst_caps_new_empty_simple ("foo/x-bar");
-  gst_pad_push_event (test_data->srcpad, gst_event_new_caps (caps));
+  gst_pad_push_event (chain_data->srcpad, gst_event_new_caps (caps));
   gst_caps_unref (caps);
 
   gst_segment_init (&segment, GST_FORMAT_TIME);
-  gst_pad_push_event (test_data->srcpad, gst_event_new_segment (&segment));
+  gst_pad_push_event (chain_data->srcpad, gst_event_new_segment (&segment));
 
-  flow = gst_pad_push (test_data->srcpad, test_data->buffer);
-  fail_unless (flow == test_data->expected_result, "got flow %s instead of OK",
+  flow = gst_pad_push (chain_data->srcpad, chain_data->buffer);
+  fail_unless (flow == chain_data->expected_result, "got flow %s instead of OK",
       gst_flow_get_name (flow));
+
+  return NULL;
+}
+
+static gpointer
+push_event (gpointer user_data)
+{
+  ChainData *chain_data = (ChainData *) user_data;
+
+  fail_unless (gst_pad_push_event (chain_data->srcpad,
+          chain_data->event) == TRUE);
 
   return NULL;
 }
@@ -319,6 +330,38 @@ GST_START_TEST (test_aggregate)
 
 GST_END_TEST;
 
+GST_START_TEST (test_aggregate_eos)
+{
+  GThread *thread1, *thread2;
+
+  ChainData data1 = { 0, };
+  ChainData data2 = { 0, };
+  TestData test = { 0, };
+
+  _test_data_init (&test);
+  _chain_data_init (&data1, test.aggregator);
+  _chain_data_init (&data2, test.aggregator);
+
+  data2.event = gst_event_new_eos ();
+
+  thread1 = g_thread_try_new ("gst-check", push_buffer, &data1, NULL);
+  thread2 = g_thread_try_new ("gst-check", push_event, &data2, NULL);
+
+  g_main_loop_run (test.ml);
+  g_source_remove (test.timeout_id);
+
+  /* these will return immediately as when the data is popped the threads are
+   * unlocked and will terminate */
+  g_thread_join (thread1);
+  g_thread_join (thread2);
+
+  _chain_data_clear (&data1);
+  _chain_data_clear (&data2);
+  _test_data_clear (&test);
+}
+
+GST_END_TEST;
+
 static Suite *
 gst_base_aggregator_suite (void)
 {
@@ -332,6 +375,7 @@ gst_base_aggregator_suite (void)
   general = tcase_create ("general");
   suite_add_tcase (suite, general);
   tcase_add_test (general, test_aggregate);
+  tcase_add_test (general, test_aggregate_eos);
 
   return suite;
 }

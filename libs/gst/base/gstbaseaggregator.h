@@ -55,6 +55,7 @@ struct _GstBaseAggregatorPad
 
   GstBuffer     *buffer;
   GstSegment    segment;
+  gboolean      eos;
 
   gpointer _gst_reserved[GST_PADDING];
 };

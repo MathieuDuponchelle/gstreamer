@@ -31,9 +31,9 @@
 GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
 #define GST_CAT_DEFAULT base_aggregator_debug
 
-/********************************
+/*************************************
  * GstBaseAggregator implementation  *
- ********************************/
+ *************************************/
 #define parent_class gst_base_aggregator_parent_class
 G_DEFINE_ABSTRACT_TYPE (GstBaseAggregator, gst_base_aggregator,
     GST_TYPE_ELEMENT);
@@ -138,7 +138,7 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
         GstBaseAggregatorPad *bpad =
             GST_BASE_AGGREGATOR_PAD (g_value_get_object (&data));
 
-        if (!bpad->buffer)
+        if (!bpad->buffer && !bpad->eos)
           res = FALSE;
         numpads++;
         g_value_reset (&data);
@@ -341,7 +341,36 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
 static gboolean
 _event (GstPad * pad, GstObject * parent, GstEvent * event)
 {
+  gboolean res = TRUE;
+  GstBaseAggregator *self = GST_BASE_AGGREGATOR (parent);
+  GstBaseAggregatorPad *bpad = GST_BASE_AGGREGATOR_PAD (pad);
+  GstBaseAggregatorPrivate *priv = self->priv;
+
+  switch (GST_EVENT_TYPE (event)) {
+    case GST_EVENT_EOS:
+    {
+      GST_ERROR ("EOS");
+
+      AGGREGATE_LOCK (self);
+      bpad->eos = TRUE;
+      priv->cookie = TRUE;
+      SIGNAL_AGGREGATE (self);
+      AGGREGATE_UNLOCK (self);
+      goto eat;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
   return gst_pad_event_default (pad, parent, event);
+
+eat:
+  if (event)
+    gst_event_unref (event);
+
+  return res;
 }
 
 static gboolean
