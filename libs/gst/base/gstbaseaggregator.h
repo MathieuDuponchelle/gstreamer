@@ -126,6 +126,10 @@ gboolean   gst_base_aggregator_src_event_default (GstElement *aggregator,
                                                   GstPad *pad,
                                                   GstEvent *event);
 
+gboolean
+gst_base_aggregator_query_default (GstBaseAggregator * self, GstBaseAggregatorPad * bpad,
+    GstQuery * query, gboolean discard);
+
 G_END_DECLS
 
 #endif /* __GST_BASE_AGGREGATOR_H__ */
