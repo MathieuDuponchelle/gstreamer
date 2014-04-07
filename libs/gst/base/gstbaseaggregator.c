@@ -224,6 +224,76 @@ _stop (GstBaseAggregator * self)
   GST_ERROR_OBJECT (self, "I've stopped running");
 }
 
+/* GstBaseAggregator vmethods default implementations */
+static gboolean
+_event (GstBaseAggregator * self, GstPad * pad, GstEvent * event)
+{
+  gboolean res = TRUE;
+  GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
+  GstBaseAggregatorPrivate *priv = self->priv;
+
+  switch (GST_EVENT_TYPE (event)) {
+    case GST_EVENT_FLUSH_START:
+    {
+      g_atomic_int_set (&aggpad->flushing, TRUE);
+      if (g_atomic_int_get (&priv->seeking)) {
+        if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
+                TRUE, FALSE) == FALSE) {
+          goto eat;
+        } else {
+          g_atomic_int_set (&priv->pending_flush_stop, TRUE);
+          goto forward;
+        }
+      } else
+        goto forward;
+    }
+    case GST_EVENT_FLUSH_STOP:
+    {
+      g_atomic_int_set (&aggpad->flushing, FALSE);
+      if (g_atomic_int_get (&priv->seeking)) {
+        if (g_atomic_int_compare_and_exchange (&priv->pending_flush_stop,
+                TRUE, FALSE))
+          goto forward;
+        else
+          goto eat;
+      } else {
+        goto forward;
+      }
+      break;
+    }
+    case GST_EVENT_EOS:
+    {
+      GST_ERROR ("EOS");
+
+      AGGREGATE_LOCK (self);
+      while (aggpad->buffer) {
+        GST_ERROR ("Waiting for buffer to be consumed");
+        WAIT_FOR_AGGREGATE (self);
+      }
+
+      aggpad->eos = TRUE;
+      priv->cookie++;;
+      BROADCAST_AGGREGATE (self);
+      AGGREGATE_UNLOCK (self);
+      goto eat;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+forward:
+  return gst_pad_event_default (pad, GST_OBJECT (self), event);
+
+eat:
+  GST_ERROR_OBJECT (self, "Eating event: %" GST_PTR_FORMAT, event);
+  if (event)
+    gst_event_unref (event);
+
+  return res;
+}
+
 /* GstElement vmethods implementations */
 static GstStateChangeReturn
 _change_state (GstElement * element, GstStateChange transition)
@@ -298,10 +368,17 @@ _request_new_pad (GstElement * element,
 
   if (priv->running)
     gst_pad_set_active (GST_PAD (agg_pad), TRUE);
+
   /* add the pad to the element */
   gst_element_add_pad (element, GST_PAD (agg_pad));
 
   return GST_PAD (agg_pad);
+}
+
+static gboolean
+_query (GstBaseAggregator * self, GstPad * pad, GstQuery * query)
+{
+  return gst_pad_query_default (pad, GST_OBJECT (self), query);
 }
 
 /* GObject vmethods implementations */
@@ -321,6 +398,9 @@ gst_base_aggregator_class_init (GstBaseAggregatorClass * klass)
 
   GST_DEBUG_CATEGORY_INIT (base_aggregator_debug, "baseaggregator", 0,
       "GstBaseAggregator");
+
+  klass->pad_event = _event;
+  klass->pad_query = _query;
 
   gstelement_class->request_new_pad = GST_DEBUG_FUNCPTR (_request_new_pad);
   gstelement_class->release_pad = GST_DEBUG_FUNCPTR (_release_pad);
@@ -409,81 +489,20 @@ flushing:
 }
 
 static gboolean
-_event (GstPad * pad, GstObject * parent, GstEvent * event)
+pad_query_func (GstPad * pad, GstObject * parent, GstQuery * query)
 {
-  gboolean res = TRUE;
-  GstBaseAggregator *self = GST_BASE_AGGREGATOR (parent);
-  GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
-  GstBaseAggregatorPrivate *priv = self->priv;
+  GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (parent);
 
-  switch (GST_EVENT_TYPE (event)) {
-    case GST_EVENT_FLUSH_START:
-    {
-      g_atomic_int_set (&aggpad->flushing, TRUE);
-      if (g_atomic_int_get (&priv->seeking)) {
-        if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
-                TRUE, FALSE) == FALSE) {
-          goto eat;
-        } else {
-          g_atomic_int_set (&priv->pending_flush_stop, TRUE);
-          goto forward;
-        }
-      } else
-        goto forward;
-    }
-    case GST_EVENT_FLUSH_STOP:
-    {
-      g_atomic_int_set (&aggpad->flushing, FALSE);
-      if (g_atomic_int_get (&priv->seeking)) {
-        if (g_atomic_int_compare_and_exchange (&priv->pending_flush_stop,
-                TRUE, FALSE))
-          goto forward;
-        else
-          goto eat;
-      } else {
-        goto forward;
-      }
-      break;
-    }
-    case GST_EVENT_EOS:
-    {
-      GST_ERROR ("EOS");
-
-      AGGREGATE_LOCK (self);
-      while (aggpad->buffer) {
-        GST_ERROR ("Waiting for buffer to be consumed");
-        WAIT_FOR_AGGREGATE (self);
-      }
-
-      aggpad->eos = TRUE;
-      priv->cookie++;;
-      BROADCAST_AGGREGATE (self);
-      AGGREGATE_UNLOCK (self);
-      goto eat;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-forward:
-  return gst_pad_event_default (pad, parent, event);
-
-eat:
-  GST_ERROR_OBJECT (parent, "Eating event: %" GST_PTR_FORMAT, event);
-  if (event)
-    gst_event_unref (event);
-
-  return res;
+  return klass->pad_query (GST_BASE_AGGREGATOR (parent), pad, query);
 }
 
 static gboolean
-_query (GstPad * pad, GstObject * parent, GstQuery * query)
+pad_event_func (GstPad * pad, GstObject * parent, GstEvent * event)
 {
-  return gst_pad_query_default (pad, parent, query);
-}
+  GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (parent);
 
+  return klass->pad_event (GST_BASE_AGGREGATOR (parent), pad, event);
+}
 
 gboolean
 gst_base_aggregator_src_event_default (GstElement * element,
@@ -555,9 +574,9 @@ _pad_constructed (GObject * object)
   gst_pad_set_chain_function (pad,
       GST_DEBUG_FUNCPTR ((GstPadChainFunction) _chain));
   gst_pad_set_event_function (pad,
-      GST_DEBUG_FUNCPTR ((GstPadEventFunction) _event));
+      GST_DEBUG_FUNCPTR ((GstPadEventFunction) pad_event_func));
   gst_pad_set_query_function (pad,
-      GST_DEBUG_FUNCPTR ((GstPadQueryFunction) _query));
+      GST_DEBUG_FUNCPTR ((GstPadQueryFunction) pad_query_func));
 }
 
 static void

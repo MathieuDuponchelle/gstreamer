@@ -99,8 +99,11 @@ typedef struct _GstBaseAggregatorClass GstBaseAggregatorClass;
 struct _GstBaseAggregator {
   GstElement      parent;
 
+  GstPad *srcpad;
+
   /*< private >*/
   GstBaseAggregatorPrivate *priv;
+
 
   gpointer _gst_reserved[GST_PADDING];
 };
@@ -108,11 +111,9 @@ struct _GstBaseAggregator {
 struct _GstBaseAggregatorClass {
   GstElementClass parent_class;
 
-  gboolean      (*flush)              (GstBaseAggregator *aggregator);
-
-  GstPadQueryFunction pad_query;
-  GstPadEventFunction pad_event;
-
+  gboolean      (*flush)     (GstBaseAggregator *aggregator);
+  gboolean      (*pad_event) (GstBaseAggregator *aggregate, GstPad *pad, GstEvent *event);
+  gboolean      (*pad_query) (GstBaseAggregator *aggregate, GstPad *pad, GstQuery *query);
   GstFlowReturn (*aggregate) (GstBaseAggregator *aggregator);
 
   /*< private >*/
