@@ -422,6 +422,53 @@ GST_START_TEST (test_linear_pipeline)
 
 GST_END_TEST;
 
+GST_START_TEST (test_two_src_pipeline)
+{
+  GstBus *bus;
+  GstMessage *msg;
+  GstElement *pipeline, *src, *src1, *agg, *sink;
+
+  gint count = 0;
+
+  pipeline = gst_pipeline_new ("pipeline");
+  src = gst_element_factory_make ("fakesrc", NULL);
+  g_object_set (src, "num-buffers", NUM_BUFFERS, "sizetype", 2, "sizemax", 4,
+      NULL);
+
+  src1 = gst_element_factory_make ("fakesrc", NULL);
+  g_object_set (src1, "num-buffers", NUM_BUFFERS + 1, "sizetype", 2, "sizemax",
+      4, NULL);
+
+  agg = gst_check_setup_element ("aggregator");
+  sink = gst_check_setup_element ("fakesink");
+  g_object_set (sink, "signal-handoffs", TRUE, NULL);
+  g_signal_connect (sink, "handoff", (GCallback) handoff, &count);
+
+  fail_unless (gst_bin_add (GST_BIN (pipeline), src));
+  fail_unless (gst_bin_add (GST_BIN (pipeline), src1));
+  fail_unless (gst_bin_add (GST_BIN (pipeline), agg));
+  fail_unless (gst_bin_add (GST_BIN (pipeline), sink));
+  fail_unless (gst_element_link (src, agg));
+  fail_unless (gst_element_link (src1, agg));
+  fail_unless (gst_element_link (agg, sink));
+
+  bus = gst_element_get_bus (pipeline);
+  fail_if (bus == NULL);
+  gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
+  msg = gst_bus_poll (bus, GST_MESSAGE_EOS | GST_MESSAGE_ERROR, -1);
+  fail_if (GST_MESSAGE_TYPE (msg) != GST_MESSAGE_EOS);
+  gst_message_unref (msg);
+
+  fail_unless_equals_int (count, NUM_BUFFERS + 1);
+
+  gst_element_set_state (pipeline, GST_STATE_NULL);
+  gst_object_unref (bus);
+  gst_object_unref (pipeline);
+}
+
+GST_END_TEST;
+
 static Suite *
 gst_base_aggregator_suite (void)
 {
@@ -437,6 +484,7 @@ gst_base_aggregator_suite (void)
   tcase_add_test (general, test_aggregate);
   tcase_add_test (general, test_aggregate_eos);
   tcase_add_test (general, test_linear_pipeline);
+  tcase_add_test (general, test_two_src_pipeline);
 
   return suite;
 }
