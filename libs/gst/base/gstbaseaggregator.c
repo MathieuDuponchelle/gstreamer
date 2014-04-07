@@ -205,8 +205,9 @@ _reset_all_pads_data (GstBaseAggregator * self)
 static gpointer
 aggregate_func (GstBaseAggregator * self)
 {
-  gboolean first = TRUE;
-  guint64 local_cookie = 0;
+  /* We always want to check if aggregate needs to be
+   * called when starting */
+  guint64 local_cookie = self->priv->cookie - 1;
 
   do {
     gboolean do_aggregate;
@@ -215,13 +216,10 @@ aggregate_func (GstBaseAggregator * self)
     AGGREGATE_LOCK (self);
     GST_ERROR ("I'm waiting for aggregation");
 
-    if (!first && local_cookie == self->priv->cookie)
+    if (local_cookie == self->priv->cookie)
       WAIT_FOR_AGGREGATE (self);
+    local_cookie++;
 
-    if (!first)
-      local_cookie++;
-
-    first = FALSE;
     GST_ERROR ("I want the lock in check");
     do_aggregate = _check_all_pads_with_data_or_eos (self);
     GST_ERROR_OBJECT (self, "Checking for aggregation : %d", do_aggregate);
