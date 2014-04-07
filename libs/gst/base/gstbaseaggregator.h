@@ -120,7 +120,9 @@ struct _GstBaseAggregatorClass {
 
 GType gst_base_aggregator_get_type(void);
 
-void            gst_base_aggregator_set_flushing  (GstBaseAggregator *base_aggregator, gboolean flushing);
+gboolean   gst_base_aggregator_src_event_default (GstElement *aggregator,
+                                                  GstPad *pad,
+                                                  GstEvent *event);
 
 G_END_DECLS
 

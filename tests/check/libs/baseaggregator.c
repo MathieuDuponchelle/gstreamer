@@ -56,6 +56,7 @@ static GstFlowReturn
 gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
 {
   GstIterator *iter;
+  gboolean all_eos = TRUE;
   GstAggregator *aggregator;
 
   gboolean done_iterating = FALSE;
@@ -84,6 +85,9 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
         fail_unless (GST_IS_BUFFER (pad->buffer) || pad->eos);
         gst_buffer_replace (&pad->buffer, NULL);
 
+        if (pad->eos == FALSE)
+          all_eos = FALSE;
+
         g_value_reset (&value);
         break;
       case GST_ITERATOR_RESYNC:
@@ -100,6 +104,13 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
   }
   gst_iterator_free (iter);
 
+  if (all_eos == TRUE) {
+    GST_ERROR_OBJECT (aggregator, "no data available, must be EOS");
+    gst_pad_push_event (aggregator->srcpad, gst_event_new_eos ());
+    return GST_FLOW_EOS;
+  }
+
+  GST_ERROR ("Push it up amigo");
   gst_pad_push (aggregator->srcpad, gst_buffer_new ());
 
   return GST_FLOW_OK;
@@ -362,6 +373,55 @@ GST_START_TEST (test_aggregate_eos)
 
 GST_END_TEST;
 
+#define NUM_BUFFERS 3
+static void
+handoff (GstElement * fakesink, GstBuffer * buf, GstPad * pad, guint * count)
+{
+  *count = *count + 1;
+  GST_ERROR ("HANDOFF: %i", *count);
+}
+
+/* Test a linear pipeline using aggregator */
+GST_START_TEST (test_linear_pipeline)
+{
+  GstBus *bus;
+  GstMessage *msg;
+  GstElement *pipeline, *src, *agg, *sink;
+
+  gint count = 0;
+
+  pipeline = gst_pipeline_new ("pipeline");
+  src = gst_check_setup_element ("fakesrc");
+  g_object_set (src, "num-buffers", NUM_BUFFERS, "sizetype", 2, "sizemax", 4,
+      NULL);
+  agg = gst_check_setup_element ("aggregator");
+  sink = gst_check_setup_element ("fakesink");
+  g_object_set (sink, "signal-handoffs", TRUE, NULL);
+  g_signal_connect (sink, "handoff", (GCallback) handoff, &count);
+
+  fail_unless (gst_bin_add (GST_BIN (pipeline), src));
+  fail_unless (gst_bin_add (GST_BIN (pipeline), agg));
+  fail_unless (gst_bin_add (GST_BIN (pipeline), sink));
+  fail_unless (gst_element_link (src, agg));
+  fail_unless (gst_element_link (agg, sink));
+
+  bus = gst_element_get_bus (pipeline);
+  fail_if (bus == NULL);
+  gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
+  msg = gst_bus_poll (bus, GST_MESSAGE_EOS | GST_MESSAGE_ERROR, -1);
+  fail_if (GST_MESSAGE_TYPE (msg) != GST_MESSAGE_EOS);
+  gst_message_unref (msg);
+
+  fail_unless_equals_int (count, NUM_BUFFERS);
+
+  gst_element_set_state (pipeline, GST_STATE_NULL);
+  gst_object_unref (bus);
+  gst_object_unref (pipeline);
+}
+
+GST_END_TEST;
+
 static Suite *
 gst_base_aggregator_suite (void)
 {
@@ -376,6 +436,7 @@ gst_base_aggregator_suite (void)
   suite_add_tcase (suite, general);
   tcase_add_test (general, test_aggregate);
   tcase_add_test (general, test_aggregate_eos);
+  tcase_add_test (general, test_linear_pipeline);
 
   return suite;
 }

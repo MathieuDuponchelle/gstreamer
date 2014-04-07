@@ -51,7 +51,7 @@ struct _GstBaseAggregatorPrivate
   GThread *aggregate_thread;
   GCond aggregate_cond;
   GMutex aggregate_lock;
-  gboolean cookie;
+  guint64 cookie;
 };
 
 #define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
@@ -138,8 +138,10 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
         GstBaseAggregatorPad *bpad =
             GST_BASE_AGGREGATOR_PAD (g_value_get_object (&data));
 
-        if (!bpad->buffer && !bpad->eos)
+        if (!bpad->buffer && !bpad->eos) {
+          GST_ERROR_OBJECT (bpad, "BUffer %p, EOS %d", bpad->buffer, bpad->eos);
           res = FALSE;
+        }
         numpads++;
         g_value_reset (&data);
         break;
@@ -204,6 +206,7 @@ static gpointer
 aggregate_func (GstBaseAggregator * self)
 {
   gboolean first = TRUE;
+  guint64 local_cookie = 0;
 
   do {
     gboolean do_aggregate;
@@ -212,8 +215,11 @@ aggregate_func (GstBaseAggregator * self)
     AGGREGATE_LOCK (self);
     GST_ERROR ("I'm waiting for aggregation");
 
-    if (!first && !self->priv->cookie)
+    if (!first && local_cookie == self->priv->cookie)
       WAIT_FOR_AGGREGATE (self);
+
+    if (!first)
+      local_cookie++;
 
     first = FALSE;
     GST_ERROR ("I want the lock in check");
@@ -229,7 +235,8 @@ aggregate_func (GstBaseAggregator * self)
       _reset_all_pads_data (self);
     }
     GST_ERROR ("releasing the lock in check");
-    self->priv->cookie = FALSE;
+
+    SIGNAL_AGGREGATE (self);
     AGGREGATE_UNLOCK (self);
   } while (self->priv->running);
 
@@ -250,7 +257,6 @@ _stop (GstBaseAggregator * self)
 {
   AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
-  self->priv->cookie = TRUE;
   SIGNAL_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
   g_thread_join (self->priv->aggregate_thread);
@@ -319,7 +325,7 @@ gst_base_aggregator_init (GstBaseAggregator * self)
       GstBaseAggregatorPrivate);
 
   self->priv->padcount = -1;
-  self->priv->cookie = FALSE;
+  self->priv->cookie = 0;
   g_mutex_init (&self->priv->aggregate_lock);
 }
 
@@ -329,12 +335,20 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (object);
   GstBaseAggregatorPad *bpad = GST_BASE_AGGREGATOR_PAD (pad);
 
+  GST_ERROR ("Start chaining");
   AGGREGATE_LOCK (self);
-  self->priv->cookie = TRUE;
+
+  while (bpad->buffer) {
+    WAIT_FOR_AGGREGATE (self);
+    GST_ERROR ("Waiting for buffer to be consumed");
+  }
+
+  self->priv->cookie++;
   gst_buffer_replace (&bpad->buffer, buffer);
   GST_ERROR ("ADDED BUFFER");
   SIGNAL_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
+  GST_ERROR ("Done chaining");
   return GST_FLOW_OK;
 }
 
@@ -352,8 +366,13 @@ _event (GstPad * pad, GstObject * parent, GstEvent * event)
       GST_ERROR ("EOS");
 
       AGGREGATE_LOCK (self);
+      while (bpad->buffer) {
+        WAIT_FOR_AGGREGATE (self);
+        GST_ERROR ("Waiting for buffer to be consumed");
+      }
+
       bpad->eos = TRUE;
-      priv->cookie = TRUE;
+      priv->cookie++;;
       SIGNAL_AGGREGATE (self);
       AGGREGATE_UNLOCK (self);
       goto eat;
@@ -377,6 +396,25 @@ static gboolean
 _query (GstPad * pad, GstObject * parent, GstQuery * query)
 {
   return gst_pad_query_default (pad, parent, query);
+}
+
+
+gboolean
+gst_base_aggregator_src_event_default (GstElement * aggregator,
+    GstPad * pad, GstEvent * event)
+{
+  switch (GST_EVENT_TYPE (event)) {
+    case GST_EVENT_SEEK:
+    {
+      GST_ERROR ("Seeking");
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return gst_pad_event_default (pad, GST_OBJECT (aggregator), event);
 }
 
 /***********************************
