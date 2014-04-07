@@ -61,10 +61,10 @@ struct _GstBaseAggregatorPrivate
       &(agg->priv->aggregate_lock));                                   \
   } G_STMT_END
 
-#define SIGNAL_AGGREGATE(agg) {                                         \
+#define BROADCAST_AGGREGATE(agg) {                                         \
   GST_INFO_OBJECT (agg, "signaling aggregate from thread %p",           \
         g_thread_self());                                               \
-  g_cond_signal(&(agg->priv->aggregate_cond));                          \
+  g_cond_broadcast(&(agg->priv->aggregate_cond));                          \
   }
 
 
@@ -236,7 +236,7 @@ aggregate_func (GstBaseAggregator * self)
     }
     GST_ERROR ("releasing the lock in check");
 
-    SIGNAL_AGGREGATE (self);
+    BROADCAST_AGGREGATE (self);
     AGGREGATE_UNLOCK (self);
   } while (self->priv->running);
 
@@ -257,7 +257,7 @@ _stop (GstBaseAggregator * self)
 {
   AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
-  SIGNAL_AGGREGATE (self);
+  BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
   g_thread_join (self->priv->aggregate_thread);
   GST_ERROR_OBJECT (self, "I've stopped running");
@@ -346,7 +346,7 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   self->priv->cookie++;
   gst_buffer_replace (&bpad->buffer, buffer);
   GST_ERROR ("ADDED BUFFER");
-  SIGNAL_AGGREGATE (self);
+  BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
   GST_ERROR ("Done chaining");
   return GST_FLOW_OK;
@@ -367,13 +367,13 @@ _event (GstPad * pad, GstObject * parent, GstEvent * event)
 
       AGGREGATE_LOCK (self);
       while (bpad->buffer) {
-        WAIT_FOR_AGGREGATE (self);
         GST_ERROR ("Waiting for buffer to be consumed");
+        WAIT_FOR_AGGREGATE (self);
       }
 
       bpad->eos = TRUE;
       priv->cookie++;;
-      SIGNAL_AGGREGATE (self);
+      BROADCAST_AGGREGATE (self);
       AGGREGATE_UNLOCK (self);
       goto eat;
     }
