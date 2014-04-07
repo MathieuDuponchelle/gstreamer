@@ -255,6 +255,7 @@ _stop (GstBaseAggregator * self)
 {
   AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
+  self->priv->cookie++;
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
   g_thread_join (self->priv->aggregate_thread);
