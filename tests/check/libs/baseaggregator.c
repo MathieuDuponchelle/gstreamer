@@ -172,6 +172,14 @@ typedef struct
   GstElement *aggregator;
   GstPad *sinkpad, *srcpad;
   GstFlowReturn expected_result;
+} ChainData;
+
+typedef struct
+{
+  GMainLoop *ml;
+  GstPad *srcpad;
+  guint timeout_id;
+  GstElement *aggregator;
 } TestData;
 
 static GstStaticPadTemplate srctemplate = GST_STATIC_PAD_TEMPLATE ("src",
@@ -184,7 +192,7 @@ push_buffer (gpointer user_data)
 {
   GstFlowReturn flow;
   GstCaps *caps;
-  TestData *test_data = (TestData *) user_data;
+  ChainData *test_data = (ChainData *) user_data;
   GstSegment segment;
 
   gst_pad_push_event (test_data->srcpad, gst_event_new_stream_start ("test"));
@@ -214,7 +222,7 @@ _aggregate_timeout (GMainLoop * ml)
 }
 
 static GstPadProbeReturn
-_aggegated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
+_aggregated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
 {
   g_main_loop_quit (ml);
 
@@ -222,21 +230,18 @@ _aggegated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
 }
 
 /*
- * Not thread safe, will create a new TestData which contains
+ * Not thread safe, will create a new ChainData which contains
  * an activated src pad linked to a requested sink pad of @agg, and
- * a newly allocated buffer ready to be pushed. Caller needs to free
- * after usage.
+ * a newly allocated buffer ready to be pushed. Caller needs to
+ * clear with _chain_data_clear after.
  */
-static TestData *
-create_test_data (GstElement * agg)
+static void
+_chain_data_init (ChainData * data, GstElement * agg)
 {
-  TestData *data;
   static gint num_src_pads = 0;
   gchar *pad_name = g_strdup_printf ("src%d", num_src_pads);
 
   num_src_pads += 1;
-  data = (TestData *) g_malloc (sizeof (TestData));
-  fail_unless (data != NULL);
 
   data->srcpad = gst_pad_new_from_static_template (&srctemplate, pad_name);
   g_free (pad_name);
@@ -246,54 +251,70 @@ create_test_data (GstElement * agg)
   data->sinkpad = gst_element_get_request_pad (agg, "sink_%u");
   fail_unless (GST_IS_PAD (data->sinkpad));
   fail_unless (gst_pad_link (data->srcpad, data->sinkpad) == GST_PAD_LINK_OK);
-
-  return data;
 }
 
-GST_START_TEST (test_collect)
+static void
+_chain_data_clear (ChainData * data)
 {
-  GMainLoop *ml;
-  GstPad *srcpad;
-  guint timeout_id;
-  GstElement *aggregator;
+  if (data->buffer)
+    gst_buffer_unref (data->buffer);
+  if (data->srcpad)
+    gst_object_unref (data->srcpad);
+  if (data->sinkpad)
+    gst_object_unref (data->sinkpad);
+}
+
+static void
+_test_data_init (TestData * test)
+{
+  test->aggregator = gst_element_factory_make ("aggregator", NULL);
+  gst_element_set_state (test->aggregator, GST_STATE_PLAYING);
+  test->ml = g_main_loop_new (NULL, TRUE);
+  test->srcpad = gst_element_get_static_pad (test->aggregator, "src");
+
+  gst_pad_add_probe (test->srcpad, GST_PAD_PROBE_TYPE_BUFFER,
+      (GstPadProbeCallback) _aggregated_cb, test->ml, NULL);
+
+  test->timeout_id =
+      g_timeout_add (1000, (GSourceFunc) _aggregate_timeout, test->ml);
+}
+
+static void
+_test_data_clear (TestData * test)
+{
+  gst_element_set_state (test->aggregator, GST_STATE_NULL);
+  gst_object_unref (test->aggregator);
+  gst_object_unref (test->srcpad);
+
+  g_main_loop_unref (test->ml);
+}
+
+GST_START_TEST (test_aggregate)
+{
   GThread *thread1, *thread2;
-  TestData *data1, *data2;
 
-  aggregator = gst_element_factory_make ("aggregator", NULL);
+  ChainData data1 = { 0, };
+  ChainData data2 = { 0, };
+  TestData test = { 0, };
 
-  data1 = create_test_data (aggregator);
-  data2 = create_test_data (aggregator);
+  _test_data_init (&test);
+  _chain_data_init (&data1, test.aggregator);
+  _chain_data_init (&data2, test.aggregator);
 
-  gst_element_set_state (aggregator, GST_STATE_PLAYING);
+  thread1 = g_thread_try_new ("gst-check", push_buffer, &data1, NULL);
+  thread2 = g_thread_try_new ("gst-check", push_buffer, &data2, NULL);
 
-  ml = g_main_loop_new (NULL, TRUE);
-
-  srcpad = gst_element_get_static_pad (aggregator, "src");
-  gst_pad_add_probe (srcpad, GST_PAD_PROBE_TYPE_BUFFER,
-      (GstPadProbeCallback) _aggegated_cb, ml, NULL);
-
-  timeout_id = g_timeout_add (1000, (GSourceFunc) _aggregate_timeout, ml);
-
-  thread1 = g_thread_try_new ("gst-check", push_buffer, data1, NULL);
-  thread2 = g_thread_try_new ("gst-check", push_buffer, data2, NULL);
-
-  g_main_loop_run (ml);
-
-  g_source_remove (timeout_id);
+  g_main_loop_run (test.ml);
+  g_source_remove (test.timeout_id);
 
   /* these will return immediately as when the data is popped the threads are
    * unlocked and will terminate */
   g_thread_join (thread1);
   g_thread_join (thread2);
 
-  gst_buffer_unref (data1->buffer);
-  gst_buffer_unref (data2->buffer);
-
-  g_free (data1);
-  g_free (data2);
-
-  gst_element_set_state (aggregator, GST_STATE_NULL);
-  gst_object_unref (aggregator);
+  _chain_data_clear (&data1);
+  _chain_data_clear (&data2);
+  _test_data_clear (&test);
 }
 
 GST_END_TEST;
@@ -310,7 +331,7 @@ gst_base_aggregator_suite (void)
 
   general = tcase_create ("general");
   suite_add_tcase (suite, general);
-  tcase_add_test (general, test_collect);
+  tcase_add_test (general, test_aggregate);
 
   return suite;
 }
