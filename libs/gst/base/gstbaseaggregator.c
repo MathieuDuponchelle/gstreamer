@@ -52,6 +52,8 @@ struct _GstBaseAggregatorPrivate
   GCond aggregate_cond;
   GMutex aggregate_lock;
   guint64 cookie;
+
+  GstFlowReturn flow_return;
 };
 
 #define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
@@ -205,9 +207,11 @@ _reset_all_pads_data (GstBaseAggregator * self)
 static gpointer
 aggregate_func (GstBaseAggregator * self)
 {
+  GstBaseAggregatorPrivate *priv = self->priv;
+
   /* We always want to check if aggregate needs to be
    * called when starting */
-  guint64 local_cookie = self->priv->cookie - 1;
+  guint64 local_cookie = priv->cookie - 1;
 
   do {
     gboolean do_aggregate;
@@ -216,7 +220,7 @@ aggregate_func (GstBaseAggregator * self)
     AGGREGATE_LOCK (self);
     GST_ERROR ("I'm waiting for aggregation");
 
-    if (local_cookie == self->priv->cookie)
+    if (local_cookie == priv->cookie)
       WAIT_FOR_AGGREGATE (self);
     local_cookie++;
 
@@ -227,7 +231,7 @@ aggregate_func (GstBaseAggregator * self)
       klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
 
       if (klass->aggregate) {
-        klass->aggregate (self);
+        priv->flow_return = klass->aggregate (self);
       }
 
       _reset_all_pads_data (self);
@@ -236,7 +240,7 @@ aggregate_func (GstBaseAggregator * self)
 
     BROADCAST_AGGREGATE (self);
     AGGREGATE_UNLOCK (self);
-  } while (self->priv->running);
+  } while (priv->running);
 
   return NULL;
 }
@@ -332,6 +336,7 @@ static GstFlowReturn
 _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
 {
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (object);
+  GstBaseAggregatorPrivate *priv = self->priv;
   GstBaseAggregatorPad *bpad = GST_BASE_AGGREGATOR_PAD (pad);
 
   GST_ERROR ("Start chaining");
@@ -342,13 +347,14 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
     GST_ERROR ("Waiting for buffer to be consumed");
   }
 
-  self->priv->cookie++;
+  priv->cookie++;
   gst_buffer_replace (&bpad->buffer, buffer);
   GST_ERROR ("ADDED BUFFER");
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
   GST_ERROR ("Done chaining");
-  return GST_FLOW_OK;
+
+  return priv->flow_return;
 }
 
 static gboolean
