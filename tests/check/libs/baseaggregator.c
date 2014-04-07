@@ -183,18 +183,41 @@ typedef struct
   GstElement *aggregator;
   GstPad *sinkpad, *srcpad;
   GstFlowReturn expected_result;
+
+  /*                       ------------------
+   * -----------   --------|--              |
+   * | srcpad | -- | sinkpad |  aggregator  |
+   * -----------   --------|--              |
+   *                       ------------------
+   *  This is for 1 Chain, we can have several
+   */
 } ChainData;
 
 typedef struct
 {
   GMainLoop *ml;
-  GstPad *srcpad;
+  GstPad *srcpad,               /* srcpad of the GstAggregator */
+   *sinkpad;                    /* fake sinkpad to which GstAggregator.srcpad is linked */
   guint timeout_id;
   GstElement *aggregator;
+
+  /* -----------------|
+   * |             ----------    -----------
+   * | aggregator  | srcpad | -- | sinkpad |
+   * |             ----------    -----------
+   * -----------------|
+   */
+
+  gint flush_start_events, flush_stop_events;
 } TestData;
 
 static GstStaticPadTemplate srctemplate = GST_STATIC_PAD_TEMPLATE ("src",
     GST_PAD_SRC,
+    GST_PAD_ALWAYS,
+    GST_STATIC_CAPS_ANY);
+
+static GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE ("sink",
+    GST_PAD_SINK,
     GST_PAD_ALWAYS,
     GST_STATIC_CAPS_ANY);
 
@@ -215,9 +238,13 @@ push_buffer (gpointer user_data)
   gst_segment_init (&segment, GST_FORMAT_TIME);
   gst_pad_push_event (chain_data->srcpad, gst_event_new_segment (&segment));
 
+  GST_ERROR ("Pushing buffer on pad: %s:%s",
+      GST_DEBUG_PAD_NAME (chain_data->sinkpad));
   flow = gst_pad_push (chain_data->srcpad, chain_data->buffer);
-  fail_unless (flow == chain_data->expected_result, "got flow %s instead of OK",
-      gst_flow_get_name (flow));
+  fail_unless (flow == chain_data->expected_result,
+      "got flow %s instead of %s on %s:%s", gst_flow_get_name (flow),
+      gst_flow_get_name (chain_data->expected_result),
+      GST_DEBUG_PAD_NAME (chain_data->sinkpad));
 
   return NULL;
 }
@@ -227,6 +254,7 @@ push_event (gpointer user_data)
 {
   ChainData *chain_data = (ChainData *) user_data;
 
+  GST_ERROR ("Srcpad: %p", chain_data->srcpad);
   fail_unless (gst_pad_push_event (chain_data->srcpad,
           chain_data->event) == TRUE);
 
@@ -249,6 +277,24 @@ _aggregated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
   g_main_loop_quit (ml);
 
   return GST_PAD_PROBE_REMOVE;
+}
+
+static GstPadProbeReturn
+downstream_probe_cb (GstPad * pad, GstPadProbeInfo * info, TestData * test)
+{
+  GST_ERROR ("PROBING ");
+  if (info->type & GST_PAD_PROBE_TYPE_EVENT_FLUSH) {
+    if (GST_EVENT_TYPE (GST_PAD_PROBE_INFO_EVENT (info)) ==
+        GST_EVENT_FLUSH_START) {
+
+      g_atomic_int_inc (&test->flush_start_events);
+      GST_ERROR ("==========> FLUSH: %i", test->flush_start_events);
+    } else if (GST_EVENT_TYPE (GST_PAD_PROBE_INFO_EVENT (info)) ==
+        GST_EVENT_FLUSH_STOP)
+      g_atomic_int_inc (&test->flush_stop_events);
+  }
+
+  return GST_PAD_PROBE_DROP;
 }
 
 /*
@@ -286,16 +332,51 @@ _chain_data_clear (ChainData * data)
     gst_object_unref (data->sinkpad);
 }
 
+static gboolean
+agg_src_event (GstPad * pad, GstObject * parent, GstEvent * event)
+{
+
+  GST_ERROR ("SRC EVEMNT");
+  return gst_base_aggregator_src_event_default (GST_ELEMENT (parent),
+      pad, event);
+}
+
+static gboolean
+src_event (GstPad * pad, GstObject * parent, GstEvent * event)
+{
+  gboolean ret = TRUE;
+  gst_event_unref (event);
+  GST_ERROR ("SRC EVENT: %" GST_PTR_FORMAT, event);
+  return ret;
+}
+
 static void
-_test_data_init (TestData * test)
+_test_data_init (TestData * test, gboolean needs_flushing)
 {
   test->aggregator = gst_element_factory_make ("aggregator", NULL);
   gst_element_set_state (test->aggregator, GST_STATE_PLAYING);
   test->ml = g_main_loop_new (NULL, TRUE);
   test->srcpad = gst_element_get_static_pad (test->aggregator, "src");
 
-  gst_pad_add_probe (test->srcpad, GST_PAD_PROBE_TYPE_BUFFER,
-      (GstPadProbeCallback) _aggregated_cb, test->ml, NULL);
+  gst_pad_set_event_function (test->srcpad, src_event);
+  if (needs_flushing) {
+    static gint num_sink_pads = 0;
+    gchar *pad_name = g_strdup_printf ("sink%d", num_sink_pads);
+
+    num_sink_pads += 1;
+    test->sinkpad = gst_pad_new_from_static_template (&sinktemplate, pad_name);
+    g_free (pad_name);
+    fail_unless (gst_pad_link (test->srcpad, test->sinkpad) == GST_PAD_LINK_OK);
+    gst_pad_add_probe (test->srcpad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM |
+        GST_PAD_PROBE_TYPE_DATA_DOWNSTREAM |
+        GST_PAD_PROBE_TYPE_EVENT_FLUSH,
+        (GstPadProbeCallback) downstream_probe_cb, test, NULL);
+    gst_pad_set_event_function (test->srcpad, agg_src_event);
+  } else {
+    gst_pad_add_probe (test->srcpad, GST_PAD_PROBE_TYPE_BUFFER,
+        (GstPadProbeCallback) _aggregated_cb, test->ml, NULL);
+  }
+
 
   test->timeout_id =
       g_timeout_add (1000, (GSourceFunc) _aggregate_timeout, test->ml);
@@ -319,7 +400,7 @@ GST_START_TEST (test_aggregate)
   ChainData data2 = { 0, };
   TestData test = { 0, };
 
-  _test_data_init (&test);
+  _test_data_init (&test, FALSE);
   _chain_data_init (&data1, test.aggregator);
   _chain_data_init (&data2, test.aggregator);
 
@@ -328,6 +409,8 @@ GST_START_TEST (test_aggregate)
 
   g_main_loop_run (test.ml);
   g_source_remove (test.timeout_id);
+
+  GST_ERROR ("================ OUT =====================");
 
   /* these will return immediately as when the data is popped the threads are
    * unlocked and will terminate */
@@ -349,7 +432,7 @@ GST_START_TEST (test_aggregate_eos)
   ChainData data2 = { 0, };
   TestData test = { 0, };
 
-  _test_data_init (&test);
+  _test_data_init (&test, FALSE);
   _chain_data_init (&data1, test.aggregator);
   _chain_data_init (&data2, test.aggregator);
 
@@ -469,6 +552,93 @@ GST_START_TEST (test_two_src_pipeline)
 
 GST_END_TEST;
 
+GST_START_TEST (test_flushing_seek)
+{
+  GstEvent *event;
+  GThread *thread1, *thread2;
+
+  ChainData data1 = { 0, };
+  ChainData data2 = { 0, };
+  TestData test = { 0, };
+
+  _test_data_init (&test, TRUE);
+
+  /* Queue a buffer in agg:sink_1. Then do a flushing seek and check that the
+   * new flushing seek logic is triggered. On the first FLUSH_START call the
+   * buffers queued in collectpads should get flushed. Only one FLUSH_START and
+   * one FLUSH_STOP should be forwarded downstream.
+   */
+  _chain_data_init (&data1, test.aggregator);
+  _chain_data_init (&data2, test.aggregator);
+  GST_BUFFER_TIMESTAMP (data2.buffer) = 0;
+
+  /* now do a successful flushing seek */
+  event = gst_event_new_seek (1, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+      GST_SEEK_TYPE_SET, 0, GST_SEEK_TYPE_SET, 10 * GST_SECOND);
+  fail_unless (gst_pad_send_event (test.srcpad, event));
+
+  /* flushing starts once one of the upstream elements sends the first
+   * FLUSH_START */
+  fail_unless_equals_int (test.flush_start_events, 0);
+  fail_unless_equals_int (test.flush_stop_events, 0);
+
+  /* flush ogg:sink_0. This flushs collectpads, calls ::flush() and sends
+   * FLUSH_START downstream */
+  GST_ERROR ("Flushin: %s:%s", GST_DEBUG_PAD_NAME (data2.sinkpad));
+  fail_unless (gst_pad_push_event (data2.srcpad, gst_event_new_flush_start ()));
+
+  /* expect this buffer to be flushed */
+  data2.expected_result = GST_FLOW_FLUSHING;
+  thread2 = g_thread_try_new ("gst-check", push_buffer, &data2, NULL);
+
+  fail_unless_equals_int (test.flush_start_events, 1);
+  fail_unless_equals_int (test.flush_stop_events, 0);
+
+  /* the first FLUSH_STOP is forwarded downstream */
+  fail_unless (gst_pad_push_event (data1.srcpad,
+          gst_event_new_flush_stop (TRUE)));
+  fail_unless_equals_int (test.flush_start_events, 1);
+  fail_unless_equals_int (test.flush_stop_events, 1);
+
+  /* at this point even the other pad agg:sink_1 should be flushing so thread2
+   * should have stopped */
+  g_thread_join (thread2);
+  GST_ERROR ("HERE:");
+
+  /* push a buffer on agg:sink_0 to trigger one collect after flushing to verify
+   * that flushing completes once all the pads have been flushed */
+  thread1 = g_thread_try_new ("gst-check", push_buffer, &data1, NULL);
+  GST_ERROR ("HERE:");
+
+  /* flush agg:sink_1 as well. This completes the flushing seek so a FLUSH_STOP is
+   * sent downstream */
+  gst_pad_push_event (data2.srcpad, gst_event_new_flush_start ());
+  gst_pad_push_event (data2.srcpad, gst_event_new_flush_stop (TRUE));
+
+  /* still, only one FLUSH_START and one FLUSH_STOP are forwarded downstream */
+  fail_unless_equals_int (test.flush_start_events, 1);
+  fail_unless_equals_int (test.flush_stop_events, 1);
+
+  /*  Check collected */
+  gst_pad_add_probe (test.srcpad, GST_PAD_PROBE_TYPE_BUFFER,
+      (GstPadProbeCallback) _aggregated_cb, test.ml, NULL);
+
+  data2.event = gst_event_new_eos ();
+  GST_ERROR ("EEEEEEEEEEEEEEEEEEEEEEEEE =-> Srcpad: %p", data2.srcpad);
+  thread2 = g_thread_try_new ("gst-check", push_event, &data2, NULL);
+
+  g_main_loop_run (test.ml);
+  g_source_remove (test.timeout_id);
+
+
+  /* these will return immediately as at this point the threads have been
+   * unlocked and are finished */
+  g_thread_join (thread1);
+  g_thread_join (thread2);
+}
+
+GST_END_TEST;
+
 static Suite *
 gst_base_aggregator_suite (void)
 {
@@ -483,6 +653,7 @@ gst_base_aggregator_suite (void)
   suite_add_tcase (suite, general);
   tcase_add_test (general, test_aggregate);
   tcase_add_test (general, test_aggregate_eos);
+  tcase_add_test (general, test_flushing_seek);
   tcase_add_test (general, test_linear_pipeline);
   tcase_add_test (general, test_two_src_pipeline);
 

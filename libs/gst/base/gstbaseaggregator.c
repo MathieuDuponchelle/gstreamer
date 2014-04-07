@@ -53,8 +53,18 @@ struct _GstBaseAggregatorPrivate
   GMutex aggregate_lock;
   guint64 cookie;
 
+  gboolean seeking;
+  gboolean pending_flush_start;
+  gboolean pending_flush_stop;
+
   GstFlowReturn flow_return;
 };
+
+typedef struct
+{
+  GstEvent *event;
+  gboolean result;
+} EventData;
 
 #define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
   GST_INFO_OBJECT (agg, "Waiting for aggregate in thread %p",           \
@@ -84,11 +94,12 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
     switch (gst_iterator_next (iter, &data)) {
       case GST_ITERATOR_OK:
       {
-        GstBaseAggregatorPad *bpad =
+        GstBaseAggregatorPad *aggpad =
             GST_BASE_AGGREGATOR_PAD (g_value_get_object (&data));
 
-        if (!bpad->buffer && !bpad->eos) {
-          GST_ERROR_OBJECT (bpad, "BUffer %p, EOS %d", bpad->buffer, bpad->eos);
+        if (!aggpad->buffer && !aggpad->eos) {
+          GST_ERROR_OBJECT (aggpad, "BUffer %p, EOS %d", aggpad->buffer,
+              aggpad->eos);
           res = FALSE;
         }
         numpads++;
@@ -128,10 +139,10 @@ _reset_all_pads_data (GstBaseAggregator * self)
     switch (gst_iterator_next (iter, &data)) {
       case GST_ITERATOR_OK:
       {
-        GstBaseAggregatorPad *bpad =
+        GstBaseAggregatorPad *aggpad =
             GST_BASE_AGGREGATOR_PAD (g_value_get_object (&data));
 
-        gst_buffer_replace (&bpad->buffer, NULL);
+        gst_buffer_replace (&aggpad->buffer, NULL);
         g_value_reset (&data);
         break;
       }
@@ -330,29 +341,71 @@ gst_base_aggregator_init (GstBaseAggregator * self)
   g_mutex_init (&self->priv->aggregate_lock);
 }
 
+static gboolean
+event_forward_func (GstPad * pad, EventData * data)
+{
+  gboolean ret = TRUE;
+  GstPad *peer = gst_pad_get_peer (pad);
+
+  if (peer) {
+    ret = gst_pad_send_event (peer, gst_event_ref (data->event));
+    gst_object_unref (peer);
+  }
+
+  data->result &= ret;
+  /* Always send to all pads */
+  return FALSE;
+}
+
+static gboolean
+_forward_event_to_all_sinkpads (GstPad * srcpad, GstEvent * event)
+{
+  EventData data;
+
+  data.event = event;
+  data.result = TRUE;
+
+  gst_pad_forward (srcpad, (GstPadForwardFunction) event_forward_func, &data);
+
+  gst_event_unref (event);
+
+  return data.result;
+}
+
 static GstFlowReturn
 _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
 {
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (object);
   GstBaseAggregatorPrivate *priv = self->priv;
-  GstBaseAggregatorPad *bpad = GST_BASE_AGGREGATOR_PAD (pad);
+  GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
   GST_ERROR ("Start chaining");
   AGGREGATE_LOCK (self);
+  GST_ERROR (" chaining");
 
-  while (bpad->buffer) {
+  if (g_atomic_int_get (&aggpad->flushing) == TRUE)
+    goto flushing;
+
+  while (aggpad->buffer) {
     WAIT_FOR_AGGREGATE (self);
     GST_ERROR ("Waiting for buffer to be consumed");
   }
 
   priv->cookie++;
-  gst_buffer_replace (&bpad->buffer, buffer);
+  gst_buffer_replace (&aggpad->buffer, buffer);
   GST_ERROR ("ADDED BUFFER");
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
   GST_ERROR ("Done chaining");
 
   return priv->flow_return;
+
+flushing:
+
+  GST_ERROR ("We are flushing");
+  AGGREGATE_UNLOCK (self);
+
+  return GST_FLOW_FLUSHING;
 }
 
 static gboolean
@@ -360,21 +413,49 @@ _event (GstPad * pad, GstObject * parent, GstEvent * event)
 {
   gboolean res = TRUE;
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (parent);
-  GstBaseAggregatorPad *bpad = GST_BASE_AGGREGATOR_PAD (pad);
+  GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
   GstBaseAggregatorPrivate *priv = self->priv;
 
   switch (GST_EVENT_TYPE (event)) {
+    case GST_EVENT_FLUSH_START:
+    {
+      g_atomic_int_set (&aggpad->flushing, TRUE);
+      if (g_atomic_int_get (&priv->seeking)) {
+        if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
+                TRUE, FALSE) == FALSE) {
+          goto eat;
+        } else {
+          g_atomic_int_set (&priv->pending_flush_stop, TRUE);
+          goto forward;
+        }
+      } else
+        goto forward;
+    }
+    case GST_EVENT_FLUSH_STOP:
+    {
+      g_atomic_int_set (&aggpad->flushing, FALSE);
+      if (g_atomic_int_get (&priv->seeking)) {
+        if (g_atomic_int_compare_and_exchange (&priv->pending_flush_stop,
+                TRUE, FALSE))
+          goto forward;
+        else
+          goto eat;
+      } else {
+        goto forward;
+      }
+      break;
+    }
     case GST_EVENT_EOS:
     {
       GST_ERROR ("EOS");
 
       AGGREGATE_LOCK (self);
-      while (bpad->buffer) {
+      while (aggpad->buffer) {
         GST_ERROR ("Waiting for buffer to be consumed");
         WAIT_FOR_AGGREGATE (self);
       }
 
-      bpad->eos = TRUE;
+      aggpad->eos = TRUE;
       priv->cookie++;;
       BROADCAST_AGGREGATE (self);
       AGGREGATE_UNLOCK (self);
@@ -386,9 +467,11 @@ _event (GstPad * pad, GstObject * parent, GstEvent * event)
     }
   }
 
+forward:
   return gst_pad_event_default (pad, parent, event);
 
 eat:
+  GST_ERROR_OBJECT (parent, "Eating event: %" GST_PTR_FORMAT, event);
   if (event)
     gst_event_unref (event);
 
@@ -403,13 +486,39 @@ _query (GstPad * pad, GstObject * parent, GstQuery * query)
 
 
 gboolean
-gst_base_aggregator_src_event_default (GstElement * aggregator,
+gst_base_aggregator_src_event_default (GstElement * element,
     GstPad * pad, GstEvent * event)
 {
+  gboolean res = TRUE;
+  GstBaseAggregatorPrivate *priv = GST_BASE_AGGREGATOR (element)->priv;
+
   switch (GST_EVENT_TYPE (event)) {
     case GST_EVENT_SEEK:
     {
-      GST_ERROR ("Seeking");
+      GstSeekFlags flags;
+
+      GST_INFO_OBJECT (element, "starting seek");
+
+      gst_event_parse_seek (event, NULL, NULL, &flags, NULL, NULL, NULL, NULL);
+
+      g_atomic_int_set (&priv->seeking, TRUE);
+      if (flags & GST_SEEK_FLAG_FLUSH)
+        g_atomic_int_set (&priv->pending_flush_start, TRUE);
+
+      /* forward the seek upstream */
+      AGGREGATE_LOCK (element);
+      res = _forward_event_to_all_sinkpads (pad, event);
+      AGGREGATE_UNLOCK (element);
+      event = NULL;
+
+      if (!res) {
+        g_atomic_int_set (&priv->seeking, FALSE);
+        g_atomic_int_set (&priv->pending_flush_start, FALSE);
+      }
+
+      GST_INFO_OBJECT (element, "seek done, result: %d", res);
+
+      goto done;
     }
     default:
     {
@@ -417,7 +526,10 @@ gst_base_aggregator_src_event_default (GstElement * aggregator,
     }
   }
 
-  return gst_pad_event_default (pad, GST_OBJECT (aggregator), event);
+  return gst_pad_event_default (pad, GST_OBJECT (element), event);
+
+done:
+  return res;
 }
 
 /***********************************
