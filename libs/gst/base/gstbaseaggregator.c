@@ -640,6 +640,9 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
 
+  if (g_atomic_int_get (&aggpad->eos) == TRUE)
+    goto eos;
+
   while (aggpad->buffer) {
     WAIT_FOR_AGGREGATE (self);
     GST_DEBUG ("Waiting for buffer to be consumed");
@@ -660,6 +663,13 @@ flushing:
   AGGREGATE_UNLOCK (self);
 
   return GST_FLOW_FLUSHING;
+
+eos:
+
+  GST_ERROR_OBJECT (pad, "We are EOS already...");
+  AGGREGATE_UNLOCK (self);
+
+  return GST_FLOW_EOS;
 }
 
 static gboolean
