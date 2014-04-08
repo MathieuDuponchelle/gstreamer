@@ -1,5 +1,5 @@
 /*
- * baseaggregatoror.c - GstBaseAggregator testsuite
+ * baseaggregator.c - GstBaseAggregator testsuite
  * Copyright (C) 2006 Alessandro Decina <alessandro.d@gmail.com>
  * Copyright (C) 2014 Mathieu Duponchelle <mathieu.duponchelle@oencreed.com>
  * Copyright (C) 2014 Thibault Saunier <tsaunier@opencreed.com>
@@ -42,7 +42,6 @@ static GType gst_aggregator_get_type (void);
 struct _GstAggregator
 {
   GstBaseAggregator parent;
-  GstPad *srcpad;
 
   gboolean send_segment;
 };
@@ -67,9 +66,10 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
     GstSegment segment;
 
     gst_segment_init (&segment, GST_FORMAT_BYTES);
-    gst_pad_push_event (aggregator->srcpad,
+    gst_pad_push_event (baseaggregator->srcpad,
         gst_event_new_stream_start ("test"));
-    gst_pad_push_event (aggregator->srcpad, gst_event_new_segment (&segment));
+    gst_pad_push_event (baseaggregator->srcpad,
+        gst_event_new_segment (&segment));
     aggregator->send_segment = FALSE;
   }
 
@@ -106,25 +106,17 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
 
   if (all_eos == TRUE) {
     GST_ERROR_OBJECT (aggregator, "no data available, must be EOS");
-    gst_pad_push_event (aggregator->srcpad, gst_event_new_eos ());
+    gst_pad_push_event (baseaggregator->srcpad, gst_event_new_eos ());
     return GST_FLOW_EOS;
   }
 
   GST_ERROR ("Push it up amigo");
-  gst_pad_push (aggregator->srcpad, gst_buffer_new ());
+  gst_pad_push (baseaggregator->srcpad, gst_buffer_new ());
 
   return GST_FLOW_OK;
 }
 
 G_DEFINE_TYPE (GstAggregator, gst_aggregator, GST_TYPE_BASE_AGGREGATOR);
-
-static GstStaticPadTemplate gst_aggregator_src_template =
-GST_STATIC_PAD_TEMPLATE ("src", GST_PAD_SRC, GST_PAD_ALWAYS,
-    GST_STATIC_CAPS_ANY);
-
-static GstStaticPadTemplate gst_aggregator_sink_template =
-GST_STATIC_PAD_TEMPLATE ("sink_%u", GST_PAD_SINK, GST_PAD_REQUEST,
-    GST_STATIC_CAPS_ANY);
 
 static void
 gst_aggregator_class_init (GstAggregatorClass * klass)
@@ -133,10 +125,20 @@ gst_aggregator_class_init (GstAggregatorClass * klass)
   GstBaseAggregatorClass *base_aggregator_class =
       (GstBaseAggregatorClass *) klass;
 
+  static GstStaticPadTemplate _src_template =
+      GST_STATIC_PAD_TEMPLATE ("src", GST_PAD_SRC, GST_PAD_ALWAYS,
+      GST_STATIC_CAPS_ANY);
+
+  static GstStaticPadTemplate _sink_template =
+      GST_STATIC_PAD_TEMPLATE ("sink_%u", GST_PAD_SINK, GST_PAD_REQUEST,
+      GST_STATIC_CAPS_ANY);
+
   gst_element_class_add_pad_template (gstelement_class,
-      gst_static_pad_template_get (&gst_aggregator_src_template));
+      gst_static_pad_template_get (&_src_template));
+
   gst_element_class_add_pad_template (gstelement_class,
-      gst_static_pad_template_get (&gst_aggregator_sink_template));
+      gst_static_pad_template_get (&_sink_template));
+
   gst_element_class_set_static_metadata (gstelement_class, "Aggregator",
       "Testing", "Combine N buffers", "Stefan Sauer <ensonic@users.sf.net>");
 
@@ -147,14 +149,6 @@ gst_aggregator_class_init (GstAggregatorClass * klass)
 static void
 gst_aggregator_init (GstAggregator * aggregator)
 {
-  GstPadTemplate *template;
-
-  template = gst_static_pad_template_get (&gst_aggregator_src_template);
-  aggregator->srcpad = gst_pad_new_from_template (template, "src");
-  gst_object_unref (template);
-
-  GST_PAD_SET_PROXY_CAPS (aggregator->srcpad);
-  gst_element_add_pad (GST_ELEMENT (aggregator), aggregator->srcpad);
   aggregator->send_segment = TRUE;
 }
 

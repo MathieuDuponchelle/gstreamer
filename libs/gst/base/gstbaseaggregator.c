@@ -34,9 +34,7 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
 /*************************************
  * GstBaseAggregator implementation  *
  *************************************/
-#define parent_class gst_base_aggregator_parent_class
-G_DEFINE_ABSTRACT_TYPE (GstBaseAggregator, gst_base_aggregator,
-    GST_TYPE_ELEMENT);
+static GstElementClass *parent_class = NULL;
 
 #define AGGREGATE_LOCK(self) g_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
 #define AGGREGATE_UNLOCK(self) g_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
@@ -315,9 +313,7 @@ _change_state (GstElement * element, GstStateChange transition)
       break;
   }
 
-  ret =
-      GST_ELEMENT_CLASS (gst_base_aggregator_parent_class)->change_state
-      (element, transition);
+  ret = GST_ELEMENT_CLASS (parent_class)->change_state (element, transition);
 
   switch (transition) {
     default:
@@ -394,6 +390,7 @@ gst_base_aggregator_class_init (GstBaseAggregatorClass * klass)
   GObjectClass *gobject_class = (GObjectClass *) klass;
   GstElementClass *gstelement_class = (GstElementClass *) klass;
 
+  parent_class = g_type_class_peek_parent (klass);
   g_type_class_add_private (klass, sizeof (GstBaseAggregatorPrivate));
 
   GST_DEBUG_CATEGORY_INIT (base_aggregator_debug, "baseaggregator", 0,
@@ -410,15 +407,54 @@ gst_base_aggregator_class_init (GstBaseAggregatorClass * klass)
 }
 
 static void
-gst_base_aggregator_init (GstBaseAggregator * self)
+gst_base_aggregator_init (GstBaseAggregator * self,
+    GstBaseAggregatorClass * klass)
 {
+  GstPadTemplate *pad_template;
+
   self->priv =
       G_TYPE_INSTANCE_GET_PRIVATE (self, GST_TYPE_BASE_AGGREGATOR,
       GstBaseAggregatorPrivate);
 
+  pad_template =
+      gst_element_class_get_pad_template (GST_ELEMENT_CLASS (klass), "src");
+  g_return_if_fail (pad_template != NULL);
+
   self->priv->padcount = -1;
   self->priv->cookie = 0;
   g_mutex_init (&self->priv->aggregate_lock);
+
+  self->srcpad = gst_pad_new_from_template (pad_template, "src");
+  GST_PAD_SET_PROXY_CAPS (self->srcpad);
+  gst_element_add_pad (GST_ELEMENT (self), self->srcpad);
+}
+
+/* we can't use G_DEFINE_ABSTRACT_TYPE because we need the klass in the _init
+ * method to get to the padtemplates */
+GType
+gst_base_aggregator_get_type (void)
+{
+  static volatile gsize type = 0;
+
+  if (g_once_init_enter (&type)) {
+    GType _type;
+    static const GTypeInfo info = {
+      sizeof (GstBaseAggregatorClass),
+      NULL,
+      NULL,
+      (GClassInitFunc) gst_base_aggregator_class_init,
+      NULL,
+      NULL,
+      sizeof (GstBaseAggregator),
+      0,
+      (GInstanceInitFunc) gst_base_aggregator_init,
+    };
+
+    _type = g_type_register_static (GST_TYPE_ELEMENT,
+        "GstBaseAggregator", &info, G_TYPE_FLAG_ABSTRACT);
+    g_once_init_leave (&type, _type);
+  }
+  return type;
 }
 
 static gboolean
