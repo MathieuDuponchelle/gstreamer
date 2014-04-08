@@ -46,7 +46,6 @@ struct _GstBaseAggregatorPrivate
   /* Our state is >= PAUSED */
   gboolean running;
 
-  GThread *aggregate_thread;
   GCond aggregate_cond;
   GMutex aggregate_lock;
   guint64 cookie;
@@ -196,6 +195,7 @@ aggregate_func (GstBaseAggregator * self)
 
     BROADCAST_AGGREGATE (self);
     AGGREGATE_UNLOCK (self);
+
   } while (priv->running);
 
   return NULL;
@@ -205,26 +205,32 @@ static void
 _start (GstBaseAggregator * self)
 {
   self->priv->running = TRUE;
-  self->priv->aggregate_thread =
-      g_thread_new ("aggregate_thread", (GThreadFunc) aggregate_func, self);
+  gst_pad_start_task (GST_PAD (self->srcpad), (GstTaskFunction) aggregate_func,
+      self, NULL);
   GST_DEBUG_OBJECT (self, "I've started running");
 }
 
 static void
 _stop (GstBaseAggregator * self)
 {
+  GST_ERROR ("STOP");
+
   AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
   self->priv->cookie++;
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
-  g_thread_join (self->priv->aggregate_thread);
+
+  gst_pad_stop_task (GST_PAD (self->srcpad));
+
+
   GST_DEBUG_OBJECT (self, "I've stopped running");
 }
 
 /* GstBaseAggregator vmethods default implementations */
 static gboolean
-_pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad, GstEvent * event)
+_pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
+    GstEvent * event)
 {
   gboolean res = TRUE;
   GstPad *pad = GST_PAD (aggpad);
@@ -504,7 +510,8 @@ src_query_func (GstPad * pad, GstObject * parent, GstQuery * query)
 }
 
 static gboolean
-_pad_query (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad, GstQuery * query)
+_pad_query (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
+    GstQuery * query)
 {
   gboolean res = TRUE;
   GstObject *parent;

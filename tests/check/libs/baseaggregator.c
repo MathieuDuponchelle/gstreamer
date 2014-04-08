@@ -613,11 +613,13 @@ GST_START_TEST (test_flushing_seek)
   g_main_loop_run (test.ml);
   g_source_remove (test.timeout_id);
 
-
   /* these will return immediately as at this point the threads have been
    * unlocked and are finished */
   g_thread_join (thread1);
   g_thread_join (thread2);
+
+  _test_data_clear (&test);
+
 }
 
 GST_END_TEST;
