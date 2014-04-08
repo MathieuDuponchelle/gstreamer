@@ -31,39 +31,6 @@
 GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
 #define GST_CAT_DEFAULT base_aggregator_debug
 
-/* GstBaseAggregatorPad definitions */
-#define PAD_LOCK_EVENT(pad)   G_STMT_START {                            \
-  GST_INFO_OBJECT (pad, "Taking EVENT lock from thread %p",              \
-        g_thread_self());                                               \
-  g_mutex_lock(&pad->priv->event_lock);                                 \
-  } G_STMT_END
-
-#define PAD_UNLOCK_EVENT(pad)  G_STMT_START {                           \
-  GST_INFO_OBJECT (pad, "Releasing EVENT lock from thread %p",          \
-        g_thread_self());                                               \
-  g_mutex_unlock(&pad->priv->event_lock);                               \
-  } G_STMT_END
-
-
-#define PAD_WAIT_EVENT(pad)   G_STMT_START {                            \
-  GST_INFO_OBJECT (pad, "Waiting for EVENT on thread %p",               \
-        g_thread_self());                                               \
-  g_cond_wait(&(((GstBaseAggregatorPad* )pad)->priv->event_cond),       \
-      &(pad->priv->event_lock));                                        \
-  } G_STMT_END
-
-#define PAD_BROADCAST_EVENT(pad) {                                          \
-  GST_INFO_OBJECT (pad, "Signaling EVENT from thread %p",               \
-        g_thread_self());                                                   \
-  g_cond_broadcast(&(((GstBaseAggregatorPad* )pad)->priv->event_cond)); \
-  }
-
-struct _GstBaseAggregatorPadPrivate
-{
-  GMutex event_lock;
-  GCond event_cond;
-};
-
 /*************************************
  * GstBaseAggregator implementation  *
  *************************************/
@@ -73,22 +40,6 @@ G_DEFINE_ABSTRACT_TYPE (GstBaseAggregator, gst_base_aggregator,
 
 #define AGGREGATE_LOCK(self) g_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
 #define AGGREGATE_UNLOCK(self) g_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
-#define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
-  GST_INFO_OBJECT (agg, "Waiting for aggregate in thread %p",           \
-        g_thread_self());                                               \
-  g_cond_wait(&(agg->priv->aggregate_cond),                             \
-      &(agg->priv->aggregate_lock));                                    \
-  GST_INFO_OBJECT (agg, "Done waiting for aggregate in thread %p",      \
-        g_thread_self());                                               \
-  } G_STMT_END
-
-#define BROADCAST_AGGREGATE(agg) {                                      \
-  GST_INFO_OBJECT (agg, "signaling aggregate from thread %p",           \
-        g_thread_self());                                               \
-  g_cond_broadcast(&(agg->priv->aggregate_cond));                       \
-  GST_INFO_OBJECT (agg, "signaled aggregate from thread %p",            \
-        g_thread_self());                                               \
-  }
 
 struct _GstBaseAggregatorPrivate
 {
@@ -114,6 +65,19 @@ typedef struct
   GstEvent *event;
   gboolean result;
 } EventData;
+
+#define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
+  GST_INFO_OBJECT (agg, "Waiting for aggregate in thread %p",           \
+        g_thread_self());                                               \
+  g_cond_wait(&(agg->priv->aggregate_cond),                             \
+      &(agg->priv->aggregate_lock));                                   \
+  } G_STMT_END
+
+#define BROADCAST_AGGREGATE(agg) {                                         \
+  GST_INFO_OBJECT (agg, "signaling aggregate from thread %p",           \
+        g_thread_self());                                               \
+  g_cond_broadcast(&(agg->priv->aggregate_cond));                          \
+  }
 
 static gboolean
 _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
@@ -179,7 +143,6 @@ _reset_all_pads_data (GstBaseAggregator * self)
             GST_BASE_AGGREGATOR_PAD (g_value_get_object (&data));
 
         gst_buffer_replace (&aggpad->buffer, NULL);
-        PAD_BROADCAST_EVENT (aggpad);
         g_value_reset (&data);
         break;
       }
@@ -208,7 +171,6 @@ aggregate_func (GstBaseAggregator * self)
    * called when starting */
   guint64 local_cookie = priv->cookie - 1;
 
-  GST_ERROR ("Aggregate function started");
   do {
     gboolean do_aggregate;
     GstBaseAggregatorClass *klass;
@@ -216,11 +178,8 @@ aggregate_func (GstBaseAggregator * self)
     AGGREGATE_LOCK (self);
     GST_ERROR ("I'm waiting for aggregation");
 
-    if (local_cookie == priv->cookie) {
-      GST_ERROR ("====> Waiting for?");
+    if (local_cookie == priv->cookie)
       WAIT_FOR_AGGREGATE (self);
-      GST_ERROR ("====> Aggregating?");
-    }
     local_cookie++;
 
     GST_ERROR ("I want the lock in check");
@@ -237,6 +196,7 @@ aggregate_func (GstBaseAggregator * self)
     }
     GST_ERROR ("releasing the lock in check");
 
+    BROADCAST_AGGREGATE (self);
     AGGREGATE_UNLOCK (self);
   } while (priv->running);
 
@@ -255,7 +215,6 @@ _start (GstBaseAggregator * self)
 static void
 _stop (GstBaseAggregator * self)
 {
-  GST_ERROR ("Stoppping");
   AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
   self->priv->cookie++;
@@ -306,14 +265,12 @@ _event (GstBaseAggregator * self, GstPad * pad, GstEvent * event)
     {
       GST_ERROR ("EOS");
 
-      if (aggpad->buffer != NULL) {
+      AGGREGATE_LOCK (self);
+      while (aggpad->buffer) {
         GST_ERROR ("Waiting for buffer to be consumed");
-        PAD_LOCK_EVENT (aggpad);
-        PAD_WAIT_EVENT (aggpad);
-        PAD_UNLOCK_EVENT (aggpad);
+        WAIT_FOR_AGGREGATE (self);
       }
 
-      AGGREGATE_LOCK (self);
       aggpad->eos = TRUE;
       priv->cookie++;;
       BROADCAST_AGGREGATE (self);
@@ -462,7 +419,6 @@ gst_base_aggregator_init (GstBaseAggregator * self)
   self->priv->padcount = -1;
   self->priv->cookie = 0;
   g_mutex_init (&self->priv->aggregate_lock);
-  g_cond_init (&self->priv->aggregate_cond);
 }
 
 static gboolean
@@ -510,13 +466,10 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
 
-  PAD_LOCK_EVENT (aggpad);
-  if (aggpad->buffer != NULL) {
-    GST_ERROR ("Waiting for buffer %i to be consumed",
-        GST_IS_BUFFER (aggpad->buffer));
-    PAD_WAIT_EVENT (aggpad);
+  while (aggpad->buffer) {
+    WAIT_FOR_AGGREGATE (self);
+    GST_ERROR ("Waiting for buffer to be consumed");
   }
-  PAD_UNLOCK_EVENT (aggpad);
 
   priv->cookie++;
   gst_buffer_replace (&aggpad->buffer, buffer);
@@ -603,6 +556,11 @@ done:
  ************************************/
 G_DEFINE_TYPE (GstBaseAggregatorPad, gst_base_aggregator_pad, GST_TYPE_PAD);
 
+struct _GstBaseAggregatorPadPrivate
+{
+  gpointer nothing;
+};
+
 static void
 gst_base_aggregator_pad_finalize (GObject * object)
 {
@@ -636,14 +594,7 @@ gst_base_aggregator_pad_class_init (GstBaseAggregatorPadClass * klass)
 static void
 gst_base_aggregator_pad_init (GstBaseAggregatorPad * pad)
 {
-  pad->priv =
-      G_TYPE_INSTANCE_GET_PRIVATE (pad, GST_TYPE_BASE_AGGREGATOR_PAD,
-      GstBaseAggregatorPadPrivate);
-
   pad->buffer = NULL;
-  g_mutex_init (&pad->priv->event_lock);
-  g_cond_init (&pad->priv->event_cond);
-
 }
 
 GstBaseAggregatorPad *
