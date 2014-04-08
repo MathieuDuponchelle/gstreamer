@@ -224,8 +224,7 @@ _stop (GstBaseAggregator * self)
 
 /* GstBaseAggregator vmethods default implementations */
 static gboolean
-_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
-    GstEvent * event)
+_pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad, GstEvent * event)
 {
   gboolean res = TRUE;
   GstPad *pad = GST_PAD (aggpad);
@@ -384,11 +383,132 @@ _request_new_pad (GstElement * element,
 }
 
 static gboolean
-_query (GstBaseAggregator * self, GstBaseAggregatorPad * bpad, GstQuery * query)
+_src_query (GstBaseAggregator * self, GstQuery * query)
+{
+  gboolean res = TRUE;
+
+  switch (GST_QUERY_TYPE (query)) {
+    case GST_QUERY_SEEKING:
+    {
+      GstFormat format;
+
+      /* don't pass it along as some (file)sink might claim it does
+       * whereas with a collectpads in between that will not likely work */
+      gst_query_parse_seeking (query, &format, NULL, NULL, NULL);
+      gst_query_set_seeking (query, format, FALSE, 0, -1);
+      res = TRUE;
+
+      goto discard;
+    }
+    default:
+      break;
+  }
+
+  return gst_pad_query_default (self->srcpad, GST_OBJECT (self), query);
+
+discard:
+  return res;
+}
+
+static gboolean
+event_forward_func (GstPad * pad, EventData * data)
+{
+  gboolean ret = TRUE;
+  GstPad *peer = gst_pad_get_peer (pad);
+
+  if (peer) {
+    ret = gst_pad_send_event (peer, gst_event_ref (data->event));
+    gst_object_unref (peer);
+  }
+
+  data->result &= ret;
+  /* Always send to all pads */
+  return FALSE;
+}
+
+static gboolean
+_forward_event_to_all_sinkpads (GstPad * srcpad, GstEvent * event)
+{
+  EventData data;
+
+  data.event = event;
+  data.result = TRUE;
+
+  gst_pad_forward (srcpad, (GstPadForwardFunction) event_forward_func, &data);
+
+  gst_event_unref (event);
+
+  return data.result;
+}
+
+static gboolean
+_src_event (GstBaseAggregator * self, GstEvent * event)
+{
+  gboolean res = TRUE;
+  GstBaseAggregatorPrivate *priv = self->priv;
+
+  switch (GST_EVENT_TYPE (event)) {
+    case GST_EVENT_SEEK:
+    {
+      GstSeekFlags flags;
+
+      GST_INFO_OBJECT (self, "starting SEEK");
+
+      gst_event_parse_seek (event, NULL, NULL, &flags, NULL, NULL, NULL, NULL);
+
+      g_atomic_int_set (&priv->seeking, TRUE);
+      if (flags & GST_SEEK_FLAG_FLUSH)
+        g_atomic_int_set (&priv->pending_flush_start, TRUE);
+
+      /* forward the seek upstream */
+      AGGREGATE_LOCK (self);
+      res = _forward_event_to_all_sinkpads (self->srcpad, event);
+      AGGREGATE_UNLOCK (self);
+      event = NULL;
+
+      if (!res) {
+        g_atomic_int_set (&priv->seeking, FALSE);
+        g_atomic_int_set (&priv->pending_flush_start, FALSE);
+      }
+
+      GST_INFO_OBJECT (self, "seek done, result: %d", res);
+
+      goto done;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return gst_pad_event_default (self->srcpad, GST_OBJECT (self), event);
+
+done:
+  return res;
+}
+
+static gboolean
+src_event_func (GstPad * pad, GstObject * parent, GstEvent * event)
+{
+  GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (parent);
+
+  return klass->src_event (GST_BASE_AGGREGATOR (parent), event);
+}
+
+static gboolean
+src_query_func (GstPad * pad, GstObject * parent, GstQuery * query)
+{
+  GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (parent);
+
+  return klass->src_query (GST_BASE_AGGREGATOR (parent), query);
+}
+
+static gboolean
+_pad_query (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad, GstQuery * query)
 {
   gboolean res = TRUE;
   GstObject *parent;
-  GstPad *pad = GST_PAD (bpad);
+  GstPad *pad = GST_PAD (aggpad);
 
   parent = GST_OBJECT_PARENT (pad);
 
@@ -434,8 +554,11 @@ gst_base_aggregator_class_init (GstBaseAggregatorClass * klass)
   GST_DEBUG_CATEGORY_INIT (base_aggregator_debug, "baseaggregator", 0,
       "GstBaseAggregator");
 
-  klass->pad_event = _event;
-  klass->pad_query = _query;
+  klass->pad_event = _pad_event;
+  klass->pad_query = _pad_query;
+
+  klass->src_event = _src_event;
+  klass->src_query = _src_query;
 
   gstelement_class->request_new_pad = GST_DEBUG_FUNCPTR (_request_new_pad);
   gstelement_class->release_pad = GST_DEBUG_FUNCPTR (_release_pad);
@@ -463,6 +586,14 @@ gst_base_aggregator_init (GstBaseAggregator * self,
   g_mutex_init (&self->priv->aggregate_lock);
 
   self->srcpad = gst_pad_new_from_template (pad_template, "src");
+
+  gst_pad_set_event_function (self->srcpad,
+      GST_DEBUG_FUNCPTR ((GstPadEventFunction) src_event_func));
+  gst_pad_set_query_function (self->srcpad,
+      GST_DEBUG_FUNCPTR ((GstPadQueryFunction) src_query_func));
+
+  /* FIXME Check if we always want proxy caps... and find a nice API
+   * if not */
   GST_PAD_SET_PROXY_CAPS (self->srcpad);
   gst_element_add_pad (GST_ELEMENT (self), self->srcpad);
 }
@@ -493,37 +624,6 @@ gst_base_aggregator_get_type (void)
     g_once_init_leave (&type, _type);
   }
   return type;
-}
-
-static gboolean
-event_forward_func (GstPad * pad, EventData * data)
-{
-  gboolean ret = TRUE;
-  GstPad *peer = gst_pad_get_peer (pad);
-
-  if (peer) {
-    ret = gst_pad_send_event (peer, gst_event_ref (data->event));
-    gst_object_unref (peer);
-  }
-
-  data->result &= ret;
-  /* Always send to all pads */
-  return FALSE;
-}
-
-static gboolean
-_forward_event_to_all_sinkpads (GstPad * srcpad, GstEvent * event)
-{
-  EventData data;
-
-  data.event = event;
-  data.result = TRUE;
-
-  gst_pad_forward (srcpad, (GstPadForwardFunction) event_forward_func, &data);
-
-  gst_event_unref (event);
-
-  return data.result;
 }
 
 static GstFlowReturn
@@ -578,53 +678,6 @@ pad_event_func (GstPad * pad, GstObject * parent, GstEvent * event)
 
   return klass->pad_event (GST_BASE_AGGREGATOR (parent),
       GST_BASE_AGGREGATOR_PAD (pad), event);
-}
-
-gboolean
-gst_base_aggregator_src_event_default (GstElement * element,
-    GstPad * pad, GstEvent * event)
-{
-  gboolean res = TRUE;
-  GstBaseAggregatorPrivate *priv = GST_BASE_AGGREGATOR (element)->priv;
-
-  switch (GST_EVENT_TYPE (event)) {
-    case GST_EVENT_SEEK:
-    {
-      GstSeekFlags flags;
-
-      GST_INFO_OBJECT (element, "starting seek");
-
-      gst_event_parse_seek (event, NULL, NULL, &flags, NULL, NULL, NULL, NULL);
-
-      g_atomic_int_set (&priv->seeking, TRUE);
-      if (flags & GST_SEEK_FLAG_FLUSH)
-        g_atomic_int_set (&priv->pending_flush_start, TRUE);
-
-      /* forward the seek upstream */
-      AGGREGATE_LOCK (element);
-      res = _forward_event_to_all_sinkpads (pad, event);
-      AGGREGATE_UNLOCK (element);
-      event = NULL;
-
-      if (!res) {
-        g_atomic_int_set (&priv->seeking, FALSE);
-        g_atomic_int_set (&priv->pending_flush_start, FALSE);
-      }
-
-      GST_INFO_OBJECT (element, "seek done, result: %d", res);
-
-      goto done;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  return gst_pad_event_default (pad, GST_OBJECT (element), event);
-
-done:
-  return res;
 }
 
 /***********************************

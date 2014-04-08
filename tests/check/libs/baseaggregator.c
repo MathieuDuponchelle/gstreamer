@@ -334,33 +334,16 @@ _chain_data_clear (ChainData * data)
     gst_object_unref (data->sinkpad);
 }
 
-static gboolean
-agg_src_event (GstPad * pad, GstObject * parent, GstEvent * event)
-{
-
-  GST_ERROR ("SRC EVEMNT");
-  return gst_base_aggregator_src_event_default (GST_ELEMENT (parent),
-      pad, event);
-}
-
-static gboolean
-src_event (GstPad * pad, GstObject * parent, GstEvent * event)
-{
-  gboolean ret = TRUE;
-  gst_event_unref (event);
-  GST_ERROR ("SRC EVENT: %" GST_PTR_FORMAT, event);
-  return ret;
-}
-
 static void
 _test_data_init (TestData * test, gboolean needs_flushing)
 {
   test->aggregator = gst_element_factory_make ("aggregator", NULL);
   gst_element_set_state (test->aggregator, GST_STATE_PLAYING);
   test->ml = g_main_loop_new (NULL, TRUE);
-  test->srcpad = gst_element_get_static_pad (test->aggregator, "src");
+  test->srcpad = GST_BASE_AGGREGATOR (test->aggregator)->srcpad;
 
-  gst_pad_set_event_function (test->srcpad, src_event);
+  GST_ERROR ("Srcpad: %p", test->srcpad);
+
   if (needs_flushing) {
     static gint num_sink_pads = 0;
     gchar *pad_name = g_strdup_printf ("sink%d", num_sink_pads);
@@ -373,7 +356,6 @@ _test_data_init (TestData * test, gboolean needs_flushing)
         GST_PAD_PROBE_TYPE_DATA_DOWNSTREAM |
         GST_PAD_PROBE_TYPE_EVENT_FLUSH,
         (GstPadProbeCallback) downstream_probe_cb, test, NULL);
-    gst_pad_set_event_function (test->srcpad, agg_src_event);
   } else {
     gst_pad_add_probe (test->srcpad, GST_PAD_PROBE_TYPE_BUFFER,
         (GstPadProbeCallback) _aggregated_cb, test->ml, NULL);
@@ -389,7 +371,6 @@ _test_data_clear (TestData * test)
 {
   gst_element_set_state (test->aggregator, GST_STATE_NULL);
   gst_object_unref (test->aggregator);
-  gst_object_unref (test->srcpad);
 
   g_main_loop_unref (test->ml);
 }
