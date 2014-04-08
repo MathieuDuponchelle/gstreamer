@@ -96,7 +96,7 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
             GST_BASE_AGGREGATOR_PAD (g_value_get_object (&data));
 
         if (!aggpad->buffer && !aggpad->eos) {
-          GST_ERROR_OBJECT (aggpad, "BUffer %p, EOS %d", aggpad->buffer,
+          GST_DEBUG_OBJECT (aggpad, "BUffer %p, EOS %d", aggpad->buffer,
               aggpad->eos);
           res = FALSE;
         }
@@ -174,15 +174,15 @@ aggregate_func (GstBaseAggregator * self)
     GstBaseAggregatorClass *klass;
 
     AGGREGATE_LOCK (self);
-    GST_ERROR ("I'm waiting for aggregation");
+    GST_DEBUG ("I'm waiting for aggregation");
 
     if (local_cookie == priv->cookie)
       WAIT_FOR_AGGREGATE (self);
     local_cookie++;
 
-    GST_ERROR ("I want the lock in check");
+    GST_DEBUG ("I want the lock in check");
     do_aggregate = _check_all_pads_with_data_or_eos (self);
-    GST_ERROR_OBJECT (self, "Checking for aggregation : %d", do_aggregate);
+    GST_DEBUG_OBJECT (self, "Checking for aggregation : %d", do_aggregate);
     if (do_aggregate) {
       klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
 
@@ -192,7 +192,7 @@ aggregate_func (GstBaseAggregator * self)
 
       _reset_all_pads_data (self);
     }
-    GST_ERROR ("releasing the lock in check");
+    GST_DEBUG ("releasing the lock in check");
 
     BROADCAST_AGGREGATE (self);
     AGGREGATE_UNLOCK (self);
@@ -207,7 +207,7 @@ _start (GstBaseAggregator * self)
   self->priv->running = TRUE;
   self->priv->aggregate_thread =
       g_thread_new ("aggregate_thread", (GThreadFunc) aggregate_func, self);
-  GST_ERROR_OBJECT (self, "I've started running");
+  GST_DEBUG_OBJECT (self, "I've started running");
 }
 
 static void
@@ -219,15 +219,16 @@ _stop (GstBaseAggregator * self)
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
   g_thread_join (self->priv->aggregate_thread);
-  GST_ERROR_OBJECT (self, "I've stopped running");
+  GST_DEBUG_OBJECT (self, "I've stopped running");
 }
 
 /* GstBaseAggregator vmethods default implementations */
 static gboolean
-_event (GstBaseAggregator * self, GstPad * pad, GstEvent * event)
+_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
+    GstEvent * event)
 {
   gboolean res = TRUE;
-  GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
+  GstPad *pad = GST_PAD (aggpad);
   GstBaseAggregatorPrivate *priv = self->priv;
 
   switch (GST_EVENT_TYPE (event)) {
@@ -261,11 +262,11 @@ _event (GstBaseAggregator * self, GstPad * pad, GstEvent * event)
     }
     case GST_EVENT_EOS:
     {
-      GST_ERROR ("EOS");
+      GST_DEBUG ("EOS");
 
       AGGREGATE_LOCK (self);
       while (aggpad->buffer) {
-        GST_ERROR ("Waiting for buffer to be consumed");
+        GST_DEBUG ("Waiting for buffer to be consumed");
         WAIT_FOR_AGGREGATE (self);
       }
 
@@ -285,7 +286,7 @@ forward:
   return gst_pad_event_default (pad, GST_OBJECT (self), event);
 
 eat:
-  GST_ERROR_OBJECT (self, "Eating event: %" GST_PTR_FORMAT, event);
+  GST_DEBUG_OBJECT (self, "Eating event: %" GST_PTR_FORMAT, event);
   if (event)
     gst_event_unref (event);
 
@@ -360,7 +361,7 @@ _request_new_pad (GstElement * element,
     return NULL;
   }
 
-  GST_ERROR_OBJECT (element, "Adding pad %s", GST_PAD_NAME (agg_pad));
+  GST_DEBUG_OBJECT (element, "Adding pad %s", GST_PAD_NAME (agg_pad));
 
   if (priv->running)
     gst_pad_set_active (GST_PAD (agg_pad), TRUE);
@@ -372,9 +373,35 @@ _request_new_pad (GstElement * element,
 }
 
 static gboolean
-_query (GstBaseAggregator * self, GstPad * pad, GstQuery * query)
+_query (GstBaseAggregator * self, GstBaseAggregatorPad * bpad, GstQuery * query)
 {
-  return gst_pad_query_default (pad, GST_OBJECT (self), query);
+  gboolean res = TRUE;
+  GstObject *parent;
+  GstPad *pad = GST_PAD (bpad);
+
+  parent = GST_OBJECT_PARENT (pad);
+
+  switch (GST_QUERY_TYPE (query)) {
+    case GST_QUERY_SEEKING:
+    {
+      GstFormat format;
+
+      /* don't pass it along as some (file)sink might claim it does
+       * whereas with a collectpads in between that will not likely work */
+      gst_query_parse_seeking (query, &format, NULL, NULL, NULL);
+      gst_query_set_seeking (query, format, FALSE, 0, -1);
+      res = TRUE;
+      query = NULL;
+      break;
+    }
+    default:
+      break;
+  }
+
+  if (query)
+    return gst_pad_query_default (pad, parent, query);
+  else
+    return res;
 }
 
 /* GObject vmethods implementations */
@@ -495,30 +522,30 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GstBaseAggregatorPrivate *priv = self->priv;
   GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
-  GST_ERROR ("Start chaining");
+  GST_DEBUG ("Start chaining");
   AGGREGATE_LOCK (self);
-  GST_ERROR (" chaining");
+  GST_DEBUG (" chaining");
 
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
 
   while (aggpad->buffer) {
     WAIT_FOR_AGGREGATE (self);
-    GST_ERROR ("Waiting for buffer to be consumed");
+    GST_DEBUG ("Waiting for buffer to be consumed");
   }
 
   priv->cookie++;
   gst_buffer_replace (&aggpad->buffer, buffer);
-  GST_ERROR ("ADDED BUFFER");
+  GST_DEBUG ("ADDED BUFFER");
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
-  GST_ERROR ("Done chaining");
+  GST_DEBUG ("Done chaining");
 
   return priv->flow_return;
 
 flushing:
 
-  GST_ERROR ("We are flushing");
+  GST_DEBUG ("We are flushing");
   AGGREGATE_UNLOCK (self);
 
   return GST_FLOW_FLUSHING;
@@ -529,7 +556,8 @@ pad_query_func (GstPad * pad, GstObject * parent, GstQuery * query)
 {
   GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (parent);
 
-  return klass->pad_query (GST_BASE_AGGREGATOR (parent), pad, query);
+  return klass->pad_query (GST_BASE_AGGREGATOR (parent),
+      GST_BASE_AGGREGATOR_PAD (pad), query);
 }
 
 static gboolean
@@ -537,7 +565,8 @@ pad_event_func (GstPad * pad, GstObject * parent, GstEvent * event)
 {
   GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (parent);
 
-  return klass->pad_event (GST_BASE_AGGREGATOR (parent), pad, event);
+  return klass->pad_event (GST_BASE_AGGREGATOR (parent),
+      GST_BASE_AGGREGATOR_PAD (pad), event);
 }
 
 gboolean

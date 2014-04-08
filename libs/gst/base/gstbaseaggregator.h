@@ -112,8 +112,9 @@ struct _GstBaseAggregatorClass {
   GstElementClass parent_class;
 
   gboolean      (*flush)     (GstBaseAggregator *aggregator);
-  gboolean      (*pad_event) (GstBaseAggregator *aggregate, GstPad *pad, GstEvent *event);
-  gboolean      (*pad_query) (GstBaseAggregator *aggregate, GstPad *pad, GstQuery *query);
+  gboolean      (*pad_event) (GstBaseAggregator *aggregate, GstBaseAggregatorPad *aggpad, GstEvent *event);
+  gboolean      (*pad_query) (GstBaseAggregator *aggregate, GstBaseAggregatorPad *aggpad, GstQuery *query);
+  GstFlowReturn (*clip)      (GstBaseAggregator *agg, GstBaseAggregatorPad * bpad, GstBuffer * buf, GstBuffer ** outbuf);
   GstFlowReturn (*aggregate) (GstBaseAggregator *aggregator);
 
   /*< private >*/
@@ -125,10 +126,6 @@ GType gst_base_aggregator_get_type(void);
 gboolean   gst_base_aggregator_src_event_default (GstElement *aggregator,
                                                   GstPad *pad,
                                                   GstEvent *event);
-
-gboolean
-gst_base_aggregator_query_default (GstBaseAggregator * self, GstBaseAggregatorPad * bpad,
-    GstQuery * query, gboolean discard);
 
 G_END_DECLS
 
