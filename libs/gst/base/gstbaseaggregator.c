@@ -467,9 +467,7 @@ _src_event (GstBaseAggregator * self, GstEvent * event)
         g_atomic_int_set (&priv->pending_flush_start, TRUE);
 
       /* forward the seek upstream */
-      AGGREGATE_LOCK (self);
       res = _forward_event_to_all_sinkpads (self->srcpad, event);
-      AGGREGATE_UNLOCK (self);
       event = NULL;
 
       if (!res) {
