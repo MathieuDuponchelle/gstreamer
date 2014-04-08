@@ -58,6 +58,9 @@ struct _GstBaseAggregatorPad
   gboolean      eos;
   gboolean      flushing;
 
+  /* < Private > */
+  GstBaseAggregatorPadPrivate *priv;
+
   gpointer _gst_reserved[GST_PADDING];
 };
 
@@ -70,6 +73,7 @@ struct _GstBaseAggregatorPadClass
 };
 
 GType gst_base_aggregator_pad_get_type(void);
+GstBuffer * gst_base_aggregator_pad_get_buffer (GstBaseAggregatorPad *pad);
 
 GstBaseAggregatorPad * gst_base_aggregator_pad_new     (void);
 

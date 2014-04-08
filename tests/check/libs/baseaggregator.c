@@ -75,6 +75,7 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
 
   iter = gst_element_iterate_sink_pads (GST_ELEMENT (aggregator));
   while (!done_iterating) {
+    GstBuffer *buffer;
     GValue value = { 0, };
     GstBaseAggregatorPad *pad;
 
@@ -83,9 +84,10 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
         pad = g_value_get_object (&value);
 
         fail_unless (GST_IS_BUFFER (pad->buffer) || pad->eos);
-        gst_buffer_replace (&pad->buffer, NULL);
+        buffer = gst_base_aggregator_pad_get_buffer (pad);
+        gst_buffer_replace (&buffer, NULL);
 
-        if (pad->eos == FALSE)
+        if (pad->eos == FALSE || pad->buffer)
           all_eos = FALSE;
 
         g_value_reset (&value);
