@@ -369,8 +369,8 @@ _request_new_pad (GstElement * element,
     /* create new pad with the name */
     name = g_strdup_printf ("sink_%u", (agg->priv->padcount)++);
     agg_pad =
-        g_object_new (GST_TYPE_BASE_AGGREGATOR_PAD, "name", name, "direction",
-        GST_PAD_SINK, "template", templ, NULL);
+        g_object_new (GST_BASE_AGGREGATOR_GET_CLASS (agg)->sinkpads_type,
+        "name", name, "direction", GST_PAD_SINK, "template", templ, NULL);
     g_free (name);
     GST_OBJECT_UNLOCK (element);
   } else {
@@ -560,6 +560,8 @@ gst_base_aggregator_class_init (GstBaseAggregatorClass * klass)
 
   GST_DEBUG_CATEGORY_INIT (base_aggregator_debug, "baseaggregator", 0,
       "GstBaseAggregator");
+
+  klass->sinkpads_type = GST_TYPE_BASE_AGGREGATOR_PAD;
 
   klass->pad_event = _pad_event;
   klass->pad_query = _pad_query;

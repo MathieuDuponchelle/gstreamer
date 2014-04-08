@@ -111,6 +111,8 @@ struct _GstBaseAggregator {
 struct _GstBaseAggregatorClass {
   GstElementClass parent_class;
 
+  GType sinkpads_type;
+
   gboolean      (*flush)     (GstBaseAggregator *aggregator);
 
   GstFlowReturn (*clip)      (GstBaseAggregator *agg, GstBaseAggregatorPad * bpad, GstBuffer * buf, GstBuffer ** outbuf);
