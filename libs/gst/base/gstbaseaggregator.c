@@ -71,8 +71,19 @@ struct _GstBaseAggregatorPadPrivate
 G_DEFINE_ABSTRACT_TYPE (GstBaseAggregator, gst_base_aggregator,
     GST_TYPE_ELEMENT);
 
-#define AGGREGATE_LOCK(self) g_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
-#define AGGREGATE_UNLOCK(self) g_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
+#define AGGREGATE_LOCK(self)   G_STMT_START {                            \
+  GST_INFO_OBJECT (self, "Taking AGGREGATE lock from thread %p",              \
+        g_thread_self());                                               \
+  g_mutex_lock(&self->priv->aggregate_lock);                                 \
+  } G_STMT_END
+
+#define AGGREGATE_UNLOCK(self)  G_STMT_START {                           \
+  GST_INFO_OBJECT (self, "Releasing AGGREGATE lock from thread %p",          \
+        g_thread_self());                                               \
+  g_mutex_unlock(&self->priv->aggregate_lock);                               \
+  } G_STMT_END
+
+
 #define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
   GST_INFO_OBJECT (agg, "Waiting for aggregate in thread %p",           \
         g_thread_self());                                               \
@@ -162,7 +173,7 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
 }
 
 static gboolean
-_reset_all_pads_data (GstBaseAggregator * self)
+_signal_all_pads (GstBaseAggregator * self)
 {
   GstIterator *iter;
   gboolean res = TRUE;
@@ -178,8 +189,9 @@ _reset_all_pads_data (GstBaseAggregator * self)
         GstBaseAggregatorPad *aggpad =
             GST_BASE_AGGREGATOR_PAD (g_value_get_object (&data));
 
-        gst_buffer_replace (&aggpad->buffer, NULL);
+        PAD_LOCK_EVENT (aggpad);
         PAD_BROADCAST_EVENT (aggpad);
+        PAD_UNLOCK_EVENT (aggpad);
         g_value_reset (&data);
         break;
       }
@@ -232,11 +244,8 @@ aggregate_func (GstBaseAggregator * self)
       if (klass->aggregate) {
         priv->flow_return = klass->aggregate (self);
       }
-
-      _reset_all_pads_data (self);
     }
-    GST_ERROR ("releasing the lock in check");
-
+    _signal_all_pads (self);
     AGGREGATE_UNLOCK (self);
   } while (priv->running);
 
@@ -304,17 +313,19 @@ _event (GstBaseAggregator * self, GstPad * pad, GstEvent * event)
     }
     case GST_EVENT_EOS:
     {
-      GST_ERROR ("EOS");
+      GST_ERROR_OBJECT (pad, "EOS");
 
-      if (aggpad->buffer != NULL) {
-        GST_ERROR ("Waiting for buffer to be consumed");
+      while (aggpad->buffer != NULL) {
         PAD_LOCK_EVENT (aggpad);
+        GST_ERROR ("Waiting for buffer to be consumed");
+        priv->cookie++;;
+        BROADCAST_AGGREGATE (self);
         PAD_WAIT_EVENT (aggpad);
         PAD_UNLOCK_EVENT (aggpad);
       }
 
       AGGREGATE_LOCK (self);
-      aggpad->eos = TRUE;
+      g_atomic_int_set (&aggpad->eos, TRUE);
       priv->cookie++;;
       BROADCAST_AGGREGATE (self);
       AGGREGATE_UNLOCK (self);
@@ -503,24 +514,25 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GstBaseAggregatorPrivate *priv = self->priv;
   GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
-  GST_ERROR ("Start chaining");
-  AGGREGATE_LOCK (self);
-  GST_ERROR (" chaining");
 
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
 
+  if (g_atomic_int_get (&aggpad->eos) == TRUE)
+    goto eos;
+
   PAD_LOCK_EVENT (aggpad);
-  if (aggpad->buffer != NULL) {
+  while (aggpad->buffer != NULL) {
     GST_ERROR ("Waiting for buffer %i to be consumed",
         GST_IS_BUFFER (aggpad->buffer));
     PAD_WAIT_EVENT (aggpad);
   }
   PAD_UNLOCK_EVENT (aggpad);
 
+  AGGREGATE_LOCK (self);
   priv->cookie++;
   gst_buffer_replace (&aggpad->buffer, buffer);
-  GST_ERROR ("ADDED BUFFER");
+  GST_ERROR_OBJECT (pad, "ADDED BUFFER %p", buffer);
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
   GST_ERROR ("Done chaining");
@@ -528,11 +540,12 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   return priv->flow_return;
 
 flushing:
-
   GST_ERROR ("We are flushing");
-  AGGREGATE_UNLOCK (self);
-
   return GST_FLOW_FLUSHING;
+
+eos:
+  GST_ERROR ("We are EOS");
+  return GST_FLOW_EOS;
 }
 
 static gboolean
@@ -572,9 +585,9 @@ gst_base_aggregator_src_event_default (GstElement * element,
         g_atomic_int_set (&priv->pending_flush_start, TRUE);
 
       /* forward the seek upstream */
-      AGGREGATE_LOCK (element);
+      AGGREGATE_LOCK (GST_BASE_AGGREGATOR (element));
       res = _forward_event_to_all_sinkpads (pad, event);
-      AGGREGATE_UNLOCK (element);
+      AGGREGATE_UNLOCK (GST_BASE_AGGREGATOR (element));
       event = NULL;
 
       if (!res) {

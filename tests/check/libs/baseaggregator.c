@@ -83,10 +83,12 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
         pad = g_value_get_object (&value);
 
         fail_unless (GST_IS_BUFFER (pad->buffer) || pad->eos);
-        gst_buffer_replace (&pad->buffer, NULL);
-
-        if (pad->eos == FALSE)
+        if (pad->eos == FALSE || pad->buffer)
           all_eos = FALSE;
+
+        gst_buffer_replace (&pad->buffer, NULL);
+        GST_ERROR_OBJECT (pad, "Is EOS: %i -- has buffer: %p", pad->eos,
+            pad->buffer);
 
         g_value_reset (&value);
         break;
