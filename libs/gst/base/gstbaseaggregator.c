@@ -276,6 +276,17 @@ _event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
       AGGREGATE_UNLOCK (self);
       goto eat;
     }
+    case GST_EVENT_SEGMENT:
+    {
+      GstSegment seg;
+      gst_event_copy_segment (event, &seg);
+      AGGREGATE_LOCK (self);
+      aggpad->segment = seg;
+      AGGREGATE_UNLOCK (self);
+      goto eat;
+    }
+    case GST_EVENT_STREAM_START:
+      goto eat;
     default:
     {
       break;
