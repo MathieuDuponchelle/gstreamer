@@ -271,10 +271,18 @@ _aggregate_timeout (GMainLoop * ml)
   return FALSE;
 }
 
+static gboolean
+_quit (GMainLoop * ml)
+{
+  g_main_loop_quit (ml);
+
+  return G_SOURCE_REMOVE;
+}
+
 static GstPadProbeReturn
 _aggregated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
 {
-  g_main_loop_quit (ml);
+  g_idle_add ((GSourceFunc) _quit, ml);
 
   return GST_PAD_PROBE_REMOVE;
 }
