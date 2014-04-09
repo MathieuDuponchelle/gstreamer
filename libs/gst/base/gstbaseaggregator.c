@@ -392,11 +392,20 @@ _change_state (GstElement * element, GstStateChange transition)
 static void
 _release_pad (GstElement * element, GstPad * pad)
 {
-  GstBaseAggregatorPrivate *priv = GST_BASE_AGGREGATOR (element)->priv;
+  GstBaseAggregator *self = GST_BASE_AGGREGATOR (element);
+  GstBaseAggregatorPrivate *priv = self->priv;
+
+  GST_DEBUG_OBJECT (pad, "Removing pad");
 
   if (!priv->running)
     gst_pad_set_active (pad, FALSE);
+
   gst_element_remove_pad (element, pad);
+
+  AGGREGATE_LOCK (self);
+  priv->cookie++;
+  BROADCAST_AGGREGATE (self);
+  AGGREGATE_UNLOCK (self);
 }
 
 static GstPad *
