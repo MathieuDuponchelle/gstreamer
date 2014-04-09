@@ -576,14 +576,15 @@ GST_START_TEST (test_flushing_seek)
   data2.expected_result = GST_FLOW_FLUSHING;
   thread2 = g_thread_try_new ("gst-check", push_buffer, &data2, NULL);
 
+  fail_unless (gst_pad_push_event (data1.srcpad, gst_event_new_flush_start ()));
   fail_unless_equals_int (test.flush_start_events, 1);
   fail_unless_equals_int (test.flush_stop_events, 0);
 
-  /* the first FLUSH_STOP is forwarded downstream */
+  /* the first FLUSH_STOP is not forwarded downstream */
   fail_unless (gst_pad_push_event (data1.srcpad,
           gst_event_new_flush_stop (TRUE)));
   fail_unless_equals_int (test.flush_start_events, 1);
-  fail_unless_equals_int (test.flush_stop_events, 1);
+  fail_unless_equals_int (test.flush_stop_events, 0);
 
   /* at this point even the other pad agg:sink_1 should be flushing so thread2
    * should have stopped */
@@ -597,10 +598,9 @@ GST_START_TEST (test_flushing_seek)
 
   /* flush agg:sink_1 as well. This completes the flushing seek so a FLUSH_STOP is
    * sent downstream */
-  gst_pad_push_event (data2.srcpad, gst_event_new_flush_start ());
   gst_pad_push_event (data2.srcpad, gst_event_new_flush_stop (TRUE));
 
-  /* still, only one FLUSH_START and one FLUSH_STOP are forwarded downstream */
+  /* and the last FLUSH_STOP is forwarded downstream */
   fail_unless_equals_int (test.flush_start_events, 1);
   fail_unless_equals_int (test.flush_stop_events, 1);
 

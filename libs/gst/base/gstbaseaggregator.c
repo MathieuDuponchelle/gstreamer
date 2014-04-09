@@ -60,6 +60,9 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
 
 struct _GstBaseAggregatorPadPrivate
 {
+  gboolean pending_flush_start;
+  gboolean pending_flush_stop;
+
   GMutex event_lock;
   GCond event_cond;
 };
@@ -101,8 +104,6 @@ struct _GstBaseAggregatorPrivate
 
   gboolean seeking;
   gboolean pending_flush_start;
-  gboolean pending_flush_stop;
-
   GstFlowReturn flow_return;
 };
 
@@ -110,6 +111,7 @@ typedef struct
 {
   GstEvent *event;
   gboolean result;
+  gboolean flush;
 } EventData;
 
 static gboolean
@@ -223,6 +225,15 @@ _stop (GstBaseAggregator * self)
   GST_DEBUG_OBJECT (self, "I've stopped running");
 }
 
+static void
+_check_pending_flush_stop (GValue * item, gboolean * needs_forward)
+{
+  GstBaseAggregatorPad *pad = g_value_get_object (item);
+
+  *needs_forward = !pad->priv->pending_flush_stop
+      && !pad->priv->pending_flush_start;
+}
+
 /* GstBaseAggregator vmethods default implementations */
 static gboolean
 _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
@@ -231,33 +242,68 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
   gboolean res = TRUE;
   GstPad *pad = GST_PAD (aggpad);
   GstBaseAggregatorPrivate *priv = self->priv;
+  GstBaseAggregatorPadPrivate *padpriv = aggpad->priv;
 
   switch (GST_EVENT_TYPE (event)) {
     case GST_EVENT_FLUSH_START:
     {
+      GstBuffer *tmpbuf;
+
       g_atomic_int_set (&aggpad->flushing, TRUE);
+
+      /*  Remove pad buffer and wake up the streaming thread */
+      tmpbuf = gst_base_aggregator_pad_get_buffer (aggpad);
+      gst_buffer_replace (&tmpbuf, NULL);
+
+      if (g_atomic_int_compare_and_exchange (&padpriv->pending_flush_start,
+              TRUE, FALSE) == TRUE) {
+        GST_DEBUG_OBJECT (aggpad, "Expecting FLUSH_STOP now");
+        g_atomic_int_set (&padpriv->pending_flush_stop, TRUE);
+      }
+
       if (g_atomic_int_get (&priv->seeking)) {
+        /* If seeking we forward the first FLUSH_START  */
         if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
-                TRUE, FALSE) == FALSE) {
-          goto eat;
-        } else {
-          g_atomic_int_set (&priv->pending_flush_stop, TRUE);
+                TRUE, FALSE) == TRUE) {
           goto forward;
         }
-      } else
-        goto forward;
+      }
+
+      /* We forward only in one case: right after seeking */
+      goto eat;
     }
     case GST_EVENT_FLUSH_STOP:
     {
       g_atomic_int_set (&aggpad->flushing, FALSE);
       if (g_atomic_int_get (&priv->seeking)) {
-        if (g_atomic_int_compare_and_exchange (&priv->pending_flush_stop,
-                TRUE, FALSE))
-          goto forward;
-        else
-          goto eat;
+        gboolean needs_forward = FALSE;
+        GstIterator *sinkpads;
+
+        g_atomic_int_set (&aggpad->priv->pending_flush_stop, FALSE);
+        sinkpads = gst_element_iterate_sink_pads (GST_ELEMENT (self));
+
+        if (g_atomic_int_get (&priv->seeking)) {
+          /* In the case of seeking we wait for FLUSH_START/FLUSH_STOP
+           * to be received on all pads before fowarding the FLUSH_STOP
+           * event downstream */
+          while (gst_iterator_foreach (sinkpads,
+                  (GstIteratorForeachFunction) _check_pending_flush_stop,
+                  &needs_forward) == GST_ITERATOR_RESYNC) {
+            gst_iterator_resync (sinkpads);
+            needs_forward = FALSE;
+          }
+
+          if (needs_forward) {
+            /* That means we received FLUSH_STOP/FLUSH_STOP on
+             * all sinkpads -- Seeking is Done.*/
+            g_atomic_int_set (&priv->seeking, FALSE);
+            goto forward;
+          }
+        }
+
+        goto eat;
       } else {
-        goto forward;
+        goto eat;
       }
       break;
     }
@@ -419,30 +465,37 @@ event_forward_func (GstPad * pad, EventData * data)
 {
   gboolean ret = TRUE;
   GstPad *peer = gst_pad_get_peer (pad);
+  GstBaseAggregatorPadPrivate *padpriv = GST_BASE_AGGREGATOR_PAD (pad)->priv;
 
   if (peer) {
     ret = gst_pad_send_event (peer, gst_event_ref (data->event));
     gst_object_unref (peer);
   }
 
-  data->result &= ret;
+  if (data->flush) {
+    padpriv->pending_flush_start = ret;
+    padpriv->pending_flush_stop = FALSE;
+  }
+
   /* Always send to all pads */
   return FALSE;
 }
 
 static gboolean
-_forward_event_to_all_sinkpads (GstPad * srcpad, GstEvent * event)
+_forward_event_to_all_sinkpads (GstPad * srcpad, GstEvent * event,
+    gboolean flush)
 {
-  EventData data;
+  EventData evdata;
 
-  data.event = event;
-  data.result = TRUE;
+  evdata.event = event;
+  evdata.result = TRUE;
+  evdata.flush = flush;
 
-  gst_pad_forward (srcpad, (GstPadForwardFunction) event_forward_func, &data);
+  gst_pad_forward (srcpad, (GstPadForwardFunction) event_forward_func, &evdata);
 
   gst_event_unref (event);
 
-  return data.result;
+  return evdata.result;
 }
 
 static gboolean
@@ -454,6 +507,7 @@ _src_event (GstBaseAggregator * self, GstEvent * event)
   switch (GST_EVENT_TYPE (event)) {
     case GST_EVENT_SEEK:
     {
+      gboolean flush;
       GstSeekFlags flags;
 
       GST_INFO_OBJECT (self, "starting SEEK");
@@ -461,11 +515,12 @@ _src_event (GstBaseAggregator * self, GstEvent * event)
       gst_event_parse_seek (event, NULL, NULL, &flags, NULL, NULL, NULL, NULL);
 
       g_atomic_int_set (&priv->seeking, TRUE);
-      if (flags & GST_SEEK_FLAG_FLUSH)
+      flush = flags & GST_SEEK_FLAG_FLUSH;
+      if (flush)
         g_atomic_int_set (&priv->pending_flush_start, TRUE);
 
       /* forward the seek upstream */
-      res = _forward_event_to_all_sinkpads (self->srcpad, event);
+      res = _forward_event_to_all_sinkpads (self->srcpad, event, flush);
       event = NULL;
 
       if (!res) {
