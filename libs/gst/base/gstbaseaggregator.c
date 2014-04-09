@@ -102,7 +102,7 @@ struct _GstBaseAggregatorPrivate
   GMutex aggregate_lock;
   guint64 cookie;
 
-  gboolean seeking;
+  gboolean flush_seeking;
   gboolean pending_flush_start;
   GstFlowReturn flow_return;
 };
@@ -190,6 +190,9 @@ aggregate_func (GstBaseAggregator * self)
 
       if (klass->aggregate) {
         priv->flow_return = klass->aggregate (self);
+        if (priv->flow_return == GST_FLOW_FLUSHING
+            && g_atomic_int_get (&priv->flush_seeking))
+          priv->flow_return = GST_FLOW_OK;
       }
 
     }
@@ -262,29 +265,29 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
         g_atomic_int_set (&padpriv->pending_flush_stop, TRUE);
       }
 
-      if (g_atomic_int_get (&priv->seeking)) {
-        /* If seeking we forward the first FLUSH_START  */
+      if (g_atomic_int_get (&priv->flush_seeking)) {
+        /* If flush_seeking we forward the first FLUSH_START  */
         if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
                 TRUE, FALSE) == TRUE) {
           goto forward;
         }
       }
 
-      /* We forward only in one case: right after seeking */
+      /* We forward only in one case: right after flush_seeking */
       goto eat;
     }
     case GST_EVENT_FLUSH_STOP:
     {
       g_atomic_int_set (&aggpad->flushing, FALSE);
-      if (g_atomic_int_get (&priv->seeking)) {
+      if (g_atomic_int_get (&priv->flush_seeking)) {
         gboolean needs_forward = FALSE;
         GstIterator *sinkpads;
 
         g_atomic_int_set (&aggpad->priv->pending_flush_stop, FALSE);
         sinkpads = gst_element_iterate_sink_pads (GST_ELEMENT (self));
 
-        if (g_atomic_int_get (&priv->seeking)) {
-          /* In the case of seeking we wait for FLUSH_START/FLUSH_STOP
+        if (g_atomic_int_get (&priv->flush_seeking)) {
+          /* In the case of flush_seeking we wait for FLUSH_START/FLUSH_STOP
            * to be received on all pads before fowarding the FLUSH_STOP
            * event downstream */
           while (gst_iterator_foreach (sinkpads,
@@ -297,7 +300,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
           if (needs_forward) {
             /* That means we received FLUSH_STOP/FLUSH_STOP on
              * all sinkpads -- Seeking is Done.*/
-            g_atomic_int_set (&priv->seeking, FALSE);
+            g_atomic_int_set (&priv->flush_seeking, FALSE);
             goto forward;
           }
         }
@@ -516,17 +519,18 @@ _src_event (GstBaseAggregator * self, GstEvent * event)
 
       gst_event_parse_seek (event, NULL, NULL, &flags, NULL, NULL, NULL, NULL);
 
-      g_atomic_int_set (&priv->seeking, TRUE);
       flush = flags & GST_SEEK_FLAG_FLUSH;
-      if (flush)
+      if (flush) {
         g_atomic_int_set (&priv->pending_flush_start, TRUE);
+        g_atomic_int_set (&priv->flush_seeking, TRUE);
+      }
 
       /* forward the seek upstream */
       res = _forward_event_to_all_sinkpads (self->srcpad, event, flush);
       event = NULL;
 
       if (!res) {
-        g_atomic_int_set (&priv->seeking, FALSE);
+        g_atomic_int_set (&priv->flush_seeking, FALSE);
         g_atomic_int_set (&priv->pending_flush_start, FALSE);
       }
 
