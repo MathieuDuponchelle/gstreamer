@@ -731,7 +731,6 @@ flushing:
 eos:
 
   GST_ERROR_OBJECT (pad, "We are EOS already...");
-  AGGREGATE_UNLOCK (self);
 
   return GST_FLOW_EOS;
 }
