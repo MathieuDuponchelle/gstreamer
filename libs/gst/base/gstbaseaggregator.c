@@ -174,8 +174,9 @@ aggregate_func (GstBaseAggregator * self)
     GstBaseAggregatorClass *klass;
 
     AGGREGATE_LOCK (self);
-    GST_DEBUG ("I'm waiting for aggregation");
 
+    GST_DEBUG ("I'm waiting for aggregation %lu -- %lu", local_cookie,
+        priv->cookie);
     if (local_cookie == priv->cookie)
       WAIT_FOR_AGGREGATE (self);
 
@@ -343,10 +344,11 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
   }
 
 forward:
+  GST_DEBUG_OBJECT (pad, "Fowarding event: %" GST_PTR_FORMAT, event);
   return gst_pad_event_default (pad, GST_OBJECT (self), event);
 
 eat:
-  GST_DEBUG_OBJECT (self, "Eating event: %" GST_PTR_FORMAT, event);
+  GST_DEBUG_OBJECT (pad, "Eating event: %" GST_PTR_FORMAT, event);
   if (event)
     gst_event_unref (event);
 
@@ -461,18 +463,18 @@ discard:
 }
 
 static gboolean
-event_forward_func (GstPad * pad, EventData * data)
+event_forward_func (GstPad * pad, EventData * evdata)
 {
   gboolean ret = TRUE;
   GstPad *peer = gst_pad_get_peer (pad);
   GstBaseAggregatorPadPrivate *padpriv = GST_BASE_AGGREGATOR_PAD (pad)->priv;
 
   if (peer) {
-    ret = gst_pad_send_event (peer, gst_event_ref (data->event));
+    ret = gst_pad_send_event (peer, gst_event_ref (evdata->event));
     gst_object_unref (peer);
   }
 
-  if (data->flush) {
+  if (evdata->flush) {
     padpriv->pending_flush_start = ret;
     padpriv->pending_flush_stop = FALSE;
   }
@@ -806,6 +808,17 @@ gst_base_aggregator_pad_new (void)
   return g_object_new (GST_TYPE_BASE_AGGREGATOR_PAD, NULL);
 }
 
+/**
+ * gst_base_aggregator_pad_get_buffer:
+ * @pad: the pad to get buffer from
+ *
+ * Pop the buffer currently queued in @pad. This function should exclusively
+ * be called from the aggregation thread as this is where buffer can be
+ * consumed.
+ *
+ * Returns: (transfer full): The buffer in @pad or NULL if no buffer was
+ *   queued. You should unref the buffer after usage.
+ */
 GstBuffer *
 gst_base_aggregator_pad_get_buffer (GstBaseAggregatorPad * pad)
 {
