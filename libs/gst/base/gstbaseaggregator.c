@@ -263,14 +263,14 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     }
     case GST_EVENT_EOS:
     {
-      GST_DEBUG ("EOS");
+      GST_DEBUG_OBJECT (aggpad, "EOS");
 
+      PAD_LOCK_EVENT (aggpad);
       while (aggpad->buffer) {
-        PAD_LOCK_EVENT (aggpad);
         GST_DEBUG ("Waiting for buffer to be consumed");
         PAD_WAIT_EVENT (aggpad);
-        PAD_UNLOCK_EVENT (aggpad);
       }
+      PAD_UNLOCK_EVENT (aggpad);
 
       AGGREGATE_LOCK (self);
       aggpad->eos = TRUE;
@@ -638,8 +638,8 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GstBaseAggregatorPrivate *priv = self->priv;
   GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
-  GST_DEBUG ("Start chaining");
-  GST_DEBUG (" chaining");
+  GST_DEBUG_OBJECT (aggpad, "Start chaining");
+  GST_DEBUG_OBJECT (aggpad, " chaining");
 
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
@@ -647,26 +647,26 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   if (g_atomic_int_get (&aggpad->eos) == TRUE)
     goto eos;
 
+  PAD_LOCK_EVENT (aggpad);
   if (aggpad->buffer) {
-    PAD_LOCK_EVENT (aggpad);
     GST_INFO_OBJECT (aggpad, "Waiting for buffer to be consumed");
     PAD_WAIT_EVENT (aggpad);
-    PAD_UNLOCK_EVENT (aggpad);
   }
+  PAD_UNLOCK_EVENT (aggpad);
 
   AGGREGATE_LOCK (self);
   priv->cookie++;
   gst_buffer_replace (&aggpad->buffer, buffer);
-  GST_DEBUG ("ADDED BUFFER");
+  GST_DEBUG_OBJECT (aggpad, "ADDED BUFFER");
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
-  GST_DEBUG ("Done chaining");
+  GST_DEBUG_OBJECT (aggpad, "Done chaining");
 
   return priv->flow_return;
 
 flushing:
 
-  GST_DEBUG ("We are flushing");
+  GST_DEBUG_OBJECT (aggpad, "We are flushing");
   AGGREGATE_UNLOCK (self);
 
   return GST_FLOW_FLUSHING;
@@ -756,11 +756,15 @@ gst_base_aggregator_pad_get_buffer (GstBaseAggregatorPad * pad)
 {
   GstBuffer *buffer = NULL;
 
+  PAD_LOCK_EVENT (pad);
   if (pad->buffer) {
+    GST_DEBUG_OBJECT (pad, "Consuming buffer");
     buffer = pad->buffer;
     pad->buffer = NULL;
     PAD_BROADCAST_EVENT (pad);
+    GST_DEBUG_OBJECT (pad, "Consummed");
   }
+  PAD_UNLOCK_EVENT (pad);
 
   return buffer;
 }
