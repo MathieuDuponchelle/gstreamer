@@ -123,6 +123,8 @@ _check_all_pads_with_data_or_eos (GstBaseAggregator * self)
   GValue data = { 0, };
   gint numpads = 0;
 
+
+  GST_DEBUG_OBJECT (self, "Checking if we are ready to aggregate");
   iter = gst_element_iterate_sink_pads (GST_ELEMENT (self));
 
   while (!done) {
@@ -164,39 +166,36 @@ static gpointer
 aggregate_func (GstBaseAggregator * self)
 {
   GstBaseAggregatorPrivate *priv = self->priv;
+  GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
 
   /* We always want to check if aggregate needs to be
    * called when starting */
   guint64 local_cookie = priv->cookie - 1;
 
   do {
-    gboolean do_aggregate;
-    GstBaseAggregatorClass *klass;
-
     AGGREGATE_LOCK (self);
 
     GST_DEBUG ("I'm waiting for aggregation %lu -- %lu", local_cookie,
         priv->cookie);
+
     if (local_cookie == priv->cookie)
       WAIT_FOR_AGGREGATE (self);
 
     local_cookie++;
 
-    GST_DEBUG ("I want the lock in check");
-    do_aggregate = _check_all_pads_with_data_or_eos (self);
-    GST_DEBUG_OBJECT (self, "Checking for aggregation : %d", do_aggregate);
-    if (do_aggregate) {
-      klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
+    if (_check_all_pads_with_data_or_eos (self)) {
+      GST_DEBUG_OBJECT (self, "Aggregating");
 
-      if (klass->aggregate) {
-        priv->flow_return = klass->aggregate (self);
-        if (priv->flow_return == GST_FLOW_FLUSHING
-            && g_atomic_int_get (&priv->flush_seeking))
-          priv->flow_return = GST_FLOW_OK;
-      }
+      priv->flow_return = klass->aggregate (self);
 
+      if (priv->flow_return == GST_FLOW_FLUSHING &&
+          g_atomic_int_get (&priv->flush_seeking))
+        priv->flow_return = GST_FLOW_OK;
+
+    } else {
+      GST_DEBUG_OBJECT (self, "Not ready to aggregate");
     }
-    GST_DEBUG ("releasing the lock in check");
+
     AGGREGATE_UNLOCK (self);
   } while (priv->running);
 
@@ -648,6 +647,8 @@ gst_base_aggregator_init (GstBaseAggregator * self,
 {
   GstPadTemplate *pad_template;
 
+  g_return_if_fail (klass->aggregate != NULL);
+
   self->priv =
       G_TYPE_INSTANCE_GET_PRIVATE (self, GST_TYPE_BASE_AGGREGATOR,
       GstBaseAggregatorPrivate);
@@ -731,6 +732,7 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GST_DEBUG_OBJECT (aggpad, "ADDED BUFFER");
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
+
   GST_DEBUG_OBJECT (aggpad, "Done chaining");
 
   return priv->flow_return;
