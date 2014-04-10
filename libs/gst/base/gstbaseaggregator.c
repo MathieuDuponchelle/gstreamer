@@ -72,8 +72,20 @@ struct _GstBaseAggregatorPadPrivate
  *************************************/
 static GstElementClass *parent_class = NULL;
 
-#define AGGREGATE_LOCK(self) g_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
-#define AGGREGATE_UNLOCK(self) g_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock)
+#define AGGREGATE_LOCK(self) G_STMT_START {                             \
+  GST_INFO_OBJECT (self, "Trying to take AGGREGATE in thread %p",       \
+        g_thread_self());                                               \
+  g_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock);      \
+  GST_INFO_OBJECT (self, "Got AGGREGATE in thread %p",                  \
+        g_thread_self());                                               \
+} G_STMT_END
+
+#define AGGREGATE_UNLOCK(self) G_STMT_START {                           \
+  g_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock);    \
+  GST_INFO_OBJECT (self, "Unlocked AGGREGATATE in thread %p",           \
+        g_thread_self());                                               \
+} G_STMT_END
+
 #define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
   GST_INFO_OBJECT (agg, "Waiting for aggregate in thread %p",           \
         g_thread_self());                                               \
@@ -89,7 +101,7 @@ static GstElementClass *parent_class = NULL;
   g_cond_broadcast(&(agg->priv->aggregate_cond));                       \
   GST_INFO_OBJECT (agg, "signaled aggregate from thread %p",            \
         g_thread_self());                                               \
-  }
+  } G_STMT_END
 
 struct _GstBaseAggregatorPrivate
 {
