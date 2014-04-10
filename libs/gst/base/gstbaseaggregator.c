@@ -536,7 +536,16 @@ event_forward_func (GstPad * pad, EventData * evdata)
 }
 
 static gboolean
-_forward_event_to_all_sinkpads (GstPad * srcpad, GstEvent * event,
+_set_flush_pending (GstBaseAggregatorPad * pad, gpointer udata)
+{
+  pad->priv->pending_flush_start = TRUE;
+  pad->priv->pending_flush_stop = FALSE;
+
+  return TRUE;
+}
+
+static gboolean
+_forward_event_to_all_sinkpads (GstBaseAggregator * self, GstEvent * event,
     gboolean flush)
 {
   EventData evdata;
@@ -545,7 +554,12 @@ _forward_event_to_all_sinkpads (GstPad * srcpad, GstEvent * event,
   evdata.result = TRUE;
   evdata.flush = flush;
 
-  gst_pad_forward (srcpad, (GstPadForwardFunction) event_forward_func, &evdata);
+  /* We first need to set all pads as flushing in a first pass
+   * as flush_start flush_stop is sometimes sent synchronously
+   * while we send the seek event */
+  _iterate_all_sinkpads (self, (PadForeachFunc) _set_flush_pending, NULL);
+  gst_pad_forward (self->srcpad, (GstPadForwardFunction) event_forward_func,
+      &evdata);
 
   gst_event_unref (event);
 
