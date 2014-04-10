@@ -819,6 +819,12 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GST_DEBUG_OBJECT (aggpad, "Start chaining");
   GST_DEBUG_OBJECT (aggpad, " chaining");
 
+  if (g_atomic_int_get (&aggpad->flushing) == TRUE)
+    goto flushing;
+
+  if (g_atomic_int_get (&aggpad->eos) == TRUE)
+    goto eos;
+
   PAD_LOCK_EVENT (aggpad);
   if (aggpad->buffer) {
     GST_INFO_OBJECT (aggpad, "Waiting for buffer to be consumed");
@@ -828,10 +834,6 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
 
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
-
-  if (g_atomic_int_get (&aggpad->eos) == TRUE)
-    goto eos;
-
 
   AGGREGATE_LOCK (self);
   priv->cookie++;
