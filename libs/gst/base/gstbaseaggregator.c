@@ -253,6 +253,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
       GstBuffer *tmpbuf;
 
       g_atomic_int_set (&aggpad->flushing, TRUE);
+      aggpad->eos = FALSE;
 
       /*  Remove pad buffer and wake up the streaming thread */
       tmpbuf = gst_base_aggregator_pad_get_buffer (aggpad);
