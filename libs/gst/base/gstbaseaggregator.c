@@ -117,6 +117,7 @@ struct _GstBaseAggregatorPrivate
   gboolean flush_seeking;
   gboolean pending_flush_start;
   GstFlowReturn flow_return;
+  GstEvent *flush_stop_evt;
 };
 
 typedef struct
@@ -204,7 +205,7 @@ _check_all_pads_with_data_or_eos (GstBaseAggregatorPad * aggpad)
   return (aggpad->buffer || aggpad->eos);
 }
 
-static gpointer
+static void
 aggregate_func (GstBaseAggregator * self)
 {
   GstBaseAggregatorPrivate *priv = self->priv;
@@ -241,8 +242,6 @@ aggregate_func (GstBaseAggregator * self)
 
     AGGREGATE_UNLOCK (self);
   } while (priv->running);
-
-  return NULL;
 }
 
 static void
