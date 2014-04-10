@@ -221,6 +221,9 @@ aggregate_func (GstBaseAggregator * self)
     GST_DEBUG ("I'm waiting for aggregation %lu -- %lu", local_cookie,
         priv->cookie);
 
+    if (local_cookie == priv->cookie)
+      WAIT_FOR_AGGREGATE (self);
+
     if (g_atomic_int_get (&priv->flush_seeking)) {
       if (priv->flush_stop_evt == NULL) {
         GST_INFO_OBJECT (self, "Going to PAUSED while seeking");
@@ -236,9 +239,6 @@ aggregate_func (GstBaseAggregator * self)
         g_atomic_int_set (&priv->flush_seeking, FALSE);
       }
     }
-
-    if (local_cookie == priv->cookie)
-      WAIT_FOR_AGGREGATE (self);
 
     local_cookie++;
 
@@ -355,7 +355,10 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
         if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
                 TRUE, FALSE) == TRUE) {
           res = gst_pad_event_default (pad, GST_OBJECT (self), event);
+          AGGREGATE_LOCK (self);
+          priv->cookie++;
           BROADCAST_AGGREGATE (self);
+          AGGREGATE_UNLOCK (self);
           gst_pad_pause_task (self->srcpad);
           event = NULL;
           goto eat;
