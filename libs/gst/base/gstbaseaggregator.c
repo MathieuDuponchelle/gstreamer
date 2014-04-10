@@ -114,52 +114,82 @@ typedef struct
   gboolean flush;
 } EventData;
 
+typedef gboolean (*PadForeachFunc) (GstPad * pad, gpointer user_data);
+
 static gboolean
-_check_all_pads_with_data_or_eos (GstBaseAggregator * self)
+_iterate_all_sinkpads (GstBaseAggregator * self, PadForeachFunc func,
+    gpointer user_data)
 {
+  gboolean result = FALSE;
   GstIterator *iter;
-  gboolean res = TRUE;
   gboolean done = FALSE;
-  GValue data = { 0, };
-  gint numpads = 0;
+  GValue item = { 0, };
+  GList *seen_pads = NULL;
 
-
-  GST_DEBUG_OBJECT (self, "Checking if we are ready to aggregate");
   iter = gst_element_iterate_sink_pads (GST_ELEMENT (self));
 
+  if (!iter)
+    goto no_iter;
+
   while (!done) {
-    switch (gst_iterator_next (iter, &data)) {
+    switch (gst_iterator_next (iter, &item)) {
       case GST_ITERATOR_OK:
       {
-        GstBaseAggregatorPad *aggpad =
-            GST_BASE_AGGREGATOR_PAD (g_value_get_object (&data));
+        GstPad *pad;
 
-        if (!aggpad->buffer && !aggpad->eos) {
-          GST_DEBUG_OBJECT (aggpad, "BUffer %p, EOS %d", aggpad->buffer,
-              aggpad->eos);
-          res = FALSE;
+        pad = g_value_get_object (&item);
+
+        /* if already pushed, skip. FIXME, find something faster to tag pads */
+        if (pad == NULL || g_list_find (seen_pads, pad)) {
+          g_value_reset (&item);
+          break;
         }
-        numpads++;
-        g_value_reset (&data);
+
+        GST_LOG_OBJECT (self, "calling function on pad %s:%s",
+            GST_DEBUG_PAD_NAME (pad));
+        result = func (pad, user_data);
+
+        done = !result;
+
+        seen_pads = g_list_prepend (seen_pads, pad);
+
+        g_value_reset (&item);
         break;
       }
       case GST_ITERATOR_RESYNC:
+        /* We don't reset the result here because we don't push the event
+         * again on pads that got the event already and because we need
+         * to consider the result of the previous pushes */
         gst_iterator_resync (iter);
-        res = TRUE;
+        break;
+      case GST_ITERATOR_ERROR:
+        GST_ERROR_OBJECT (self,
+            "Could not iterate over internally linked pads");
+        done = TRUE;
         break;
       case GST_ITERATOR_DONE:
         done = TRUE;
         break;
-      case GST_ITERATOR_ERROR:
-        g_assert_not_reached ();
-        break;
     }
   }
+  g_value_unset (&item);
+  gst_iterator_free (iter);
 
-  if (!numpads)
-    res = FALSE;
+  if (seen_pads == NULL) {
+    GST_INFO_OBJECT (self, "No pad seen");
+    return FALSE;
+  }
 
-  return res;
+  g_list_free (seen_pads);
+
+no_iter:
+  return result;
+}
+
+static gboolean
+_check_all_pads_with_data_or_eos (GstBaseAggregatorPad * aggpad)
+{
+  return (aggpad->buffer || aggpad->eos);
 }
 
 static gpointer
@@ -183,7 +213,8 @@ aggregate_func (GstBaseAggregator * self)
 
     local_cookie++;
 
-    if (_check_all_pads_with_data_or_eos (self)) {
+    if (_iterate_all_sinkpads (self,
+            (PadForeachFunc) _check_all_pads_with_data_or_eos, NULL)) {
       GST_DEBUG_OBJECT (self, "Aggregating");
 
       priv->flow_return = klass->aggregate (self);
