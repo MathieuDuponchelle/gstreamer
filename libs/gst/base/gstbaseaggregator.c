@@ -260,19 +260,46 @@ aggregate_func (GstBaseAggregator * self)
   } while (priv->running);
 }
 
+static gboolean
+_start_pad (GstBaseAggregatorPad * pad)
+{
+  GST_DEBUG_OBJECT (pad, "Starting pad");
+  g_atomic_int_set (&pad->flushing, FALSE);
+  PAD_LOCK_EVENT (pad);
+  PAD_BROADCAST_EVENT (pad);
+  PAD_UNLOCK_EVENT (pad);
+
+  return TRUE;
+}
+
 static void
 _start (GstBaseAggregator * self)
 {
   self->priv->running = TRUE;
+  _iterate_all_sinkpads (self, (PadForeachFunc) _start_pad, NULL);
   gst_pad_start_task (GST_PAD (self->srcpad), (GstTaskFunction) aggregate_func,
       self, NULL);
   GST_DEBUG_OBJECT (self, "I've started running");
 }
 
+static gboolean
+_stop_pad (GstBaseAggregatorPad * pad)
+{
+  GST_DEBUG_OBJECT (pad, "Stopping pad");
+  g_atomic_int_set (&pad->flushing, TRUE);
+  PAD_LOCK_EVENT (pad);
+  PAD_BROADCAST_EVENT (pad);
+  PAD_UNLOCK_EVENT (pad);
+
+  return TRUE;
+}
+
 static void
 _stop (GstBaseAggregator * self)
 {
-  GST_ERROR ("STOP");
+  GST_DEBUG_OBJECT (self, "Stopping");
+
+  _iterate_all_sinkpads (self, (PadForeachFunc) _stop_pad, NULL);
 
   AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
