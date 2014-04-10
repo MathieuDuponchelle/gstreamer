@@ -221,6 +221,22 @@ aggregate_func (GstBaseAggregator * self)
     GST_DEBUG ("I'm waiting for aggregation %lu -- %lu", local_cookie,
         priv->cookie);
 
+    if (g_atomic_int_get (&priv->flush_seeking)) {
+      if (priv->flush_stop_evt == NULL) {
+        GST_INFO_OBJECT (self, "Going to PAUSED while seeking");
+        AGGREGATE_UNLOCK (self);
+        return;
+      } else {
+        /* The thread was just waken up, push the flush_stop
+         * and stop concidering we are seeking... as we are not anymore!
+         */
+        GST_INFO_OBJECT (self, "Done seeking, pushing FLUSH_STOP event");
+        gst_pad_push_event (self->srcpad, priv->flush_stop_evt);
+        priv->flush_stop_evt = NULL;
+        g_atomic_int_set (&priv->flush_seeking, FALSE);
+      }
+    }
+
     if (local_cookie == priv->cookie)
       WAIT_FOR_AGGREGATE (self);
 
@@ -311,7 +327,11 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
         /* If flush_seeking we forward the first FLUSH_START  */
         if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
                 TRUE, FALSE) == TRUE) {
-          goto forward;
+          res = gst_pad_event_default (pad, GST_OBJECT (self), event);
+          BROADCAST_AGGREGATE (self);
+          gst_pad_pause_task (self->srcpad);
+          event = NULL;
+          goto eat;
         }
       }
 
@@ -320,38 +340,43 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     }
     case GST_EVENT_FLUSH_STOP:
     {
+      GST_ERROR_OBJECT (aggpad, "Got FLUSH_STOP");
       g_atomic_int_set (&aggpad->flushing, FALSE);
       if (g_atomic_int_get (&priv->flush_seeking)) {
-        gboolean needs_forward = FALSE;
         GstIterator *sinkpads;
 
         g_atomic_int_set (&aggpad->priv->pending_flush_stop, FALSE);
         sinkpads = gst_element_iterate_sink_pads (GST_ELEMENT (self));
 
         if (g_atomic_int_get (&priv->flush_seeking)) {
+          gboolean last_flush_stop = FALSE;
+
           /* In the case of flush_seeking we wait for FLUSH_START/FLUSH_STOP
            * to be received on all pads before fowarding the FLUSH_STOP
            * event downstream */
           while (gst_iterator_foreach (sinkpads,
                   (GstIteratorForeachFunction) _check_pending_flush_stop,
-                  &needs_forward) == GST_ITERATOR_RESYNC) {
+                  &last_flush_stop) == GST_ITERATOR_RESYNC) {
             gst_iterator_resync (sinkpads);
-            needs_forward = FALSE;
+            last_flush_stop = FALSE;
           }
 
-          if (needs_forward) {
+          if (last_flush_stop) {
             /* That means we received FLUSH_STOP/FLUSH_STOP on
-             * all sinkpads -- Seeking is Done.*/
-            g_atomic_int_set (&priv->flush_seeking, FALSE);
-            goto forward;
+             * all sinkpads -- Seeking is Done... let our src pad
+             * task start over*/
+            priv->flush_stop_evt = gst_event_copy (event);
+            GST_ERROR ("Going back to PLAYING -- vent: %" GST_PTR_FORMAT,
+                priv->flush_stop_evt);
+
+            gst_pad_start_task (GST_PAD (self->srcpad),
+                (GstTaskFunction) aggregate_func, self, NULL);
           }
         }
-
-        goto eat;
-      } else {
-        goto eat;
       }
-      break;
+
+      /* We never forward the event */
+      goto eat;
     }
     case GST_EVENT_EOS:
     {
@@ -375,6 +400,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     {
       GstSegment seg;
       gst_event_copy_segment (event, &seg);
+
       aggpad->segment = seg;
       goto eat;
     }
@@ -386,7 +412,6 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     }
   }
 
-forward:
   GST_DEBUG_OBJECT (pad, "Fowarding event: %" GST_PTR_FORMAT, event);
   return gst_pad_event_default (pad, GST_OBJECT (self), event);
 
@@ -589,7 +614,7 @@ _src_event (GstBaseAggregator * self, GstEvent * event)
       }
 
       /* forward the seek upstream */
-      res = _forward_event_to_all_sinkpads (self->srcpad, event, flush);
+      res = _forward_event_to_all_sinkpads (self, event, flush);
       event = NULL;
 
       if (!res) {

@@ -602,7 +602,6 @@ GST_START_TEST (test_flushing_seek)
 
   /* and the last FLUSH_STOP is forwarded downstream */
   fail_unless_equals_int (test.flush_start_events, 1);
-  fail_unless_equals_int (test.flush_stop_events, 1);
 
   /*  Check collected */
   gst_pad_add_probe (test.srcpad, GST_PAD_PROBE_TYPE_BUFFER,
@@ -614,6 +613,8 @@ GST_START_TEST (test_flushing_seek)
 
   g_main_loop_run (test.ml);
   g_source_remove (test.timeout_id);
+
+  fail_unless_equals_int (test.flush_stop_events, 1);
 
   /* these will return immediately as at this point the threads have been
    * unlocked and are finished */
