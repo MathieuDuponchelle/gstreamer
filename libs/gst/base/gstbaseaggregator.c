@@ -62,6 +62,7 @@ struct _GstBaseAggregatorPadPrivate
 {
   gboolean pending_flush_start;
   gboolean pending_flush_stop;
+  gboolean pending_eos;
 
   GMutex event_lock;
   GCond event_cond;
@@ -212,6 +213,9 @@ aggregate_func (GstBaseAggregator * self)
   GstBaseAggregatorPrivate *priv = self->priv;
   GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
 
+  if (!priv->running)
+    return;
+
   AGGREGATE_LOCK (self);
 
   GST_DEBUG ("I'm waiting for aggregation %lu -- %lu", priv->aggregate_cookie,
@@ -241,7 +245,7 @@ aggregate_func (GstBaseAggregator * self)
 
   priv->aggregate_cookie++;
 
-  if (_iterate_all_sinkpads (self,
+  while (_iterate_all_sinkpads (self,
           (PadForeachFunc) _check_all_pads_with_data_or_eos, NULL)) {
     GST_DEBUG_OBJECT (self, "Aggregating");
 
@@ -251,8 +255,8 @@ aggregate_func (GstBaseAggregator * self)
         g_atomic_int_get (&priv->flush_seeking))
       priv->flow_return = GST_FLOW_OK;
 
-  } else {
-    GST_DEBUG_OBJECT (self, "Not ready to aggregate");
+    if (priv->flow_return != GST_FLOW_OK)
+      break;
   }
 
   AGGREGATE_UNLOCK (self);
@@ -413,9 +417,19 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
       GST_DEBUG_OBJECT (aggpad, "EOS");
 
       AGGREGATE_LOCK (self);
-      aggpad->eos = TRUE;
-      priv->cookie++;;
-      BROADCAST_AGGREGATE (self);
+
+      /* We still have a buffer, and we don't want the subclass to have to
+       * check for it. Mark pending_eos, eos will be set when get_buffer is
+       * called
+       */
+      if (!aggpad->buffer) {
+        aggpad->eos = TRUE;
+        priv->cookie++;;
+        BROADCAST_AGGREGATE (self);
+      } else {
+        aggpad->priv->pending_eos = TRUE;
+      }
+
       AGGREGATE_UNLOCK (self);
       goto eat;
     }
@@ -823,7 +837,7 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
 
-  if (g_atomic_int_get (&aggpad->eos) == TRUE)
+  if (g_atomic_int_get (&aggpad->priv->pending_eos) == TRUE)
     goto eos;
 
   PAD_LOCK_EVENT (aggpad);
@@ -955,6 +969,8 @@ gst_base_aggregator_pad_get_buffer (GstBaseAggregatorPad * pad)
     GST_DEBUG_OBJECT (pad, "Consuming buffer");
     buffer = pad->buffer;
     pad->buffer = NULL;
+    if (pad->priv->pending_eos)
+      pad->eos = TRUE;
     PAD_BROADCAST_EVENT (pad);
     GST_DEBUG_OBJECT (pad, "Consummed");
   }
