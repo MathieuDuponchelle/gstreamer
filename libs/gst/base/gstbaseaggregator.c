@@ -845,19 +845,19 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
     GST_INFO_OBJECT (aggpad, "Waiting for buffer to be consumed");
     PAD_WAIT_EVENT (aggpad);
   }
+  PAD_UNLOCK_EVENT (aggpad);
 
-  if (g_atomic_int_get (&aggpad->flushing) == TRUE) {
-    PAD_UNLOCK_EVENT (aggpad);
+  if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
-  }
 
   AGGREGATE_LOCK (self);
   priv->cookie++;
+  PAD_LOCK_EVENT (aggpad);
   gst_buffer_replace (&aggpad->buffer, buffer);
+  PAD_UNLOCK_EVENT (aggpad);
   GST_DEBUG_OBJECT (aggpad, "ADDED BUFFER");
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
-  PAD_UNLOCK_EVENT (aggpad);
 
   GST_DEBUG_OBJECT (aggpad, "Done chaining");
 
