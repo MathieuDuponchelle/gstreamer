@@ -313,13 +313,10 @@ _stop (GstBaseAggregator * self)
   GST_DEBUG_OBJECT (self, "I've stopped running");
 }
 
-static void
-_check_pending_flush_stop (GValue * item, gboolean * needs_forward)
+static gboolean
+_check_pending_flush_stop (GstBaseAggregatorPad * pad)
 {
-  GstBaseAggregatorPad *pad = g_value_get_object (item);
-
-  *needs_forward = !pad->priv->pending_flush_stop
-      && !pad->priv->pending_flush_start;
+  return (!pad->priv->pending_flush_stop && !pad->priv->pending_flush_start);
 }
 
 /* GstBaseAggregator vmethods default implementations */
@@ -373,23 +370,29 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
       GST_ERROR_OBJECT (aggpad, "Got FLUSH_STOP");
       g_atomic_int_set (&aggpad->flushing, FALSE);
       if (g_atomic_int_get (&priv->flush_seeking)) {
-        GstIterator *sinkpads;
-
         g_atomic_int_set (&aggpad->priv->pending_flush_stop, FALSE);
-        sinkpads = gst_element_iterate_sink_pads (GST_ELEMENT (self));
 
         if (g_atomic_int_get (&priv->flush_seeking)) {
           gboolean last_flush_stop = FALSE;
 
-          /* In the case of flush_seeking we wait for FLUSH_START/FLUSH_STOP
-           * to be received on all pads before fowarding the FLUSH_STOP
-           * event downstream */
-          while (gst_iterator_foreach (sinkpads,
-                  (GstIteratorForeachFunction) _check_pending_flush_stop,
-                  &last_flush_stop) == GST_ITERATOR_RESYNC) {
-            gst_iterator_resync (sinkpads);
-            last_flush_stop = FALSE;
+          GST_OBJECT_LOCK (self);
+          {
+            GList *tmp;
+            GstBaseAggregatorPad *tmppad;
+
+            for (tmp = GST_ELEMENT (self)->sinkpads; tmp; tmp = tmp->next) {
+              tmppad = (GstBaseAggregatorPad *) tmp->data;
+              last_flush_stop = _check_pending_flush_stop (tmp->data);
+
+              if (last_flush_stop == FALSE) {
+                GST_ERROR_OBJECT (tmppad, "Is not last %i -- %i",
+                    tmppad->priv->pending_flush_start,
+                    tmppad->priv->pending_flush_stop);
+                break;
+              }
+            }
           }
+          GST_OBJECT_UNLOCK (self);
 
           if (last_flush_stop) {
             /* That means we received FLUSH_STOP/FLUSH_STOP on
@@ -582,8 +585,12 @@ event_forward_func (GstPad * pad, EventData * evdata)
   }
 
   if (evdata->flush) {
-    padpriv->pending_flush_start = ret;
-    padpriv->pending_flush_stop = FALSE;
+    evdata->result &= ret;
+
+    if (ret == FALSE) {
+      padpriv->pending_flush_start = FALSE;
+      padpriv->pending_flush_stop = FALSE;
+    }
   }
 
   /* Always send to all pads */
