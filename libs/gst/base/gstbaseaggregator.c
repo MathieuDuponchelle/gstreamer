@@ -217,13 +217,16 @@ aggregate_func (GstBaseAggregator * self)
   GST_DEBUG ("I'm waiting for aggregation %lu -- %lu", priv->aggregate_cookie,
       priv->cookie);
 
-  if (priv->aggregate_cookie == priv->cookie && priv->aggregate_cookie != 0)
+  if (priv->aggregate_cookie == priv->cookie) {
+    GST_ERROR ("I'm really waiting");
     WAIT_FOR_AGGREGATE (self);
+  }
 
   if (g_atomic_int_get (&priv->flush_seeking)) {
     if (priv->flush_stop_evt == NULL) {
       GST_INFO_OBJECT (self, "Going to PAUSED while seeking");
       AGGREGATE_UNLOCK (self);
+      gst_pad_pause_task (self->srcpad);
       return;
     } else {
       /* The thread was just waken up, push the flush_stop
@@ -351,7 +354,6 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
           priv->cookie++;
           BROADCAST_AGGREGATE (self);
           AGGREGATE_UNLOCK (self);
-          gst_pad_pause_task (self->srcpad);
           event = NULL;
           goto eat;
         }
@@ -409,13 +411,6 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     case GST_EVENT_EOS:
     {
       GST_DEBUG_OBJECT (aggpad, "EOS");
-
-      PAD_LOCK_EVENT (aggpad);
-      while (aggpad->buffer) {
-        GST_DEBUG ("Waiting for buffer to be consumed");
-        PAD_WAIT_EVENT (aggpad);
-      }
-      PAD_UNLOCK_EVENT (aggpad);
 
       AGGREGATE_LOCK (self);
       aggpad->eos = TRUE;
@@ -771,7 +766,7 @@ gst_base_aggregator_init (GstBaseAggregator * self,
 
   self->priv->padcount = -1;
   self->priv->cookie = 0;
-  self->priv->aggregate_cookie = 0;
+  self->priv->aggregate_cookie = -1;
   g_mutex_init (&self->priv->aggregate_lock);
 
   self->srcpad = gst_pad_new_from_template (pad_template, "src");
@@ -836,10 +831,11 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
     GST_INFO_OBJECT (aggpad, "Waiting for buffer to be consumed");
     PAD_WAIT_EVENT (aggpad);
   }
-  PAD_UNLOCK_EVENT (aggpad);
 
-  if (g_atomic_int_get (&aggpad->flushing) == TRUE)
+  if (g_atomic_int_get (&aggpad->flushing) == TRUE) {
+    PAD_UNLOCK_EVENT (aggpad);
     goto flushing;
+  }
 
   AGGREGATE_LOCK (self);
   priv->cookie++;
@@ -847,6 +843,7 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GST_DEBUG_OBJECT (aggpad, "ADDED BUFFER");
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
+  PAD_UNLOCK_EVENT (aggpad);
 
   GST_DEBUG_OBJECT (aggpad, "Done chaining");
 
