@@ -258,8 +258,8 @@ aggregate_func (GstBaseAggregator * self)
   if (g_atomic_int_get (&priv->flush_seeking)) {
     if (priv->flush_stop_evt == NULL) {
       GST_INFO_OBJECT (self, "Going to PAUSED while seeking");
-      AGGREGATE_UNLOCK (self);
       gst_pad_pause_task (self->srcpad);
+      AGGREGATE_UNLOCK (self);
       return;
     } else {
       /* The thread was just waken up, push the flush_stop
@@ -310,8 +310,10 @@ _start (GstBaseAggregator * self)
 {
   self->priv->running = TRUE;
   _iterate_all_sinkpads (self, (PadForeachFunc) _start_pad, NULL);
+  AGGREGATE_LOCK (self);
   gst_pad_start_task (GST_PAD (self->srcpad), (GstTaskFunction) aggregate_func,
       self, NULL);
+  AGGREGATE_UNLOCK (self);
   GST_DEBUG_OBJECT (self, "I've started running");
 }
 
@@ -430,6 +432,8 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
             /* That means we received FLUSH_STOP/FLUSH_STOP on
              * all sinkpads -- Seeking is Done... let our src pad
              * task start over*/
+
+            AGGREGATE_LOCK (self);
             GST_DEBUG_OBJECT (self, "I shall send segment");
             g_atomic_int_set (&priv->send_segment, TRUE);
             priv->flush_stop_evt = gst_event_copy (event);
@@ -439,6 +443,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
             gst_pad_start_task (GST_PAD (self->srcpad),
                 (GstTaskFunction) aggregate_func, self, NULL);
+            AGGREGATE_UNLOCK (self);
           }
         }
       }
