@@ -669,15 +669,16 @@ GST_START_TEST (test_infinite_seek)
       gst_element_seek_simple (sink, GST_FORMAT_BYTES,
       GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
 
-  while ((msg = gst_bus_poll (bus, GST_MESSAGE_ASYNC_DONE, -1))
-      && count < INFINITE_SEEK_NUMBER) {
-    GST_INFO ("Starting a new seek");
+  GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (pipeline), GST_DEBUG_GRAPH_SHOW_ALL,
+      "baseaggregator_infiniteseek");
+  while (count < INFINITE_SEEK_NUMBER) {
     seek_res =
         gst_element_seek_simple (sink, GST_FORMAT_BYTES,
         GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
     GST_DEBUG ("seek result is : %d", seek_res);
     fail_unless (seek_res != 0);
     count += 1;
+    gst_element_get_state (pipeline, NULL, NULL, -1);
   }
 
   gst_element_set_state (pipeline, GST_STATE_NULL);

@@ -628,10 +628,11 @@ event_forward_func (GstPad * pad, EventData * evdata)
     gst_object_unref (peer);
   }
 
-  if (evdata->flush) {
-    evdata->result &= ret;
+  evdata->result &= ret;
 
-    if (ret == FALSE) {
+  if (ret == FALSE) {
+    GST_ERROR_OBJECT (pad, "Seek %" GST_PTR_FORMAT " failed", evdata->event);
+    if (evdata->flush) {
       padpriv->pending_flush_start = FALSE;
       padpriv->pending_flush_stop = FALSE;
     }
