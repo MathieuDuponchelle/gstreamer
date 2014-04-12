@@ -628,14 +628,14 @@ GST_START_TEST (test_flushing_seek)
 
 GST_END_TEST;
 
-GST_START_TEST (test_infinite_seek)
+static void
+infinite_seek (guint num_srcs)
 {
   GstBus *bus;
-  GstMessage *msg;
-  GstElement *pipeline, *src, *src1, *agg, *sink;
+  GstElement *pipeline, *src, *agg, *sink;
   gboolean seek_res;
 
-  gint count = 0;
+  gint count = 0, i;
 
   gst_init (NULL, NULL);
 
@@ -644,21 +644,16 @@ GST_START_TEST (test_infinite_seek)
   agg = gst_check_setup_element ("aggregator");
   sink = gst_check_setup_element ("fakesink");
 
-  src = gst_element_factory_make ("fakesrc", NULL);
-  g_object_set (src, "num-buffers", 10000, "sizetype", 2, "sizemax", 4, NULL);
-
-  src1 = gst_element_factory_make ("fakesrc", "src1");
-  g_object_set (src1, "num-buffers", 10000, "sizetype", 2, "sizemax", 4, NULL);
-
-  g_object_set (sink, "sync", TRUE, NULL);
-
-  fail_unless (gst_bin_add (GST_BIN (pipeline), src));
-  fail_unless (gst_bin_add (GST_BIN (pipeline), src1));
   fail_unless (gst_bin_add (GST_BIN (pipeline), agg));
   fail_unless (gst_bin_add (GST_BIN (pipeline), sink));
-  fail_unless (gst_element_link (src, agg));
-  fail_unless (gst_element_link (src1, agg));
   fail_unless (gst_element_link (agg, sink));
+
+  for (i = 0; i < num_srcs; i++) {
+    src = gst_element_factory_make ("fakesrc", NULL);
+    g_object_set (src, "sizetype", 2, "sizemax", 4, NULL);
+    fail_unless (gst_bin_add (GST_BIN (pipeline), src));
+    fail_unless (gst_element_link (src, agg));
+  }
 
   bus = gst_element_get_bus (pipeline);
   fail_if (bus == NULL);
@@ -686,6 +681,18 @@ GST_START_TEST (test_infinite_seek)
   gst_object_unref (pipeline);
 }
 
+GST_START_TEST (test_infinite_seek)
+{
+  infinite_seek (2);
+}
+
+GST_END_TEST;
+
+GST_START_TEST (test_infinite_seek_50_src)
+{
+  infinite_seek (50);
+}
+
 GST_END_TEST;
 
 static Suite *
@@ -703,8 +710,8 @@ gst_base_aggregator_suite (void)
   tcase_add_test (general, test_aggregate);
   tcase_add_test (general, test_aggregate_eos);
   tcase_add_test (general, test_flushing_seek);
-  (void) test_infinite_seek;
   tcase_add_test (general, test_infinite_seek);
+  tcase_add_test (general, test_infinite_seek_50_src);
   tcase_add_test (general, test_linear_pipeline);
   tcase_add_test (general, test_two_src_pipeline);
 
