@@ -508,6 +508,7 @@ _change_state (GstElement * element, GstStateChange transition)
 static void
 _release_pad (GstElement * element, GstPad * pad)
 {
+  GstBuffer *tmpbuf;
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (element);
   GstBaseAggregatorPrivate *priv = self->priv;
 
@@ -517,7 +518,8 @@ _release_pad (GstElement * element, GstPad * pad)
 
   AGGREGATE_LOCK (self);
   g_atomic_int_set (&aggpad->flushing, FALSE);
-  gst_base_aggregator_pad_get_buffer (aggpad);
+  tmpbuf = gst_base_aggregator_pad_get_buffer (aggpad);
+  gst_buffer_replace (&tmpbuf, NULL);
   gst_element_remove_pad (element, pad);
   priv->cookie++;
   BROADCAST_AGGREGATE (self);
