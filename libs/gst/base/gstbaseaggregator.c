@@ -537,6 +537,7 @@ _request_new_pad (GstElement * element,
 
   agg = GST_BASE_AGGREGATOR (element);
 
+  AGGREGATE_LOCK (agg);
   if (templ == gst_element_class_get_pad_template (klass, "sink_%u")) {
     gchar *name = NULL;
 
@@ -549,6 +550,7 @@ _request_new_pad (GstElement * element,
     g_free (name);
     GST_OBJECT_UNLOCK (element);
   } else {
+    AGGREGATE_UNLOCK (agg);
     return NULL;
   }
 
@@ -559,6 +561,7 @@ _request_new_pad (GstElement * element,
 
   /* add the pad to the element */
   gst_element_add_pad (element, GST_PAD (agg_pad));
+  AGGREGATE_UNLOCK (agg);
 
   return GST_PAD (agg_pad);
 }
