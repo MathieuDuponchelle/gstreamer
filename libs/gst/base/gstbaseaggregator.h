@@ -104,6 +104,7 @@ struct _GstBaseAggregator {
   GstElement      parent;
 
   GstPad *srcpad;
+  GstSegment segment;
 
   /*< private >*/
   GstBaseAggregatorPrivate *priv;
@@ -134,6 +135,9 @@ struct _GstBaseAggregatorClass {
   /*< private >*/
   gpointer _gst_reserved[GST_PADDING];
 };
+
+GstFlowReturn
+gst_base_aggregator_finish_buffer(GstBaseAggregator *agg, GstBuffer *buf);
 
 GType gst_base_aggregator_get_type(void);
 
