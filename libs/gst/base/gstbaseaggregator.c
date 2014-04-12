@@ -538,17 +538,18 @@ _release_pad (GstElement * element, GstPad * pad)
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (element);
   GstBaseAggregatorPrivate *priv = self->priv;
 
-  GST_DEBUG_OBJECT (pad, "Removing pad");
+  GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
-  if (!priv->running)
-    gst_pad_set_active (pad, FALSE);
-
-  gst_element_remove_pad (element, pad);
+  GST_ERROR_OBJECT (pad, "Removing pad");
 
   AGGREGATE_LOCK (self);
+  g_atomic_int_set (&aggpad->flushing, FALSE);
+  gst_base_aggregator_pad_get_buffer (aggpad);
+  gst_element_remove_pad (element, pad);
   priv->cookie++;
   BROADCAST_AGGREGATE (self);
   AGGREGATE_UNLOCK (self);
+
 }
 
 static GstPad *

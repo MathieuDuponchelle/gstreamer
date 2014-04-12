@@ -693,7 +693,7 @@ GST_END_TEST;
 GST_START_TEST (test_add_remove)
 {
   GstBus *bus;
-  guint num_iterations = 5;
+  guint num_iterations = 50;
   GstElement *pipeline, *src, *src1, *agg, *sink;
 
   gint count = 0;
@@ -722,20 +722,21 @@ GST_START_TEST (test_add_remove)
   GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (pipeline), GST_DEBUG_GRAPH_SHOW_ALL,
       "baseaggregator_infiniteseek");
   while (count < num_iterations) {
-    GST_ERROR ("Count: %i", count);
+    GstPad *pad, *peer;
     src1 = gst_element_factory_make ("fakesrc", NULL);
     g_object_set (src, "sizetype", 2, "sizemax", 4, NULL);
     fail_unless (gst_bin_add (GST_BIN (pipeline), src1));
-    GST_ERROR ("Added src1");
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
         GST_DEBUG_GRAPH_SHOW_ALL, "baseaggregator_added");
     fail_unless (gst_element_sync_state_with_parent (src1));
     fail_unless (gst_element_link (src1, agg));
 
-    gst_element_unlink (src, agg);
+    pad = gst_element_get_static_pad (src, "src");
+    peer = gst_pad_get_peer (pad);
+    gst_pad_unlink (pad, peer);
+    gst_element_release_request_pad (agg, peer);
     fail_unless (gst_bin_remove (GST_BIN (pipeline), src));
     gst_element_set_state (src, GST_STATE_NULL);
-    GST_ERROR ("Cleaning %p", src);
 
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
         GST_DEBUG_GRAPH_SHOW_ALL, "baseaggregator_removed");
