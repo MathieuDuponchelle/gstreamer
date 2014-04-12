@@ -694,7 +694,7 @@ GST_START_TEST (test_add_remove)
 {
   GstBus *bus;
   guint num_iterations = 50;
-  GstElement *pipeline, *src, *src1, *agg, *sink;
+  GstElement *pipeline, *src = NULL, *src1, *agg, *sink;
 
   gint count = 0;
 
@@ -709,34 +709,34 @@ GST_START_TEST (test_add_remove)
   fail_unless (gst_bin_add (GST_BIN (pipeline), sink));
   fail_unless (gst_element_link (agg, sink));
 
-  src = gst_element_factory_make ("fakesrc", NULL);
-  g_object_set (src, "sizetype", 2, "sizemax", 4, NULL);
-  fail_unless (gst_bin_add (GST_BIN (pipeline), src));
-  fail_unless (gst_element_link (src, agg));
-
   bus = gst_element_get_bus (pipeline);
   fail_if (bus == NULL);
-  gst_element_set_state (pipeline, GST_STATE_PLAYING);
-  gst_element_get_state (pipeline, NULL, NULL, -1);
 
   GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (pipeline), GST_DEBUG_GRAPH_SHOW_ALL,
       "baseaggregator_infiniteseek");
   while (count < num_iterations) {
     GstPad *pad, *peer;
+
     src1 = gst_element_factory_make ("fakesrc", NULL);
-    g_object_set (src, "sizetype", 2, "sizemax", 4, NULL);
+    g_object_set (src1, "sizetype", 2, "sizemax", 4, NULL);
     fail_unless (gst_bin_add (GST_BIN (pipeline), src1));
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
         GST_DEBUG_GRAPH_SHOW_ALL, "baseaggregator_added");
     fail_unless (gst_element_sync_state_with_parent (src1));
     fail_unless (gst_element_link (src1, agg));
 
-    pad = gst_element_get_static_pad (src, "src");
-    peer = gst_pad_get_peer (pad);
-    gst_pad_unlink (pad, peer);
-    gst_element_release_request_pad (agg, peer);
-    fail_unless (gst_bin_remove (GST_BIN (pipeline), src));
-    gst_element_set_state (src, GST_STATE_NULL);
+    if (src) {
+      pad = gst_element_get_static_pad (src, "src");
+      peer = gst_pad_get_peer (pad);
+      gst_pad_unlink (pad, peer);
+      GST_ERROR ("HERE");
+      gst_element_release_request_pad (agg, peer);
+      fail_unless (gst_bin_remove (GST_BIN (pipeline), src));
+      gst_element_set_state (src, GST_STATE_NULL);
+    } else {
+      gst_element_set_state (pipeline, GST_STATE_PLAYING);
+      gst_element_get_state (pipeline, NULL, NULL, -1);
+    }
 
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
         GST_DEBUG_GRAPH_SHOW_ALL, "baseaggregator_removed");
