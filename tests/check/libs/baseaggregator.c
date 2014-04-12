@@ -40,7 +40,6 @@ typedef struct _GstAggregatorClass GstAggregatorClass;
 static GType gst_aggregator_get_type (void);
 
 #define BUFFER_DURATION 100000000       /* 10 frames per second */
-#define INFINITE_SEEK_NUMBER 500        /* Everything is finite my good lord */
 
 struct _GstAggregator
 {
@@ -629,7 +628,7 @@ GST_START_TEST (test_flushing_seek)
 GST_END_TEST;
 
 static void
-infinite_seek (guint num_srcs)
+infinite_seek (guint num_srcs, guint num_seeks)
 {
   GstBus *bus;
   GstElement *pipeline, *src, *agg, *sink;
@@ -660,13 +659,9 @@ infinite_seek (guint num_srcs)
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
   gst_element_get_state (pipeline, NULL, NULL, -1);
 
-  seek_res =
-      gst_element_seek_simple (sink, GST_FORMAT_BYTES,
-      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
-
   GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (pipeline), GST_DEBUG_GRAPH_SHOW_ALL,
       "baseaggregator_infiniteseek");
-  while (count < INFINITE_SEEK_NUMBER) {
+  while (count < num_seeks) {
     seek_res =
         gst_element_seek_simple (sink, GST_FORMAT_BYTES,
         GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
@@ -683,14 +678,14 @@ infinite_seek (guint num_srcs)
 
 GST_START_TEST (test_infinite_seek)
 {
-  infinite_seek (2);
+  infinite_seek (2, 500);
 }
 
 GST_END_TEST;
 
 GST_START_TEST (test_infinite_seek_50_src)
 {
-  infinite_seek (50);
+  infinite_seek (50, 100);
 }
 
 GST_END_TEST;
