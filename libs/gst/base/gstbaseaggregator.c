@@ -346,10 +346,8 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
       aggpad->eos = FALSE;
 
       /*  Remove pad buffer and wake up the streaming thread */
-      AGGREGATE_LOCK (self);
       tmpbuf = gst_base_aggregator_pad_get_buffer (aggpad);
       gst_buffer_replace (&tmpbuf, NULL);
-      AGGREGATE_UNLOCK (self);
 
       if (g_atomic_int_compare_and_exchange (&padpriv->pending_flush_start,
               TRUE, FALSE) == TRUE) {
