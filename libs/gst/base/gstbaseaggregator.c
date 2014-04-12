@@ -293,23 +293,10 @@ aggregate_func (GstBaseAggregator * self)
   AGGREGATE_UNLOCK (self);
 }
 
-static gboolean
-_start_pad (GstBaseAggregatorPad * pad)
-{
-  GST_DEBUG_OBJECT (pad, "Starting pad");
-  g_atomic_int_set (&pad->flushing, FALSE);
-  PAD_LOCK_EVENT (pad);
-  PAD_BROADCAST_EVENT (pad);
-  PAD_UNLOCK_EVENT (pad);
-
-  return TRUE;
-}
-
 static void
 _start (GstBaseAggregator * self)
 {
   self->priv->running = TRUE;
-  _iterate_all_sinkpads (self, (PadForeachFunc) _start_pad, NULL);
   AGGREGATE_LOCK (self);
   gst_pad_start_task (GST_PAD (self->srcpad), (GstTaskFunction) aggregate_func,
       self, NULL);
@@ -317,24 +304,10 @@ _start (GstBaseAggregator * self)
   GST_DEBUG_OBJECT (self, "I've started running");
 }
 
-static gboolean
-_stop_pad (GstBaseAggregatorPad * pad)
-{
-  GST_DEBUG_OBJECT (pad, "Stopping pad");
-  g_atomic_int_set (&pad->flushing, TRUE);
-  PAD_LOCK_EVENT (pad);
-  PAD_BROADCAST_EVENT (pad);
-  PAD_UNLOCK_EVENT (pad);
-
-  return TRUE;
-}
-
 static void
 _stop (GstBaseAggregator * self)
 {
   GST_DEBUG_OBJECT (self, "Stopping");
-
-  _iterate_all_sinkpads (self, (PadForeachFunc) _stop_pad, NULL);
 
   AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
@@ -958,6 +931,27 @@ pad_event_func (GstPad * pad, GstObject * parent, GstEvent * event)
       GST_BASE_AGGREGATOR_PAD (pad), event);
 }
 
+static gboolean
+pad_activate_mode_func (GstPad * pad,
+    GstObject * parent, GstPadMode mode, gboolean active)
+{
+  GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
+
+  if (active == FALSE) {
+    PAD_LOCK_EVENT (aggpad);
+    g_atomic_int_set (&aggpad->flushing, TRUE);
+    PAD_BROADCAST_EVENT (aggpad);
+    PAD_UNLOCK_EVENT (aggpad);
+  } else {
+    g_atomic_int_set (&aggpad->flushing, FALSE);
+    PAD_LOCK_EVENT (aggpad);
+    PAD_BROADCAST_EVENT (aggpad);
+    PAD_UNLOCK_EVENT (aggpad);
+  }
+
+  return TRUE;
+}
+
 /***********************************
  * GstBaseAggregatorPad implementation  *
  ************************************/
@@ -979,6 +973,8 @@ _pad_constructed (GObject * object)
       GST_DEBUG_FUNCPTR ((GstPadEventFunction) pad_event_func));
   gst_pad_set_query_function (pad,
       GST_DEBUG_FUNCPTR ((GstPadQueryFunction) pad_query_func));
+  gst_pad_set_activatemode_function (pad,
+      GST_DEBUG_FUNCPTR ((GstPadActivateModeFunction) pad_activate_mode_func));
 }
 
 static void
