@@ -630,10 +630,11 @@ static void
 infinite_seek (guint num_srcs, guint num_seeks)
 {
   GstBus *bus;
+  GstMessage *message;
   GstElement *pipeline, *src, *agg, *sink;
-  gboolean seek_res;
 
   gint count = 0, i;
+  gboolean seek_res, carry_on = TRUE;
 
   gst_init (NULL, NULL);
 
@@ -656,18 +657,47 @@ infinite_seek (guint num_srcs, guint num_seeks)
   bus = gst_element_get_bus (pipeline);
   fail_if (bus == NULL);
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
-  gst_element_get_state (pipeline, NULL, NULL, -1);
+  while (count < num_seeks && carry_on) {
+    message = gst_bus_poll (bus, GST_MESSAGE_ANY, GST_SECOND / 10);
+    if (message) {
+      switch (GST_MESSAGE_TYPE (message)) {
+        case GST_MESSAGE_EOS:
+        {
+          /* we should check if we really finished here */
+          GST_WARNING ("Got an EOS");
+          carry_on = FALSE;
+          break;
+        }
+        case GST_MESSAGE_STATE_CHANGED:
+        {
+          GstState new;
 
-  GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (pipeline), GST_DEBUG_GRAPH_SHOW_ALL,
-      "baseaggregator_infiniteseek");
-  while (count < num_seeks) {
-    seek_res =
-        gst_element_seek_simple (sink, GST_FORMAT_BYTES,
-        GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
-    GST_DEBUG ("seek result is : %d", seek_res);
-    fail_unless (seek_res != 0);
-    count += 1;
-    gst_element_get_state (pipeline, NULL, NULL, -1);
+          if (GST_MESSAGE_SRC (message) == GST_OBJECT (pipeline)) {
+            gst_message_parse_state_changed (message, NULL, &new, NULL);
+
+            if (new != GST_STATE_PLAYING)
+              break;
+
+            GST_INFO ("Seeking (num: %i)", count);
+            seek_res =
+                gst_element_seek_simple (sink, GST_FORMAT_BYTES,
+                GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
+            GST_INFO ("seek result is : %d", seek_res);
+            fail_unless (seek_res != 0);
+            count++;
+          }
+
+          break;
+        }
+        case GST_MESSAGE_ERROR:
+          GST_ERROR ("Error on the bus: %" GST_PTR_FORMAT, message);
+          carry_on = FALSE;
+          break;
+        default:
+          break;
+      }
+      gst_message_unref (message);
+    }
   }
 
   gst_element_set_state (pipeline, GST_STATE_NULL);
