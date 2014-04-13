@@ -122,6 +122,8 @@ struct _GstBaseAggregatorPrivate
   gboolean pending_flush_start;
   GstFlowReturn flow_return;
   GstEvent *flush_stop_evt;
+
+  GstCaps *srccaps;
 };
 
 typedef struct
@@ -209,6 +211,12 @@ _check_all_pads_with_data_or_eos (GstBaseAggregatorPad * aggpad)
   return (aggpad->buffer || aggpad->eos);
 }
 
+void
+gst_base_aggregator_set_src_caps (GstBaseAggregator * agg, GstCaps * caps)
+{
+  agg->priv->srccaps = caps;
+}
+
 GstFlowReturn
 gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
 {
@@ -222,6 +230,14 @@ gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
       GST_WARNING_OBJECT (self->srcpad, "Sending stream start event failed");
     }
     g_atomic_int_set (&self->priv->send_stream_start, FALSE);
+  }
+
+  if (self->priv->srccaps) {
+    if (!gst_pad_push_event (self->srcpad,
+            gst_event_new_caps (self->priv->srccaps))) {
+      GST_WARNING_OBJECT (self->srcpad, "Sending caps event failed");
+    }
+    self->priv->srccaps = NULL;
   }
 
   if (g_atomic_int_get (&self->priv->send_segment)) {
@@ -298,11 +314,14 @@ static void
 _start (GstBaseAggregator * self)
 {
   self->priv->running = TRUE;
+  self->priv->send_stream_start = TRUE;
+  self->priv->send_segment = TRUE;
+  self->priv->srccaps = NULL;
   AGGREGATE_LOCK (self);
   gst_pad_start_task (GST_PAD (self->srcpad), (GstTaskFunction) aggregate_func,
       self, NULL);
   AGGREGATE_UNLOCK (self);
-  GST_DEBUG_OBJECT (self, "I've started running");
+  GST_INFO_OBJECT (self, "I've started running");
 }
 
 static void
@@ -319,7 +338,7 @@ _stop (GstBaseAggregator * self)
   gst_pad_stop_task (GST_PAD (self->srcpad));
 
 
-  GST_DEBUG_OBJECT (self, "I've stopped running");
+  GST_INFO_OBJECT (self, "I've stopped running");
 }
 
 static gboolean
@@ -817,8 +836,6 @@ gst_base_aggregator_init (GstBaseAggregator * self,
   self->priv->padcount = -1;
   self->priv->cookie = 0;
   self->priv->aggregate_cookie = -1;
-  self->priv->send_stream_start = TRUE;
-  self->priv->send_segment = TRUE;
   gst_segment_init (&self->segment, GST_FORMAT_TIME);
 
   self->srcpad = gst_pad_new_from_template (pad_template, "src");

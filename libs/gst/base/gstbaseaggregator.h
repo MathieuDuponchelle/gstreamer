@@ -139,6 +139,9 @@ struct _GstBaseAggregatorClass {
 GstFlowReturn
 gst_base_aggregator_finish_buffer(GstBaseAggregator *agg, GstBuffer *buf);
 
+void
+gst_base_aggregator_set_src_caps (GstBaseAggregator * agg, GstCaps * caps);
+
 GType gst_base_aggregator_get_type(void);
 
 G_END_DECLS
