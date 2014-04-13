@@ -33,27 +33,27 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
 
 /* GstBaseAggregatorPad definitions */
 #define PAD_LOCK_EVENT(pad)   G_STMT_START {                            \
-  GST_INFO_OBJECT (pad, "Taking EVENT lock from thread %p",              \
+  GST_LOG_OBJECT (pad, "Taking EVENT lock from thread %p",              \
         g_thread_self());                                               \
   g_mutex_lock(&pad->priv->event_lock);                                 \
   } G_STMT_END
 
 #define PAD_UNLOCK_EVENT(pad)  G_STMT_START {                           \
-  GST_INFO_OBJECT (pad, "Releasing EVENT lock from thread %p",          \
+  GST_LOG_OBJECT (pad, "Releasing EVENT lock from thread %p",          \
         g_thread_self());                                               \
   g_mutex_unlock(&pad->priv->event_lock);                               \
   } G_STMT_END
 
 
 #define PAD_WAIT_EVENT(pad)   G_STMT_START {                            \
-  GST_INFO_OBJECT (pad, "Waiting for EVENT on thread %p",               \
+  GST_LOG_OBJECT (pad, "Waiting for EVENT on thread %p",               \
         g_thread_self());                                               \
   g_cond_wait(&(((GstBaseAggregatorPad* )pad)->priv->event_cond),       \
       &(pad->priv->event_lock));                                        \
   } G_STMT_END
 
 #define PAD_BROADCAST_EVENT(pad) {                                          \
-  GST_INFO_OBJECT (pad, "Signaling EVENT from thread %p",               \
+  GST_LOG_OBJECT (pad, "Signaling EVENT from thread %p",               \
         g_thread_self());                                                   \
   g_cond_broadcast(&(((GstBaseAggregatorPad* )pad)->priv->event_cond)); \
   }
@@ -74,33 +74,33 @@ struct _GstBaseAggregatorPadPrivate
 static GstElementClass *parent_class = NULL;
 
 #define AGGREGATE_LOCK(self) G_STMT_START {                             \
-  GST_INFO_OBJECT (self, "Trying to take AGGREGATE in thread %p",       \
+  GST_LOG_OBJECT (self, "Trying to take AGGREGATE in thread %p",       \
         g_thread_self());                                               \
   g_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock);      \
-  GST_INFO_OBJECT (self, "Got AGGREGATE in thread %p",                  \
+  GST_LOG_OBJECT (self, "Got AGGREGATE in thread %p",                  \
         g_thread_self());                                               \
 } G_STMT_END
 
 #define AGGREGATE_UNLOCK(self) G_STMT_START {                           \
   g_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock);    \
-  GST_INFO_OBJECT (self, "Unlocked AGGREGATATE in thread %p",           \
+  GST_LOG_OBJECT (self, "Unlocked AGGREGATATE in thread %p",           \
         g_thread_self());                                               \
 } G_STMT_END
 
 #define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
-  GST_INFO_OBJECT (agg, "Waiting for aggregate in thread %p",           \
+  GST_LOG_OBJECT (agg, "Waiting for aggregate in thread %p",           \
         g_thread_self());                                               \
   g_cond_wait(&(agg->priv->aggregate_cond),                             \
       &(agg->priv->aggregate_lock));                                    \
-  GST_INFO_OBJECT (agg, "Done waiting for aggregate in thread %p",      \
+  GST_LOG_OBJECT (agg, "Done waiting for aggregate in thread %p",      \
         g_thread_self());                                               \
   } G_STMT_END
 
 #define BROADCAST_AGGREGATE(agg) {                                      \
-  GST_INFO_OBJECT (agg, "signaling aggregate from thread %p",           \
+  GST_LOG_OBJECT (agg, "signaling aggregate from thread %p",           \
         g_thread_self());                                               \
   g_cond_broadcast(&(agg->priv->aggregate_cond));                       \
-  GST_INFO_OBJECT (agg, "signaled aggregate from thread %p",            \
+  GST_LOG_OBJECT (agg, "signaled aggregate from thread %p",            \
         g_thread_self());                                               \
   } G_STMT_END
 
@@ -193,7 +193,7 @@ _iterate_all_sinkpads (GstBaseAggregator * self, PadForeachFunc func,
   gst_iterator_free (iter);
 
   if (seen_pads == NULL) {
-    GST_INFO_OBJECT (self, "No pad seen");
+    GST_DEBUG_OBJECT (self, "No pad seen");
     return FALSE;
   }
 
@@ -215,6 +215,7 @@ gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
   if (g_atomic_int_get (&self->priv->send_stream_start)) {
     gchar s_id[32];
 
+    GST_INFO_OBJECT (self, "pushing stream start");
     /* stream-start (FIXME: create id based on input ids) */
     g_snprintf (s_id, sizeof (s_id), "agg-%08x", g_random_int ());
     if (!gst_pad_push_event (self->srcpad, gst_event_new_stream_start (s_id))) {
@@ -879,7 +880,7 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
 
   PAD_LOCK_EVENT (aggpad);
   if (aggpad->buffer) {
-    GST_INFO_OBJECT (aggpad, "Waiting for buffer to be consumed");
+    GST_DEBUG_OBJECT (aggpad, "Waiting for buffer to be consumed");
     PAD_WAIT_EVENT (aggpad);
   }
   PAD_UNLOCK_EVENT (aggpad);
