@@ -75,7 +75,6 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
       case GST_ITERATOR_OK:
         pad = g_value_get_object (&value);
 
-        fail_unless (GST_IS_BUFFER (pad->buffer) || pad->eos);
         if (pad->eos == FALSE)
           all_eos = FALSE;
         buffer = gst_base_aggregator_pad_get_buffer (pad);
