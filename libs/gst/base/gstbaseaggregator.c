@@ -1052,8 +1052,10 @@ gst_base_aggregator_pad_get_buffer (GstBaseAggregatorPad * pad)
     GST_DEBUG_OBJECT (pad, "Consuming buffer");
     buffer = pad->buffer;
     pad->buffer = NULL;
-    if (pad->priv->pending_eos)
+    if (pad->priv->pending_eos) {
+      pad->priv->pending_eos = FALSE;
       pad->eos = TRUE;
+    }
     PAD_BROADCAST_EVENT (pad);
     GST_DEBUG_OBJECT (pad, "Consummed");
   }
