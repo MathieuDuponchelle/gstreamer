@@ -379,6 +379,11 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
         /* If flush_seeking we forward the first FLUSH_START */
         if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
                 TRUE, FALSE) == TRUE) {
+          GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
+
+          if (klass->flush)
+            klass->flush (self);
+
           res = gst_pad_event_default (pad, GST_OBJECT (self), event);
           AGGREGATE_LOCK (self);
           priv->cookie++;
