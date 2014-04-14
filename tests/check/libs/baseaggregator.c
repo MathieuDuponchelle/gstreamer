@@ -719,11 +719,41 @@ GST_START_TEST (test_infinite_seek_50_src)
 
 GST_END_TEST;
 
+typedef struct
+{
+  GstPad *pad;
+  GstElement *src;
+  GstPad *peer;
+  GstElement *pipeline;
+  GstElement *agg;
+  GMainLoop *mainloop;
+} PadRemovalData;
+
+static gboolean
+remove_pad (PadRemovalData * data)
+{
+  gst_pad_unlink (data->pad, data->peer);
+  gst_element_release_request_pad (data->agg, data->peer);
+  fail_unless (gst_bin_remove (GST_BIN (data->pipeline), data->src));
+  gst_element_set_state (data->src, GST_STATE_NULL);
+
+  gst_element_seek_simple (data->pipeline, GST_FORMAT_BYTES,
+      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
+
+  if (data->mainloop)
+    g_main_loop_quit (data->mainloop);
+
+  g_free (data);
+
+  return FALSE;
+}
+
 GST_START_TEST (test_add_remove)
 {
   GstBus *bus;
-  guint num_iterations = 50;
-  GstElement *pipeline, *src = NULL, *src1, *agg, *sink;
+  guint num_iterations = 5;
+  GstElement *pipeline, *src1, *agg, *sink;
+  GMainLoop *ml = g_main_loop_new (NULL, TRUE);
 
   gint count = 0;
 
@@ -744,35 +774,45 @@ GST_START_TEST (test_add_remove)
   GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (pipeline), GST_DEBUG_GRAPH_SHOW_ALL,
       "baseaggregator_infiniteseek");
   while (count < num_iterations) {
-    GstPad *pad, *peer;
+    PadRemovalData *data =
+        (PadRemovalData *) g_malloc0 (sizeof (PadRemovalData));
 
     src1 = gst_element_factory_make ("fakesrc", NULL);
-    g_object_set (src1, "sizetype", 2, "sizemax", 4, NULL);
+    g_object_set (src1, "num-buffers", 100000, "sizetype", 2, "sizemax", 4,
+        NULL);
     fail_unless (gst_bin_add (GST_BIN (pipeline), src1));
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
         GST_DEBUG_GRAPH_SHOW_ALL, "baseaggregator_added");
     fail_unless (gst_element_sync_state_with_parent (src1));
     fail_unless (gst_element_link (src1, agg));
 
-    if (src) {
-      pad = gst_element_get_static_pad (src, "src");
-      peer = gst_pad_get_peer (pad);
-      gst_pad_unlink (pad, peer);
-      GST_ERROR ("HERE");
-      gst_element_release_request_pad (agg, peer);
-      fail_unless (gst_bin_remove (GST_BIN (pipeline), src));
-      gst_element_set_state (src, GST_STATE_NULL);
-    } else {
-      gst_element_set_state (pipeline, GST_STATE_PLAYING);
-      gst_element_get_state (pipeline, NULL, NULL, -1);
+    data->pad = gst_element_get_static_pad (src1, "src");
+    data->peer = gst_pad_get_peer (data->pad);
+    data->agg = agg;
+    data->src = src1;
+    data->pipeline = pipeline;
+    data->mainloop = NULL;
+    if (count == num_iterations - 1)
+      data->mainloop = ml;
+
+    g_timeout_add (100 + (count * 100), (GSourceFunc) remove_pad, data);
+
+    if (count == 0) {
     }
 
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
         GST_DEBUG_GRAPH_SHOW_ALL, "baseaggregator_removed");
 
-    src = src1;
     count++;
   }
+
+  gst_element_set_state (pipeline, GST_STATE_PLAYING);
+  gst_element_get_state (pipeline, NULL, NULL, -1);
+
+  gst_element_seek_simple (pipeline, GST_FORMAT_BYTES,
+      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
+
+  g_main_loop_run (ml);
 
   gst_element_set_state (pipeline, GST_STATE_NULL);
   gst_object_unref (bus);
