@@ -384,6 +384,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
           if (klass->flush)
             klass->flush (self);
 
+          priv->flow_return = GST_FLOW_OK;
           res = gst_pad_event_default (pad, GST_OBJECT (self), event);
           AGGREGATE_LOCK (self);
           priv->cookie++;
