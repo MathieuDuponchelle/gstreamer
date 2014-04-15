@@ -217,6 +217,14 @@ gst_base_aggregator_set_src_caps (GstBaseAggregator * agg, GstCaps * caps)
   agg->priv->srccaps = caps;
 }
 
+static void
+_reset_flow_values (GstBaseAggregator * self)
+{
+  self->priv->send_stream_start = TRUE;
+  self->priv->send_segment = TRUE;
+  gst_segment_init (&self->segment, GST_FORMAT_TIME);
+}
+
 GstFlowReturn
 gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
 {
@@ -503,30 +511,50 @@ static GstStateChangeReturn
 _change_state (GstElement * element, GstStateChange transition)
 {
   GstStateChangeReturn ret;
+  GstBaseAggregator *self = GST_BASE_AGGREGATOR (element);
 
   switch (transition) {
     case GST_STATE_CHANGE_NULL_TO_READY:
       break;
     case GST_STATE_CHANGE_READY_TO_PAUSED:
-      _start (GST_BASE_AGGREGATOR (element));
+      _start (self);
       break;
     case GST_STATE_CHANGE_PAUSED_TO_PLAYING:
       break;
     case GST_STATE_CHANGE_PAUSED_TO_READY:
-      _stop (GST_BASE_AGGREGATOR (element));
+      _stop (self);
       break;
     default:
       break;
   }
 
-  ret = GST_ELEMENT_CLASS (parent_class)->change_state (element, transition);
+  if ((ret =
+          GST_ELEMENT_CLASS (parent_class)->change_state (element,
+              transition)) == GST_STATE_CHANGE_FAILURE)
+    goto failure;
+
 
   switch (transition) {
+    case GST_STATE_CHANGE_NULL_TO_READY:
+      break;
+    case GST_STATE_CHANGE_READY_TO_PAUSED:
+      break;
+    case GST_STATE_CHANGE_PAUSED_TO_PLAYING:
+      break;
+    case GST_STATE_CHANGE_PAUSED_TO_READY:
+      _reset_flow_values (self);
+      break;
     default:
       break;
   }
 
   return ret;
+
+failure:
+  {
+    GST_INFO_OBJECT (element, "parent failed state change");
+    return ret;
+  }
 }
 
 static void
@@ -842,8 +870,7 @@ gst_base_aggregator_init (GstBaseAggregator * self,
   self->priv->padcount = -1;
   self->priv->cookie = 0;
   self->priv->aggregate_cookie = -1;
-  gst_segment_init (&self->segment, GST_FORMAT_TIME);
-
+  _reset_flow_values (self);
   self->srcpad = gst_pad_new_from_template (pad_template, "src");
 
   gst_pad_set_event_function (self->srcpad,
