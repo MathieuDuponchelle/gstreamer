@@ -821,6 +821,110 @@ GST_START_TEST (test_add_remove)
 
 GST_END_TEST;
 
+GST_START_TEST (test_change_state_intensive)
+{
+  GstBus *bus;
+  GstMessage *message;
+  GstElement *pipeline, *src, *agg, *sink;
+
+  gint i, state_i = 0, num_srcs = 3;
+  gboolean carry_on = TRUE;
+  GstStateChangeReturn state_return;
+  GstState wanted_state, wanted_states[] = {
+    GST_STATE_PLAYING, GST_STATE_NULL, GST_STATE_PAUSED, GST_STATE_READY,
+    GST_STATE_PLAYING, GST_STATE_NULL, GST_STATE_PAUSED, GST_STATE_READY,
+    GST_STATE_PLAYING, GST_STATE_NULL, GST_STATE_PAUSED, GST_STATE_READY,
+    GST_STATE_PAUSED, GST_STATE_READY, GST_STATE_PAUSED, GST_STATE_READY,
+    GST_STATE_PAUSED, GST_STATE_READY, GST_STATE_PAUSED, GST_STATE_NULL,
+    GST_STATE_PAUSED, GST_STATE_NULL, GST_STATE_PAUSED, GST_STATE_NULL,
+    GST_STATE_PAUSED, GST_STATE_NULL, GST_STATE_PAUSED, GST_STATE_NULL,
+    GST_STATE_PAUSED, GST_STATE_NULL, GST_STATE_PLAYING, GST_STATE_NULL,
+    GST_STATE_PLAYING, GST_STATE_NULL, GST_STATE_PLAYING, GST_STATE_NULL,
+    GST_STATE_PLAYING, GST_STATE_NULL, GST_STATE_PLAYING, GST_STATE_NULL,
+    GST_STATE_PLAYING, GST_STATE_NULL, GST_STATE_PLAYING, GST_STATE_NULL,
+  };
+
+  gst_init (NULL, NULL);
+
+  pipeline = gst_pipeline_new ("pipeline");
+
+  agg = gst_check_setup_element ("aggregator");
+  sink = gst_check_setup_element ("fakesink");
+
+  fail_unless (gst_bin_add (GST_BIN (pipeline), agg));
+  fail_unless (gst_bin_add (GST_BIN (pipeline), sink));
+  fail_unless (gst_element_link (agg, sink));
+
+  for (i = 0; i < num_srcs; i++) {
+    src = gst_element_factory_make ("fakesrc", NULL);
+    g_object_set (src, "sizetype", 2, "sizemax", 4, NULL);
+    fail_unless (gst_bin_add (GST_BIN (pipeline), src));
+    fail_unless (gst_element_link (src, agg));
+  }
+
+  bus = gst_element_get_bus (pipeline);
+  fail_if (bus == NULL);
+
+  wanted_state = wanted_states[state_i++];
+  state_return = gst_element_set_state (pipeline, wanted_state);
+
+  while (state_i < G_N_ELEMENTS (wanted_states) && carry_on) {
+    if (state_return == GST_STATE_CHANGE_SUCCESS) {
+      wanted_state = wanted_states[state_i++];
+      fail_unless (gst_element_set_state (pipeline, wanted_state),
+          GST_STATE_CHANGE_SUCCESS);
+      GST_INFO ("Wanted state: %s", gst_element_state_get_name (wanted_state));
+    }
+
+    message = gst_bus_poll (bus, GST_MESSAGE_ANY, GST_SECOND / 10);
+    if (message) {
+      switch (GST_MESSAGE_TYPE (message)) {
+        case GST_MESSAGE_EOS:
+        {
+          /* we should check if we really finished here */
+          GST_WARNING ("Got an EOS");
+          carry_on = FALSE;
+          break;
+        }
+        case GST_MESSAGE_STATE_CHANGED:
+        {
+          GstState new;
+
+          if (GST_MESSAGE_SRC (message) == GST_OBJECT (pipeline)) {
+            gst_message_parse_state_changed (message, NULL, &new, NULL);
+
+            if (new != wanted_state)
+              break;
+
+            GST_INFO ("State %s reached, Wanted state: %s",
+                gst_element_state_get_name (wanted_state),
+                gst_element_state_get_name (wanted_states[state_i + 1]));
+            wanted_state = wanted_states[state_i++];
+            state_return = gst_element_set_state (pipeline, wanted_state);
+            fail_unless (state_return == GST_STATE_CHANGE_SUCCESS ||
+                state_return == GST_STATE_CHANGE_ASYNC);
+          }
+
+          break;
+        }
+        case GST_MESSAGE_ERROR:
+          GST_ERROR ("Error on the bus: %" GST_PTR_FORMAT, message);
+          carry_on = FALSE;
+          break;
+        default:
+          break;
+      }
+      gst_message_unref (message);
+    }
+  }
+
+  gst_element_set_state (pipeline, GST_STATE_NULL);
+  gst_object_unref (bus);
+  gst_object_unref (pipeline);
+}
+
+GST_END_TEST;
+
 static Suite *
 gst_base_aggregator_suite (void)
 {
@@ -841,6 +945,7 @@ gst_base_aggregator_suite (void)
   tcase_add_test (general, test_linear_pipeline);
   tcase_add_test (general, test_two_src_pipeline);
   tcase_add_test (general, test_add_remove);
+  tcase_add_test (general, test_change_state_intensive);
 
   return suite;
 }
