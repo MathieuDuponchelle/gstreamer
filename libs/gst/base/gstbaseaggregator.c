@@ -554,14 +554,14 @@ _release_pad (GstElement * element, GstPad * pad)
 
   GST_ERROR_OBJECT (pad, "Removing pad");
 
-  AGGREGATE_LOCK (self);
-  g_atomic_int_set (&aggpad->flushing, FALSE);
+  g_atomic_int_set (&aggpad->flushing, TRUE);
   tmpbuf = gst_base_aggregator_pad_get_buffer (aggpad);
   gst_buffer_replace (&tmpbuf, NULL);
   gst_element_remove_pad (element, pad);
+
+  /* Something change we need to signal */
   priv->cookie++;
   BROADCAST_AGGREGATE (self);
-  AGGREGATE_UNLOCK (self);
 
 }
 
