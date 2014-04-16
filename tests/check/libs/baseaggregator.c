@@ -34,6 +34,15 @@
 #define GST_AGGREGATOR_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), GST_TYPE_AGGREGATOR, GstAggregatorClass))
 #define GST_AGGREGATOR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), GST_TYPE_AGGREGATOR, GstAggregatorClass))
 
+#define fail_error_message(msg)     \
+  G_STMT_START {        \
+    GError *error;        \
+    gst_message_parse_error(msg, &error, NULL);       \
+    fail_unless(FALSE, "Error Message from %s : %s",      \
+    GST_OBJECT_NAME (GST_MESSAGE_SRC(msg)), error->message); \
+    g_error_free (error);           \
+  } G_STMT_END;
+
 typedef struct _GstAggregator GstAggregator;
 typedef struct _GstAggregatorClass GstAggregatorClass;
 
@@ -692,6 +701,7 @@ infinite_seek (guint num_srcs, guint num_seeks)
         case GST_MESSAGE_ERROR:
           GST_ERROR ("Error on the bus: %" GST_PTR_FORMAT, message);
           carry_on = FALSE;
+          fail_error_message (message);
           break;
         default:
           break;
@@ -721,43 +731,50 @@ GST_END_TEST;
 
 typedef struct
 {
-  GstPad *pad;
-  GstElement *src;
-  GstPad *peer;
-  GstElement *pipeline;
-  GstElement *agg;
-  GMainLoop *mainloop;
-} PadRemovalData;
+  GstElement *agg, *src, *pipeline;
+  GCond *cond;
+  GMutex *lock;
+} RemoveElementData;
 
-static gboolean
-remove_pad (PadRemovalData * data)
+static GstPadProbeReturn
+pad_probe_cb (GstPad * pad, GstPadProbeInfo * info, RemoveElementData * data)
 {
-  gst_pad_unlink (data->pad, data->peer);
-  gst_element_release_request_pad (data->agg, data->peer);
+  GstPad *peer;
+
+  GST_INFO_OBJECT (pad, "Removing pad");
+
+  peer = gst_pad_get_peer (pad);
+  gst_pad_unlink (pad, peer);
+  gst_element_release_request_pad (data->agg, peer);
   fail_unless (gst_bin_remove (GST_BIN (data->pipeline), data->src));
-  gst_element_set_state (data->src, GST_STATE_NULL);
 
-  gst_element_seek_simple (data->pipeline, GST_FORMAT_BYTES,
-      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
+  g_mutex_lock (data->lock);
+  g_cond_broadcast (data->cond);
+  g_mutex_unlock (data->lock);
 
-  if (data->mainloop)
-    g_main_loop_quit (data->mainloop);
-
-  g_free (data);
-
-  return FALSE;
+  return GST_PAD_PROBE_OK;
 }
 
 GST_START_TEST (test_add_remove)
 {
+  /* Used to notify that we removed the pad from  */
+  GCond cond;
+  GMutex lock;
+
   GstBus *bus;
-  guint num_iterations = 5;
-  GstElement *pipeline, *src1, *agg, *sink;
-  GMainLoop *ml = g_main_loop_new (NULL, TRUE);
+  GstState state;
+  GstMessage *message;
+  gboolean carry_on = TRUE;
+  guint num_iterations = 100;
+
+  GstPad *pad;
+  GstElement *pipeline, *src, *src1 = NULL, *agg, *sink;
 
   gint count = 0;
 
   gst_init (NULL, NULL);
+  g_mutex_init (&lock);
+  g_cond_init (&cond);
 
   pipeline = gst_pipeline_new ("pipeline");
 
@@ -769,51 +786,94 @@ GST_START_TEST (test_add_remove)
   fail_unless (gst_element_link (agg, sink));
 
   bus = gst_element_get_bus (pipeline);
-  fail_if (bus == NULL);
-
-  GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (pipeline), GST_DEBUG_GRAPH_SHOW_ALL,
-      "baseaggregator_infiniteseek");
   while (count < num_iterations) {
-    PadRemovalData *data =
-        (PadRemovalData *) g_malloc0 (sizeof (PadRemovalData));
 
-    src1 = gst_element_factory_make ("fakesrc", NULL);
-    g_object_set (src1, "num-buffers", 100000, "sizetype", 2, "sizemax", 4,
+    src = gst_element_factory_make ("fakesrc", NULL);
+    g_object_set (src, "num-buffers", 100000, "sizetype", 2, "sizemax", 4,
         NULL);
-    fail_unless (gst_bin_add (GST_BIN (pipeline), src1));
-    GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
-        GST_DEBUG_GRAPH_SHOW_ALL, "baseaggregator_added");
-    fail_unless (gst_element_sync_state_with_parent (src1));
-    fail_unless (gst_element_link (src1, agg));
+    gst_element_set_locked_state (src, TRUE);
+    fail_unless (gst_bin_add (GST_BIN (pipeline), src));
+    fail_unless (gst_element_link (src, agg));
+    gst_element_set_locked_state (src, FALSE);
+    fail_unless (gst_element_sync_state_with_parent (src));
 
-    data->pad = gst_element_get_static_pad (src1, "src");
-    data->peer = gst_pad_get_peer (data->pad);
-    data->agg = agg;
-    data->src = src1;
-    data->pipeline = pipeline;
-    data->mainloop = NULL;
-    if (count == num_iterations - 1)
-      data->mainloop = ml;
+    if (count == 0)
+      gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
-    g_timeout_add (100 + (count * 100), (GSourceFunc) remove_pad, data);
+    /* Now make sure the seek happend */
+    carry_on = TRUE;
+    do {
+      message = gst_bus_timed_pop (bus, -1);
+      switch (GST_MESSAGE_TYPE (message)) {
+        case GST_MESSAGE_EOS:
+        {
+          /* we should check if we really finished here */
+          GST_WARNING ("Got an EOS");
+          carry_on = FALSE;
+          break;
+        }
+        case GST_MESSAGE_STATE_CHANGED:
+        {
+          if (GST_MESSAGE_SRC (message) == GST_OBJECT (pipeline)) {
+            gst_message_parse_state_changed (message, NULL, &state, NULL);
 
-    if (count == 0) {
-    }
+            if (state == GST_STATE_PLAYING) {
+              RemoveElementData data;
 
-    GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
-        GST_DEBUG_GRAPH_SHOW_ALL, "baseaggregator_removed");
+              carry_on = FALSE;
+              if (count == 0) {
+                GST_DEBUG ("First run, not removing any element yet");
+
+                break;
+              }
+
+              data.src = gst_object_ref (src1);
+              data.agg = agg;
+              data.lock = &lock;
+              data.cond = &cond;
+              data.pipeline = pipeline;
+              pad = gst_element_get_static_pad (data.src, "src");
+
+              g_mutex_lock (&lock);
+              gst_pad_add_probe (pad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM,
+                  (GstPadProbeCallback) pad_probe_cb, &data, NULL);
+              GST_INFO ("Waiting for %" GST_PTR_FORMAT " %s", pad,
+                  gst_element_state_get_name (GST_STATE (data.src)));
+              g_cond_wait (&cond, &lock);
+              g_mutex_unlock (&lock);
+
+              /*  We can not set state from the streaming thread so we
+               *  need to make sure that the source has been removed
+               *  before setting its state to NULL */
+              gst_element_set_state (data.src, GST_STATE_NULL);
+
+              gst_object_unref (data.src);
+            }
+          }
+
+          break;
+        }
+        case GST_MESSAGE_ERROR:
+        {
+          GST_ERROR ("Error on the bus: %" GST_PTR_FORMAT, message);
+          carry_on = FALSE;
+          fail_error_message (message);
+          break;
+        }
+        default:
+          break;
+      }
+
+      gst_message_unref (message);
+    } while (carry_on);
+
+    GST_INFO ("Seeking");
+    fail_unless (gst_element_seek_simple (pipeline, GST_FORMAT_BYTES,
+            GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0));
 
     count++;
+    src1 = src;
   }
-
-  gst_element_set_state (pipeline, GST_STATE_PLAYING);
-  gst_element_get_state (pipeline, NULL, NULL, -1);
-
-  gst_element_seek_simple (pipeline, GST_FORMAT_BYTES,
-      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE, 0);
-
-  g_main_loop_run (ml);
-
   gst_element_set_state (pipeline, GST_STATE_NULL);
   gst_object_unref (bus);
   gst_object_unref (pipeline);
