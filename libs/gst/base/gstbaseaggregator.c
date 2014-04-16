@@ -280,6 +280,11 @@ aggregate_func (GstBaseAggregator * self)
     WAIT_FOR_AGGREGATE (self);
   }
 
+  if (!priv->running) {
+    AGGREGATE_UNLOCK (self);
+    return;
+  }
+
   if (g_atomic_int_get (&priv->flush_seeking)) {
     if (priv->flush_stop_evt == NULL) {
       GST_INFO_OBJECT (self, "Going to PAUSED while seeking");
