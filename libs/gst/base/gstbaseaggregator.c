@@ -325,27 +325,13 @@ _start (GstBaseAggregator * self)
   self->priv->send_stream_start = TRUE;
   self->priv->send_segment = TRUE;
   self->priv->srccaps = NULL;
-  AGGREGATE_LOCK (self);
-  gst_pad_start_task (GST_PAD (self->srcpad), (GstTaskFunction) aggregate_func,
-      self, NULL);
-  AGGREGATE_UNLOCK (self);
-  GST_INFO_OBJECT (self, "I've started running");
 }
 
 static void
 _stop (GstBaseAggregator * self)
 {
   GST_DEBUG_OBJECT (self, "Stopping");
-
-  AGGREGATE_LOCK (self);
   self->priv->running = FALSE;
-  self->priv->cookie++;
-  BROADCAST_AGGREGATE (self);
-  AGGREGATE_UNLOCK (self);
-
-  gst_pad_stop_task (GST_PAD (self->srcpad));
-
-
   GST_INFO_OBJECT (self, "I've stopped running");
 }
 
@@ -552,7 +538,7 @@ _change_state (GstElement * element, GstStateChange transition)
 
 failure:
   {
-    GST_INFO_OBJECT (element, "parent failed state change");
+    GST_ERROR_OBJECT (element, "parent failed state change");
     return ret;
   }
 }
@@ -785,6 +771,43 @@ src_query_func (GstPad * pad, GstObject * parent, GstQuery * query)
 }
 
 static gboolean
+src_activate_mode (GstPad * pad,
+    GstObject * parent, GstPadMode mode, gboolean active)
+{
+  GstBaseAggregator *self = GST_BASE_AGGREGATOR (parent);
+
+  if (active == TRUE) {
+    switch (mode) {
+      case GST_PAD_MODE_PUSH:
+      {
+        GST_ERROR_OBJECT (pad, "Activating pad!");
+
+        AGGREGATE_LOCK (self);
+        gst_pad_start_task (pad, (GstTaskFunction) aggregate_func, self, NULL);
+        AGGREGATE_UNLOCK (self);
+
+        return TRUE;
+      }
+      default:
+      {
+        GST_ERROR_OBJECT (pad, "Only supported mode is PUSH");
+        return FALSE;
+      }
+    }
+  }
+
+  /* desactivating */
+  AGGREGATE_LOCK (self);
+  self->priv->running = FALSE;
+  self->priv->cookie++;
+  BROADCAST_AGGREGATE (self);
+  AGGREGATE_UNLOCK (self);
+  gst_pad_stop_task (GST_PAD (self->srcpad));
+
+  return TRUE;
+}
+
+static gboolean
 _pad_query (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     GstQuery * query)
 {
@@ -877,6 +900,8 @@ gst_base_aggregator_init (GstBaseAggregator * self,
       GST_DEBUG_FUNCPTR ((GstPadEventFunction) src_event_func));
   gst_pad_set_query_function (self->srcpad,
       GST_DEBUG_FUNCPTR ((GstPadQueryFunction) src_query_func));
+  gst_pad_set_activatemode_function (self->srcpad,
+      GST_DEBUG_FUNCPTR ((GstPadActivateModeFunction) src_activate_mode));
 
   /* FIXME Check if we always want proxy caps... and find a nice API
    * if not */
