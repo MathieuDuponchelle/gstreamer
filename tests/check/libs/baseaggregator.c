@@ -888,7 +888,7 @@ GST_START_TEST (test_change_state_intensive)
   GstElement *pipeline, *src, *agg, *sink;
 
   gint i, state_i = 0, num_srcs = 3;
-  gboolean carry_on = TRUE;
+  gboolean carry_on = TRUE, ready = FALSE;
   GstStateChangeReturn state_return;
   GstState wanted_state, wanted_states[] = {
     GST_STATE_PLAYING, GST_STATE_NULL, GST_STATE_PAUSED, GST_STATE_READY,
@@ -929,11 +929,11 @@ GST_START_TEST (test_change_state_intensive)
   state_return = gst_element_set_state (pipeline, wanted_state);
 
   while (state_i < G_N_ELEMENTS (wanted_states) && carry_on) {
-    if (state_return == GST_STATE_CHANGE_SUCCESS) {
+    if (state_return == GST_STATE_CHANGE_SUCCESS && ready) {
       wanted_state = wanted_states[state_i++];
       fail_unless (gst_element_set_state (pipeline, wanted_state),
           GST_STATE_CHANGE_SUCCESS);
-      GST_INFO ("Wanted state: %s", gst_element_state_get_name (wanted_state));
+      GST_ERROR ("Wanted state: %s", gst_element_state_get_name (wanted_state));
     }
 
     message = gst_bus_poll (bus, GST_MESSAGE_ANY, GST_SECOND / 10);
@@ -953,16 +953,20 @@ GST_START_TEST (test_change_state_intensive)
           if (GST_MESSAGE_SRC (message) == GST_OBJECT (pipeline)) {
             gst_message_parse_state_changed (message, NULL, &new, NULL);
 
-            if (new != wanted_state)
+            if (new != wanted_state) {
+              ready = FALSE;
               break;
+            }
 
-            GST_INFO ("State %s reached, Wanted state: %s",
-                gst_element_state_get_name (wanted_state),
-                gst_element_state_get_name (wanted_states[state_i + 1]));
+            GST_ERROR ("State %s reached",
+                gst_element_state_get_name (wanted_state));
             wanted_state = wanted_states[state_i++];
+            GST_ERROR ("Wanted state: %s",
+                gst_element_state_get_name (wanted_state));
             state_return = gst_element_set_state (pipeline, wanted_state);
             fail_unless (state_return == GST_STATE_CHANGE_SUCCESS ||
                 state_return == GST_STATE_CHANGE_ASYNC);
+            ready = TRUE;
           }
 
           break;

@@ -58,6 +58,8 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
   g_cond_broadcast(&(((GstBaseAggregatorPad* )pad)->priv->event_cond)); \
   }
 
+#define G_PRIORITY_VERY_HIGH (G_PRIORITY_HIGH - 100)
+
 struct _GstBaseAggregatorPadPrivate
 {
   gboolean pending_flush_start;
@@ -108,13 +110,14 @@ struct _GstBaseAggregatorPrivate
 {
   gint padcount;
 
+  GMainLoop *mloop;
+  GMainContext *mcontext;
+
   /* Our state is >= PAUSED */
   gboolean running;
 
   GCond aggregate_cond;
   GMutex aggregate_lock;
-  guint64 cookie;
-  guint64 aggregate_cookie;
 
   gboolean send_stream_start;
   gboolean send_segment;
@@ -256,55 +259,36 @@ gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
     }
   }
   GST_LOG_OBJECT (self, "pushing buffer");
-  if (!g_atomic_int_get (&self->priv->flush_seeking))
+  if (!g_atomic_int_get (&self->priv->flush_seeking) &&
+      gst_pad_is_active (self->srcpad))
     return gst_pad_push (self->srcpad, buf);
   else
     return GST_FLOW_OK;
 }
 
-static void
+static gboolean
+_send_flush_stop_func (GstBaseAggregator * self)
+{
+  GstBaseAggregatorPrivate *priv = self->priv;
+
+  g_return_val_if_fail (priv->flush_stop_evt, G_SOURCE_REMOVE);
+
+  gst_pad_push_event (self->srcpad, priv->flush_stop_evt);
+  gst_event_replace (&priv->flush_stop_evt, NULL);
+  g_atomic_int_set (&priv->flush_seeking, FALSE);
+
+  return G_SOURCE_REMOVE;
+}
+
+static gboolean
 aggregate_func (GstBaseAggregator * self)
 {
   GstBaseAggregatorPrivate *priv = self->priv;
   GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
 
-  if (!priv->running)
-    return;
-
-  AGGREGATE_LOCK (self);
-
-  GST_DEBUG ("I'm waiting for aggregation %lu -- %lu", priv->aggregate_cookie,
-      priv->cookie);
-
-  if (priv->aggregate_cookie == priv->cookie) {
-    WAIT_FOR_AGGREGATE (self);
-  }
-
-  if (!priv->running) {
-    AGGREGATE_UNLOCK (self);
-    return;
-  }
-
-  if (g_atomic_int_get (&priv->flush_seeking)) {
-    if (priv->flush_stop_evt == NULL) {
-      GST_INFO_OBJECT (self, "Going to PAUSED while seeking");
-      gst_pad_pause_task (self->srcpad);
-      AGGREGATE_UNLOCK (self);
-      return;
-    } else {
-      /* The thread was just waken up, push the flush_stop
-       * and stop concidering we are seeking... as we are not anymore!
-       */
-      GST_INFO_OBJECT (self, "Done seeking, pushing FLUSH_STOP event");
-      gst_pad_push_event (self->srcpad, priv->flush_stop_evt);
-      priv->flush_stop_evt = NULL;
-      g_atomic_int_set (&priv->flush_seeking, FALSE);
-    }
-  }
-
-  priv->aggregate_cookie++;
-
-  while (_iterate_all_sinkpads (self,
+  GST_ERROR ("Aggregating");
+  /* FIXME Check if we need a WHILE here now that we are using a maincontext */
+  if (_iterate_all_sinkpads (self,
           (PadForeachFunc) _check_all_pads_with_data_or_eos, NULL)) {
     GST_DEBUG_OBJECT (self, "Aggregating");
 
@@ -316,11 +300,50 @@ aggregate_func (GstBaseAggregator * self)
 
     GST_LOG_OBJECT (self, "flow return is %s",
         gst_flow_get_name (priv->flow_return));
-    if (priv->flow_return != GST_FLOW_OK)
-      break;
   }
 
-  AGGREGATE_UNLOCK (self);
+  return G_SOURCE_REMOVE;
+}
+
+
+static void
+_remove_all_sources (GstBaseAggregator * self)
+{
+  GSource *source;
+
+  while ((source =
+          g_main_context_find_source_by_user_data (self->priv->mcontext,
+              self))) {
+    g_source_destroy (source);
+  }
+}
+
+/* We need to quite the mainloop from the thread
+ * it is running in (otherwize it sometimes does
+ * not work*/
+static gboolean
+_quit_mainloop (GstBaseAggregator * self)
+{
+  _remove_all_sources (self);
+  self->priv->running = FALSE;
+
+  GST_ERROR ("Actually quiting mainloop from ML thread!");
+  g_main_loop_quit (self->priv->mloop);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+run_mainloop_func (GstBaseAggregator * self)
+{
+  GstBaseAggregatorPrivate *priv = self->priv;
+
+  if (priv->running) {
+    GST_ERROR ("ML STARTED");
+    g_main_loop_run (priv->mloop);
+    GST_ERROR ("ML QUITTED");
+  } else
+    GST_ERROR ("NOT RUNNING");
 }
 
 static void
@@ -330,14 +353,6 @@ _start (GstBaseAggregator * self)
   self->priv->send_stream_start = TRUE;
   self->priv->send_segment = TRUE;
   self->priv->srccaps = NULL;
-}
-
-static void
-_stop (GstBaseAggregator * self)
-{
-  GST_DEBUG_OBJECT (self, "Stopping");
-  self->priv->running = FALSE;
-  GST_INFO_OBJECT (self, "I've stopped running");
 }
 
 static gboolean
@@ -385,10 +400,11 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
           priv->flow_return = GST_FLOW_OK;
           res = gst_pad_event_default (pad, GST_OBJECT (self), event);
-          AGGREGATE_LOCK (self);
-          priv->cookie++;
-          BROADCAST_AGGREGATE (self);
-          AGGREGATE_UNLOCK (self);
+          g_main_context_invoke_full (priv->mcontext,
+              G_PRIORITY_VERY_HIGH, (GSourceFunc) _quit_mainloop, self, NULL);
+          GST_ERROR ("=> FLUSHING QUITING ML");
+          gst_pad_pause_task (self->srcpad);
+
           event = NULL;
           goto eat;
         }
@@ -431,17 +447,25 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
              * all sinkpads -- Seeking is Done... let our src pad
              * task start over*/
 
-            AGGREGATE_LOCK (self);
             GST_DEBUG_OBJECT (self, "I shall send segment");
             g_atomic_int_set (&priv->send_segment, TRUE);
-            priv->flush_stop_evt = gst_event_copy (event);
+            gst_event_replace (&priv->flush_stop_evt, gst_event_copy (event));
             GST_DEBUG_OBJECT (self,
                 "Going back to PLAYING -- vent: %" GST_PTR_FORMAT,
                 priv->flush_stop_evt);
 
+            /* We need to send a flush_stop event ASAP in our srcpad
+             * streaming thread */
+            priv->running = TRUE;
+            g_main_context_invoke_full (priv->mcontext,
+                G_PRIORITY_HIGH, (GSourceFunc) _send_flush_stop_func,
+                self, NULL);
+
+            g_main_context_invoke (priv->mcontext,
+                (GSourceFunc) aggregate_func, self);
+
             gst_pad_start_task (GST_PAD (self->srcpad),
-                (GstTaskFunction) aggregate_func, self, NULL);
-            AGGREGATE_UNLOCK (self);
+                (GstTaskFunction) run_mainloop_func, self, NULL);
           }
         }
       }
@@ -461,12 +485,12 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
        */
       if (!aggpad->buffer) {
         aggpad->eos = TRUE;
-        priv->cookie++;;
-        BROADCAST_AGGREGATE (self);
       } else {
         aggpad->priv->pending_eos = TRUE;
       }
 
+      g_main_context_invoke (priv->mcontext,
+          (GSourceFunc) aggregate_func, self);
       AGGREGATE_UNLOCK (self);
       goto eat;
     }
@@ -513,7 +537,6 @@ _change_state (GstElement * element, GstStateChange transition)
     case GST_STATE_CHANGE_PAUSED_TO_PLAYING:
       break;
     case GST_STATE_CHANGE_PAUSED_TO_READY:
-      _stop (self);
       break;
     default:
       break;
@@ -564,9 +587,8 @@ _release_pad (GstElement * element, GstPad * pad)
   gst_buffer_replace (&tmpbuf, NULL);
   gst_element_remove_pad (element, pad);
 
-  /* Something change we need to signal */
-  priv->cookie++;
-  BROADCAST_AGGREGATE (self);
+  /* Something change make sure we try to aggregate */
+  g_main_context_invoke (priv->mcontext, (GSourceFunc) aggregate_func, self);
 
 }
 
@@ -780,6 +802,7 @@ src_activate_mode (GstPad * pad,
     GstObject * parent, GstPadMode mode, gboolean active)
 {
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (parent);
+  GstBaseAggregatorPrivate *priv = self->priv;
 
   if (active == TRUE) {
     switch (mode) {
@@ -787,9 +810,9 @@ src_activate_mode (GstPad * pad,
       {
         GST_ERROR_OBJECT (pad, "Activating pad!");
 
-        AGGREGATE_LOCK (self);
-        gst_pad_start_task (pad, (GstTaskFunction) aggregate_func, self, NULL);
-        AGGREGATE_UNLOCK (self);
+        priv->running = TRUE;
+        gst_pad_start_task (pad, (GstTaskFunction) run_mainloop_func, self,
+            NULL);
 
         return TRUE;
       }
@@ -802,11 +825,10 @@ src_activate_mode (GstPad * pad,
   }
 
   /* desactivating */
-  AGGREGATE_LOCK (self);
-  self->priv->running = FALSE;
-  self->priv->cookie++;
-  BROADCAST_AGGREGATE (self);
-  AGGREGATE_UNLOCK (self);
+  GST_ERROR ("DESACTIVATING => QUITING MAINLOOP");
+  g_main_context_invoke_full (priv->mcontext,
+      G_PRIORITY_VERY_HIGH, (GSourceFunc) _quit_mainloop, self, NULL);
+  GST_ERROR ("=> FLUSHING QUITING ML");
   gst_pad_stop_task (GST_PAD (self->srcpad));
 
   return TRUE;
@@ -884,6 +906,7 @@ gst_base_aggregator_init (GstBaseAggregator * self,
     GstBaseAggregatorClass * klass)
 {
   GstPadTemplate *pad_template;
+  GstBaseAggregatorPrivate *priv;
 
   g_return_if_fail (klass->aggregate != NULL);
 
@@ -891,14 +914,18 @@ gst_base_aggregator_init (GstBaseAggregator * self,
       G_TYPE_INSTANCE_GET_PRIVATE (self, GST_TYPE_BASE_AGGREGATOR,
       GstBaseAggregatorPrivate);
 
+  priv = self->priv;
+
   pad_template =
       gst_element_class_get_pad_template (GST_ELEMENT_CLASS (klass), "src");
   g_return_if_fail (pad_template != NULL);
 
-  self->priv->padcount = -1;
-  self->priv->cookie = 0;
-  self->priv->aggregate_cookie = -1;
+  priv->padcount = -1;
   _reset_flow_values (self);
+
+  priv->mcontext = g_main_context_new ();
+  priv->mloop = g_main_loop_new (priv->mcontext, FALSE);
+
   self->srcpad = gst_pad_new_from_template (pad_template, "src");
 
   gst_pad_set_event_function (self->srcpad,
@@ -968,14 +995,11 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
 
-  AGGREGATE_LOCK (self);
-  priv->cookie++;
   PAD_LOCK_EVENT (aggpad);
   gst_buffer_replace (&aggpad->buffer, buffer);
   PAD_UNLOCK_EVENT (aggpad);
-  GST_DEBUG_OBJECT (aggpad, "ADDED BUFFER");
-  BROADCAST_AGGREGATE (self);
-  AGGREGATE_UNLOCK (self);
+
+  g_main_context_invoke (priv->mcontext, (GSourceFunc) aggregate_func, self);
 
   GST_DEBUG_OBJECT (aggpad, "Done chaining");
 
@@ -1021,6 +1045,7 @@ pad_activate_mode_func (GstPad * pad,
   if (active == FALSE) {
     PAD_LOCK_EVENT (aggpad);
     g_atomic_int_set (&aggpad->flushing, TRUE);
+    gst_buffer_replace (&aggpad->buffer, NULL);
     PAD_BROADCAST_EVENT (aggpad);
     PAD_UNLOCK_EVENT (aggpad);
   } else {
