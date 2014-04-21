@@ -89,23 +89,6 @@ static GstElementClass *parent_class = NULL;
         g_thread_self());                                               \
 } G_STMT_END
 
-#define WAIT_FOR_AGGREGATE(agg)   G_STMT_START {                        \
-  GST_LOG_OBJECT (agg, "Waiting for aggregate in thread %p",           \
-        g_thread_self());                                               \
-  g_cond_wait(&(agg->priv->aggregate_cond),                             \
-      &(agg->priv->aggregate_lock));                                    \
-  GST_LOG_OBJECT (agg, "Done waiting for aggregate in thread %p",      \
-        g_thread_self());                                               \
-  } G_STMT_END
-
-#define BROADCAST_AGGREGATE(agg) {                                      \
-  GST_LOG_OBJECT (agg, "signaling aggregate from thread %p",           \
-        g_thread_self());                                               \
-  g_cond_broadcast(&(agg->priv->aggregate_cond));                       \
-  GST_LOG_OBJECT (agg, "signaled aggregate from thread %p",            \
-        g_thread_self());                                               \
-  } G_STMT_END
-
 struct _GstBaseAggregatorPrivate
 {
   gint padcount;
@@ -116,7 +99,6 @@ struct _GstBaseAggregatorPrivate
   /* Our state is >= PAUSED */
   gboolean running;
 
-  GCond aggregate_cond;
   GMutex aggregate_lock;
 
   gboolean send_stream_start;
