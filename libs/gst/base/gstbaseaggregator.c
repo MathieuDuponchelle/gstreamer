@@ -477,21 +477,20 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     {
       GST_DEBUG_OBJECT (aggpad, "EOS");
 
-      AGGREGATE_LOCK (self);
-
       /* We still have a buffer, and we don't want the subclass to have to
        * check for it. Mark pending_eos, eos will be set when get_buffer is
        * called
        */
+      PAD_LOCK_EVENT (aggpad);
       if (!aggpad->buffer) {
         aggpad->eos = TRUE;
       } else {
         aggpad->priv->pending_eos = TRUE;
       }
+      PAD_UNLOCK_EVENT (aggpad);
 
       g_main_context_invoke (priv->mcontext,
           (GSourceFunc) aggregate_func, self);
-      AGGREGATE_UNLOCK (self);
       goto eat;
     }
     case GST_EVENT_SEGMENT:
