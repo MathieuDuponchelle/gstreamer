@@ -106,7 +106,7 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
   gst_iterator_free (iter);
 
   if (all_eos == TRUE) {
-    GST_DEBUG_OBJECT (aggregator, "no data available, must be EOS");
+    GST_ERROR_OBJECT (aggregator, "no data available, must be EOS");
     gst_pad_push_event (baseaggregator->srcpad, gst_event_new_eos ());
     return GST_FLOW_EOS;
   }
@@ -118,9 +118,7 @@ gst_aggregator_aggregate (GstBaseAggregator * baseaggregator)
 
   gst_base_aggregator_finish_buffer (baseaggregator, buf);
 
-  /* That's quite incorrect, we should return what finish_buffer returns, lazy
-   * now
-   */
+  /* We just check finish_frame return FLOW_OK */
   return GST_FLOW_OK;
 }
 
@@ -243,7 +241,7 @@ push_buffer (gpointer user_data)
   gst_segment_init (&segment, GST_FORMAT_TIME);
   gst_pad_push_event (chain_data->srcpad, gst_event_new_segment (&segment));
 
-  GST_DEBUG ("Pushing buffer on pad: %s:%s",
+  GST_ERROR ("Pushing buffer on pad: %s:%s",
       GST_DEBUG_PAD_NAME (chain_data->sinkpad));
   flow = gst_pad_push (chain_data->srcpad, chain_data->buffer);
   fail_unless (flow == chain_data->expected_result,
@@ -259,6 +257,8 @@ push_event (gpointer user_data)
 {
   ChainData *chain_data = (ChainData *) user_data;
 
+  GST_ERROR_OBJECT (chain_data->srcpad, "Pushing event: %"
+      GST_PTR_FORMAT, chain_data->event);
   fail_unless (gst_pad_push_event (chain_data->srcpad,
           chain_data->event) == TRUE);
 
@@ -278,6 +278,7 @@ _aggregate_timeout (GMainLoop * ml)
 static gboolean
 _quit (GMainLoop * ml)
 {
+  GST_ERROR ("QUITING ML");
   g_main_loop_quit (ml);
 
   return G_SOURCE_REMOVE;
@@ -286,6 +287,7 @@ _quit (GMainLoop * ml)
 static GstPadProbeReturn
 _aggregated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
 {
+  GST_ERROR ("SHould quit ML");
   g_idle_add ((GSourceFunc) _quit, ml);
 
   return GST_PAD_PROBE_REMOVE;
@@ -579,7 +581,7 @@ GST_START_TEST (test_flushing_seek)
 
   /* flush ogg:sink_0. This flushs collectpads, calls ::flush() and sends
    * FLUSH_START downstream */
-  GST_DEBUG ("Flushin: %s:%s", GST_DEBUG_PAD_NAME (data2.sinkpad));
+  GST_ERROR ("Flushing: %s:%s", GST_DEBUG_PAD_NAME (data2.sinkpad));
   fail_unless (gst_pad_push_event (data2.srcpad, gst_event_new_flush_start ()));
 
   /* expect this buffer to be flushed */
@@ -616,7 +618,7 @@ GST_START_TEST (test_flushing_seek)
       (GstPadProbeCallback) _aggregated_cb, test.ml, NULL);
 
   data2.event = gst_event_new_eos ();
-  GST_DEBUG ("EEEEEEEEEEEEEEEEEEEEEEEEE =-> Srcpad: %p", data2.srcpad);
+  GST_ERROR ("EEEEEEEEEEEEEEEEEEEEEEEEE =-> Srcpad: %p", data2.srcpad);
   thread2 = g_thread_try_new ("gst-check", push_event, &data2, NULL);
 
   g_main_loop_run (test.ml);

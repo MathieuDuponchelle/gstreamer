@@ -190,10 +190,15 @@ no_iter:
   return result;
 }
 
-static gboolean
+static inline gboolean
 _check_all_pads_with_data_or_eos (GstBaseAggregatorPad * aggpad)
 {
-  return (aggpad->buffer || aggpad->eos);
+  if (aggpad->buffer || aggpad->eos) {
+    return TRUE;
+  }
+
+  GST_ERROR_OBJECT (aggpad, "Not ready to be aggregated");
+  return FALSE;
 }
 
 void
@@ -240,12 +245,14 @@ gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
       g_atomic_int_set (&self->priv->send_segment, FALSE);
     }
   }
-  GST_LOG_OBJECT (self, "pushing buffer");
   if (!g_atomic_int_get (&self->priv->flush_seeking) &&
-      gst_pad_is_active (self->srcpad))
+      gst_pad_is_active (self->srcpad)) {
+    GST_LOG_OBJECT (self, "pushing buffer");
     return gst_pad_push (self->srcpad, buf);
-  else
+  } else {
+
     return GST_FLOW_OK;
+  }
 }
 
 static gboolean
@@ -270,7 +277,7 @@ aggregate_func (GstBaseAggregator * self)
 
   GST_ERROR ("Aggregating");
   /* FIXME Check if we need a WHILE here now that we are using a maincontext */
-  if (_iterate_all_sinkpads (self,
+  while (_iterate_all_sinkpads (self,
           (PadForeachFunc) _check_all_pads_with_data_or_eos, NULL)) {
     GST_DEBUG_OBJECT (self, "Aggregating");
 
@@ -282,6 +289,9 @@ aggregate_func (GstBaseAggregator * self)
 
     GST_LOG_OBJECT (self, "flow return is %s",
         gst_flow_get_name (priv->flow_return));
+
+    if (priv->flow_return == GST_FLOW_EOS)
+      break;
   }
 
   return G_SOURCE_REMOVE;
@@ -300,15 +310,13 @@ _remove_all_sources (GstBaseAggregator * self)
   }
 }
 
-/* We need to quite the mainloop from the thread
+/* We need to quit the mainloop from the thread
  * it is running in (otherwize it sometimes does
  * not work*/
 static gboolean
 _quit_mainloop (GstBaseAggregator * self)
 {
   _remove_all_sources (self);
-  self->priv->running = FALSE;
-
   GST_ERROR ("Actually quiting mainloop from ML thread!");
   g_main_loop_quit (self->priv->mloop);
 
@@ -382,6 +390,8 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
           priv->flow_return = GST_FLOW_OK;
           res = gst_pad_event_default (pad, GST_OBJECT (self), event);
+
+          self->priv->running = FALSE;
           g_main_context_invoke_full (priv->mcontext,
               G_PRIORITY_VERY_HIGH, (GSourceFunc) _quit_mainloop, self, NULL);
           GST_ERROR ("=> FLUSHING QUITING ML");
@@ -807,6 +817,7 @@ src_activate_mode (GstPad * pad,
 
   /* desactivating */
   GST_ERROR ("DESACTIVATING => QUITING MAINLOOP");
+  self->priv->running = FALSE;
   g_main_context_invoke_full (priv->mcontext,
       G_PRIORITY_VERY_HIGH, (GSourceFunc) _quit_mainloop, self, NULL);
   GST_ERROR ("=> FLUSHING QUITING ML");
