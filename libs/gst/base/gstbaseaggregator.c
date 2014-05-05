@@ -93,7 +93,6 @@ struct _GstBaseAggregatorPrivate
 {
   gint padcount;
 
-  GMainLoop *mloop;
   GMainContext *mcontext;
 
   /* Our state is >= PAUSED */
@@ -276,7 +275,6 @@ aggregate_func (GstBaseAggregator * self)
   GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
 
   GST_ERROR ("Aggregating");
-  /* FIXME Check if we need a WHILE here now that we are using a maincontext */
   while (_iterate_all_sinkpads (self,
           (PadForeachFunc) _check_all_pads_with_data_or_eos, NULL)) {
     GST_DEBUG_OBJECT (self, "Aggregating");
@@ -310,30 +308,16 @@ _remove_all_sources (GstBaseAggregator * self)
   }
 }
 
-/* We need to quit the mainloop from the thread
- * it is running in (otherwize it sometimes does
- * not work*/
-static gboolean
-_quit_mainloop (GstBaseAggregator * self)
-{
-  _remove_all_sources (self);
-  GST_ERROR ("Actually quiting mainloop from ML thread!");
-  g_main_loop_quit (self->priv->mloop);
-
-  return G_SOURCE_REMOVE;
-}
-
 static void
-run_mainloop_func (GstBaseAggregator * self)
+iterate_main_context_func (GstBaseAggregator * self)
 {
-  GstBaseAggregatorPrivate *priv = self->priv;
+  if (self->priv->running == FALSE) {
+    GST_ERROR ("Not running anymore");
 
-  if (priv->running) {
-    GST_ERROR ("ML STARTED");
-    g_main_loop_run (priv->mloop);
-    GST_ERROR ("ML QUITTED");
-  } else
-    GST_ERROR ("NOT RUNNING");
+    return;
+  }
+
+  g_main_context_iteration (self->priv->mcontext, TRUE);
 }
 
 static void
@@ -392,9 +376,9 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
           res = gst_pad_event_default (pad, GST_OBJECT (self), event);
 
           self->priv->running = FALSE;
-          g_main_context_invoke_full (priv->mcontext,
-              G_PRIORITY_VERY_HIGH, (GSourceFunc) _quit_mainloop, self, NULL);
+          _remove_all_sources (self);
           GST_ERROR ("=> FLUSHING QUITING ML");
+          g_main_context_wakeup (self->priv->mcontext);
           gst_pad_pause_task (self->srcpad);
 
           event = NULL;
@@ -457,7 +441,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
                 (GSourceFunc) aggregate_func, self);
 
             gst_pad_start_task (GST_PAD (self->srcpad),
-                (GstTaskFunction) run_mainloop_func, self, NULL);
+                (GstTaskFunction) iterate_main_context_func, self, NULL);
           }
         }
       }
@@ -802,8 +786,8 @@ src_activate_mode (GstPad * pad,
         GST_ERROR_OBJECT (pad, "Activating pad!");
 
         priv->running = TRUE;
-        gst_pad_start_task (pad, (GstTaskFunction) run_mainloop_func, self,
-            NULL);
+        gst_pad_start_task (pad, (GstTaskFunction) iterate_main_context_func,
+            self, NULL);
 
         return TRUE;
       }
@@ -818,9 +802,9 @@ src_activate_mode (GstPad * pad,
   /* desactivating */
   GST_ERROR ("DESACTIVATING => QUITING MAINLOOP");
   self->priv->running = FALSE;
-  g_main_context_invoke_full (priv->mcontext,
-      G_PRIORITY_VERY_HIGH, (GSourceFunc) _quit_mainloop, self, NULL);
+  _remove_all_sources (self);
   GST_ERROR ("=> FLUSHING QUITING ML");
+  g_main_context_wakeup (self->priv->mcontext);
   gst_pad_stop_task (GST_PAD (self->srcpad));
 
   return TRUE;
@@ -916,7 +900,6 @@ gst_base_aggregator_init (GstBaseAggregator * self,
   _reset_flow_values (self);
 
   priv->mcontext = g_main_context_new ();
-  priv->mloop = g_main_loop_new (priv->mcontext, FALSE);
 
   self->srcpad = gst_pad_new_from_template (pad_template, "src");
 
