@@ -335,6 +335,20 @@ _check_pending_flush_stop (GstBaseAggregatorPad * pad)
   return (!pad->priv->pending_flush_stop && !pad->priv->pending_flush_start);
 }
 
+static void
+_stop_srcpad_task (GstBaseAggregator * self, gboolean pause_only)
+{
+  self->priv->running = FALSE;
+
+  /*  Clean the stack of GSource set on the MainContext */
+  _remove_all_sources (self);
+  g_main_context_wakeup (self->priv->mcontext);
+  if (pause_only)
+    gst_pad_pause_task (self->srcpad);
+  else
+    gst_pad_stop_task (self->srcpad);
+}
+
 /* GstBaseAggregator vmethods default implementations */
 static gboolean
 _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
@@ -373,13 +387,12 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
             klass->flush (self);
 
           priv->flow_return = GST_FLOW_OK;
+
+          GST_INFO_OBJECT (self, "Fowarding %" GST_PTR_FORMAT, event);
           res = gst_pad_event_default (pad, GST_OBJECT (self), event);
 
-          self->priv->running = FALSE;
-          _remove_all_sources (self);
-          GST_ERROR ("=> FLUSHING QUITING ML");
-          g_main_context_wakeup (self->priv->mcontext);
-          gst_pad_pause_task (self->srcpad);
+          GST_DEBUG_OBJECT (self, "Flushing, pausing srcpad task");
+          _stop_srcpad_task (self, GST_STATE_PAUSED);
 
           event = NULL;
           goto eat;
@@ -801,11 +814,7 @@ src_activate_mode (GstPad * pad,
 
   /* desactivating */
   GST_ERROR ("DESACTIVATING => QUITING MAINLOOP");
-  self->priv->running = FALSE;
-  _remove_all_sources (self);
-  GST_ERROR ("=> FLUSHING QUITING ML");
-  g_main_context_wakeup (self->priv->mcontext);
-  gst_pad_stop_task (GST_PAD (self->srcpad));
+  _stop_srcpad_task (self, GST_STATE_NULL);
 
   return TRUE;
 }
