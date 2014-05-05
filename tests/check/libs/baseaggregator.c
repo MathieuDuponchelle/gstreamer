@@ -241,7 +241,7 @@ push_buffer (gpointer user_data)
   gst_segment_init (&segment, GST_FORMAT_TIME);
   gst_pad_push_event (chain_data->srcpad, gst_event_new_segment (&segment));
 
-  GST_ERROR ("Pushing buffer on pad: %s:%s",
+  GST_DEBUG ("Pushing buffer on pad: %s:%s",
       GST_DEBUG_PAD_NAME (chain_data->sinkpad));
   flow = gst_pad_push (chain_data->srcpad, chain_data->buffer);
   fail_unless (flow == chain_data->expected_result,
@@ -278,7 +278,7 @@ _aggregate_timeout (GMainLoop * ml)
 static gboolean
 _quit (GMainLoop * ml)
 {
-  GST_ERROR ("QUITING ML");
+  GST_DEBUG ("QUITING ML");
   g_main_loop_quit (ml);
 
   return G_SOURCE_REMOVE;
@@ -287,7 +287,7 @@ _quit (GMainLoop * ml)
 static GstPadProbeReturn
 _aggregated_cb (GstPad * pad, GstPadProbeInfo * info, GMainLoop * ml)
 {
-  GST_ERROR ("SHould quit ML");
+  GST_DEBUG ("SHould quit ML");
   g_idle_add ((GSourceFunc) _quit, ml);
 
   return GST_PAD_PROBE_REMOVE;
@@ -405,7 +405,6 @@ GST_START_TEST (test_aggregate)
   g_main_loop_run (test.ml);
   g_source_remove (test.timeout_id);
 
-  GST_ERROR ("================ OUT =====================");
 
   /* these will return immediately as when the data is popped the threads are
    * unlocked and will terminate */
@@ -581,7 +580,7 @@ GST_START_TEST (test_flushing_seek)
 
   /* flush ogg:sink_0. This flushs collectpads, calls ::flush() and sends
    * FLUSH_START downstream */
-  GST_ERROR ("Flushing: %s:%s", GST_DEBUG_PAD_NAME (data2.sinkpad));
+  GST_DEBUG ("Flushing: %s:%s", GST_DEBUG_PAD_NAME (data2.sinkpad));
   fail_unless (gst_pad_push_event (data2.srcpad, gst_event_new_flush_start ()));
 
   /* expect this buffer to be flushed */
@@ -618,7 +617,6 @@ GST_START_TEST (test_flushing_seek)
       (GstPadProbeCallback) _aggregated_cb, test.ml, NULL);
 
   data2.event = gst_event_new_eos ();
-  GST_ERROR ("EEEEEEEEEEEEEEEEEEEEEEEEE =-> Srcpad: %p", data2.srcpad);
   thread2 = g_thread_try_new ("gst-check", push_event, &data2, NULL);
 
   g_main_loop_run (test.ml);
@@ -935,7 +933,7 @@ GST_START_TEST (test_change_state_intensive)
       wanted_state = wanted_states[state_i++];
       fail_unless (gst_element_set_state (pipeline, wanted_state),
           GST_STATE_CHANGE_SUCCESS);
-      GST_ERROR ("Wanted state: %s", gst_element_state_get_name (wanted_state));
+      GST_INFO ("Wanted state: %s", gst_element_state_get_name (wanted_state));
     }
 
     message = gst_bus_poll (bus, GST_MESSAGE_ANY, GST_SECOND / 10);
@@ -960,10 +958,10 @@ GST_START_TEST (test_change_state_intensive)
               break;
             }
 
-            GST_ERROR ("State %s reached",
+            GST_DEBUG ("State %s reached",
                 gst_element_state_get_name (wanted_state));
             wanted_state = wanted_states[state_i++];
-            GST_ERROR ("Wanted state: %s",
+            GST_DEBUG ("Wanted state: %s",
                 gst_element_state_get_name (wanted_state));
             state_return = gst_element_set_state (pipeline, wanted_state);
             fail_unless (state_return == GST_STATE_CHANGE_SUCCESS ||

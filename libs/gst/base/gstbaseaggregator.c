@@ -344,12 +344,13 @@ _stop_srcpad_task (GstBaseAggregator * self, gboolean pause_only)
   self->priv->running = FALSE;
 
   /*  Clean the stack of GSource set on the MainContext */
-  _remove_all_sources (self);
   g_main_context_wakeup (self->priv->mcontext);
-  if (pause_only)
+  if (pause_only) {
     gst_pad_pause_task (self->srcpad);
-  else
+  } else {
     gst_pad_stop_task (self->srcpad);
+  }
+  _remove_all_sources (self);
 }
 
 static void
@@ -405,7 +406,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
           res = gst_pad_event_default (pad, GST_OBJECT (self), event);
 
           GST_DEBUG_OBJECT (self, "Flushing, pausing srcpad task");
-          _stop_srcpad_task (self, GST_STATE_PAUSED);
+          _stop_srcpad_task (self, TRUE);
 
           event = NULL;
           goto eat;
@@ -820,7 +821,7 @@ src_activate_mode (GstPad * pad,
 
   /* desactivating */
   GST_INFO_OBJECT (self, "Desactivating srcpad");
-  _stop_srcpad_task (self, GST_STATE_NULL);
+  _stop_srcpad_task (self, FALSE);
 
   return TRUE;
 }
