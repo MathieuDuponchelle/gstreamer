@@ -196,7 +196,8 @@ _check_all_pads_with_data_or_eos (GstBaseAggregatorPad * aggpad)
     return TRUE;
   }
 
-  GST_ERROR_OBJECT (aggpad, "Not ready to be aggregated");
+  GST_LOG_OBJECT (aggpad, "Not ready to be aggregated");
+
   return FALSE;
 }
 
@@ -274,10 +275,10 @@ aggregate_func (GstBaseAggregator * self)
   GstBaseAggregatorPrivate *priv = self->priv;
   GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
 
-  GST_ERROR ("Aggregating");
+  GST_LOG_OBJECT (self, "Checking aggregate");
   while (_iterate_all_sinkpads (self,
           (PadForeachFunc) _check_all_pads_with_data_or_eos, NULL)) {
-    GST_DEBUG_OBJECT (self, "Aggregating");
+    GST_DEBUG_OBJECT (self, "Actually aggregating!");
 
     priv->flow_return = klass->aggregate (self);
 
@@ -312,7 +313,7 @@ static void
 iterate_main_context_func (GstBaseAggregator * self)
 {
   if (self->priv->running == FALSE) {
-    GST_ERROR ("Not running anymore");
+    GST_DEBUG_OBJECT (self, "Not running anymore");
 
     return;
   }
@@ -338,6 +339,8 @@ _check_pending_flush_stop (GstBaseAggregatorPad * pad)
 static void
 _stop_srcpad_task (GstBaseAggregator * self, gboolean pause_only)
 {
+  GST_INFO_OBJECT (self, "%s srcpad task", pause_only ? "Pausing" : "Stopping");
+
   self->priv->running = FALSE;
 
   /*  Clean the stack of GSource set on the MainContext */
@@ -347,6 +350,16 @@ _stop_srcpad_task (GstBaseAggregator * self, gboolean pause_only)
     gst_pad_pause_task (self->srcpad);
   else
     gst_pad_stop_task (self->srcpad);
+}
+
+static void
+_start_srcpad_task (GstBaseAggregator * self)
+{
+  GST_INFO_OBJECT (self, "Starting srcpad task");
+
+  self->priv->running = TRUE;
+  gst_pad_start_task (GST_PAD (self->srcpad),
+      (GstTaskFunction) iterate_main_context_func, self, NULL);
 }
 
 /* GstBaseAggregator vmethods default implementations */
@@ -445,7 +458,6 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
             /* We need to send a flush_stop event ASAP in our srcpad
              * streaming thread */
-            priv->running = TRUE;
             g_main_context_invoke_full (priv->mcontext,
                 G_PRIORITY_HIGH, (GSourceFunc) _send_flush_stop_func,
                 self, NULL);
@@ -453,8 +465,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
             g_main_context_invoke (priv->mcontext,
                 (GSourceFunc) aggregate_func, self);
 
-            gst_pad_start_task (GST_PAD (self->srcpad),
-                (GstTaskFunction) iterate_main_context_func, self, NULL);
+            _start_srcpad_task (self);
           }
         }
       }
@@ -568,7 +579,7 @@ _release_pad (GstElement * element, GstPad * pad)
 
   GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
-  GST_ERROR_OBJECT (pad, "Removing pad");
+  GST_INFO_OBJECT (pad, "Removing pad");
 
   g_atomic_int_set (&aggpad->flushing, TRUE);
   tmpbuf = gst_base_aggregator_pad_get_buffer (aggpad);
@@ -790,18 +801,13 @@ src_activate_mode (GstPad * pad,
     GstObject * parent, GstPadMode mode, gboolean active)
 {
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (parent);
-  GstBaseAggregatorPrivate *priv = self->priv;
 
   if (active == TRUE) {
     switch (mode) {
       case GST_PAD_MODE_PUSH:
       {
-        GST_ERROR_OBJECT (pad, "Activating pad!");
-
-        priv->running = TRUE;
-        gst_pad_start_task (pad, (GstTaskFunction) iterate_main_context_func,
-            self, NULL);
-
+        GST_INFO_OBJECT (pad, "Activating pad!");
+        _start_srcpad_task (self);
         return TRUE;
       }
       default:
@@ -813,7 +819,7 @@ src_activate_mode (GstPad * pad,
   }
 
   /* desactivating */
-  GST_ERROR ("DESACTIVATING => QUITING MAINLOOP");
+  GST_INFO_OBJECT (self, "Desactivating srcpad");
   _stop_srcpad_task (self, GST_STATE_NULL);
 
   return TRUE;
