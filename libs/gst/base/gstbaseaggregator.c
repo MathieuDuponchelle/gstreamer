@@ -264,19 +264,6 @@ gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
   }
 }
 
-static gboolean
-_send_flush_stop_func (GstBaseAggregator * self)
-{
-  GstBaseAggregatorPrivate *priv = self->priv;
-
-  g_return_val_if_fail (priv->flush_stop_evt, G_SOURCE_REMOVE);
-
-  gst_pad_push_event (self->srcpad, priv->flush_stop_evt);
-  gst_event_replace (&priv->flush_stop_evt, NULL);
-  g_atomic_int_set (&priv->flush_seeking, FALSE);
-
-  return G_SOURCE_REMOVE;
-}
 
 static gboolean
 aggregate_func (GstBaseAggregator * self)
@@ -479,10 +466,9 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
             /* We need to send a flush_stop event ASAP in our srcpad
              * streaming thread */
-            g_main_context_invoke_full (priv->mcontext,
-                G_PRIORITY_HIGH, (GSourceFunc) _send_flush_stop_func,
-                self, NULL);
-
+            gst_pad_push_event (self->srcpad, event);
+            event = NULL;
+            g_atomic_int_set (&priv->flush_seeking, FALSE);
 
             _add_aggregate_source (self);
             _start_srcpad_task (self);
