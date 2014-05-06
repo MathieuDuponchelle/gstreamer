@@ -81,18 +81,18 @@ struct _GstBaseAggregatorPadPrivate
  *************************************/
 static GstElementClass *parent_class = NULL;
 
-#define AGGREGATE_LOCK(self) G_STMT_START {                             \
-  GST_LOG_OBJECT (self, "Trying to take AGGREGATE in thread %p",       \
-        g_thread_self());                                               \
-  g_mutex_lock(&((GstBaseAggregator*)self)->priv->aggregate_lock);      \
-  GST_LOG_OBJECT (self, "Got AGGREGATE in thread %p",                  \
-        g_thread_self());                                               \
+#define MAIN_CONTEXT_LOCK(self) G_STMT_START {                       \
+  GST_LOG_OBJECT (self, "Getting MAIN_CONTEXT_LOCK in thread %p",    \
+        g_thread_self());                                            \
+  g_mutex_lock(&((GstBaseAggregator*)self)->priv->mcontext_lock);    \
+  GST_LOG_OBJECT (self, "Got MAIN_CONTEXT_LOCK in thread %p",        \
+        g_thread_self());                                            \
 } G_STMT_END
 
-#define AGGREGATE_UNLOCK(self) G_STMT_START {                           \
-  g_mutex_unlock(&((GstBaseAggregator*)self)->priv->aggregate_lock);    \
-  GST_LOG_OBJECT (self, "Unlocked AGGREGATATE in thread %p",           \
-        g_thread_self());                                               \
+#define MAIN_CONTEXT_UNLOCK(self) G_STMT_START {                     \
+  g_mutex_unlock(&((GstBaseAggregator*)self)->priv->mcontext_lock);  \
+  GST_LOG_OBJECT (self, "Unlocked MAIN_CONTEXT_LOCK in thread %p",   \
+        g_thread_self());                                            \
 } G_STMT_END
 
 struct _GstBaseAggregatorPrivate
@@ -104,7 +104,10 @@ struct _GstBaseAggregatorPrivate
   /* Our state is >= PAUSED */
   gboolean running;
 
-  GMutex aggregate_lock;
+  /* Unsure that when we remove all sources from the maincontext
+   * we can not add any source, avoiding:
+   * "g_source_attach: assertion '!SOURCE_DESTROYED (source)' failed" */
+  GMutex mcontext_lock;
 
   gboolean send_stream_start;
   gboolean send_segment;
@@ -308,11 +311,13 @@ _remove_all_sources (GstBaseAggregator * self)
 {
   GSource *source;
 
+  MAIN_CONTEXT_LOCK (self);
   while ((source =
           g_main_context_find_source_by_user_data (self->priv->mcontext,
               self))) {
     g_source_destroy (source);
   }
+  MAIN_CONTEXT_UNLOCK (self);
 }
 
 static void
@@ -367,6 +372,15 @@ _start_srcpad_task (GstBaseAggregator * self)
   self->priv->running = TRUE;
   gst_pad_start_task (GST_PAD (self->srcpad),
       (GstTaskFunction) iterate_main_context_func, self, NULL);
+}
+
+static inline void
+_add_aggregate_source (GstBaseAggregator * self)
+{
+  MAIN_CONTEXT_LOCK (self);
+  g_main_context_invoke (self->priv->mcontext, (GSourceFunc) aggregate_func,
+      self);
+  MAIN_CONTEXT_UNLOCK (self);
 }
 
 /* GstBaseAggregator vmethods default implementations */
@@ -469,9 +483,8 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
                 G_PRIORITY_HIGH, (GSourceFunc) _send_flush_stop_func,
                 self, NULL);
 
-            g_main_context_invoke (priv->mcontext,
-                (GSourceFunc) aggregate_func, self);
 
+            _add_aggregate_source (self);
             _start_srcpad_task (self);
           }
         }
@@ -496,8 +509,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
       }
       PAD_UNLOCK_EVENT (aggpad);
 
-      g_main_context_invoke (priv->mcontext,
-          (GSourceFunc) aggregate_func, self);
+      _add_aggregate_source (self);
       goto eat;
     }
     case GST_EVENT_SEGMENT:
@@ -582,7 +594,6 @@ _release_pad (GstElement * element, GstPad * pad)
 {
   GstBuffer *tmpbuf;
   GstBaseAggregator *self = GST_BASE_AGGREGATOR (element);
-  GstBaseAggregatorPrivate *priv = self->priv;
 
   GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
@@ -594,7 +605,7 @@ _release_pad (GstElement * element, GstPad * pad)
   gst_element_remove_pad (element, pad);
 
   /* Something change make sure we try to aggregate */
-  g_main_context_invoke (priv->mcontext, (GSourceFunc) aggregate_func, self);
+  _add_aggregate_source (self);
 
 }
 
@@ -996,7 +1007,7 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   gst_buffer_replace (&aggpad->buffer, buffer);
   PAD_UNLOCK_EVENT (aggpad);
 
-  g_main_context_invoke (priv->mcontext, (GSourceFunc) aggregate_func, self);
+  _add_aggregate_source (self);
 
   GST_DEBUG_OBJECT (aggpad, "Done chaining");
 
