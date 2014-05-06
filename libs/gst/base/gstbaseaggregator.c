@@ -881,8 +881,8 @@ gst_base_aggregator_class_init (GstBaseAggregatorClass * klass)
   parent_class = g_type_class_peek_parent (klass);
   g_type_class_add_private (klass, sizeof (GstBaseAggregatorPrivate));
 
-  GST_DEBUG_CATEGORY_INIT (base_aggregator_debug, "baseaggregator", 0,
-      "GstBaseAggregator");
+  GST_DEBUG_CATEGORY_INIT (base_aggregator_debug, "baseaggregator",
+      GST_DEBUG_FG_MAGENTA, "GstBaseAggregator");
 
   klass->sinkpads_type = GST_TYPE_BASE_AGGREGATOR_PAD;
 
