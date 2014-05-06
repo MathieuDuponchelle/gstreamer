@@ -334,21 +334,28 @@ _check_pending_flush_stop (GstBaseAggregatorPad * pad)
   return (!pad->priv->pending_flush_stop && !pad->priv->pending_flush_start);
 }
 
-static void
-_stop_srcpad_task (GstBaseAggregator * self, gboolean pause_only)
+static gboolean
+_stop_srcpad_task (GstBaseAggregator * self, GstEvent * flush_start)
 {
   GST_INFO_OBJECT (self, "%s srcpad task", pause_only ? "Pausing" : "Stopping");
+  gboolean res = TRUE;
+
+  GST_ERROR_OBJECT (self, "%s srcpad task",
+      flush_start ? "Pausing" : "Stopping");
 
   self->priv->running = FALSE;
 
   /*  Clean the stack of GSource set on the MainContext */
   g_main_context_wakeup (self->priv->mcontext);
-  if (pause_only) {
+  _remove_all_sources (self);
+  if (flush_start) {
+    res = gst_pad_push_event (self->srcpad, flush_start);
     gst_pad_pause_task (self->srcpad);
   } else {
     gst_pad_stop_task (self->srcpad);
   }
-  _remove_all_sources (self);
+
+  return res;
 }
 
 static void
@@ -409,12 +416,8 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
           priv->flow_return = GST_FLOW_OK;
 
-          GST_INFO_OBJECT (self, "Fowarding %" GST_PTR_FORMAT, event);
-          res = gst_pad_event_default (pad, GST_OBJECT (self), event);
-
           GST_DEBUG_OBJECT (self, "Flushing, pausing srcpad task");
-          _stop_srcpad_task (self, TRUE);
-
+          _stop_srcpad_task (self, event);
           event = NULL;
           goto eat;
         }
