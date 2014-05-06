@@ -36,12 +36,16 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
   GST_LOG_OBJECT (pad, "Taking EVENT lock from thread %p",              \
         g_thread_self());                                               \
   g_mutex_lock(&pad->priv->event_lock);                                 \
+  GST_LOG_OBJECT (pad, "Took EVENT lock from thread %p",              \
+        g_thread_self());                                               \
   } G_STMT_END
 
 #define PAD_UNLOCK_EVENT(pad)  G_STMT_START {                           \
   GST_LOG_OBJECT (pad, "Releasing EVENT lock from thread %p",          \
         g_thread_self());                                               \
   g_mutex_unlock(&pad->priv->event_lock);                               \
+  GST_LOG_OBJECT (pad, "Release EVENT lock from thread %p",          \
+        g_thread_self());                                               \
   } G_STMT_END
 
 
@@ -50,6 +54,8 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
         g_thread_self());                                               \
   g_cond_wait(&(((GstBaseAggregatorPad* )pad)->priv->event_cond),       \
       &(pad->priv->event_lock));                                        \
+  GST_LOG_OBJECT (pad, "DONE Waiting for EVENT on thread %p",               \
+        g_thread_self());                                               \
   } G_STMT_END
 
 #define PAD_BROADCAST_EVENT(pad) {                                          \
