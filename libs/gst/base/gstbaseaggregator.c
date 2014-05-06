@@ -337,10 +337,9 @@ _check_pending_flush_stop (GstBaseAggregatorPad * pad)
 static gboolean
 _stop_srcpad_task (GstBaseAggregator * self, GstEvent * flush_start)
 {
-  GST_INFO_OBJECT (self, "%s srcpad task", pause_only ? "Pausing" : "Stopping");
   gboolean res = TRUE;
 
-  GST_ERROR_OBJECT (self, "%s srcpad task",
+  GST_INFO_OBJECT (self, "%s srcpad task",
       flush_start ? "Pausing" : "Stopping");
 
   self->priv->running = FALSE;
