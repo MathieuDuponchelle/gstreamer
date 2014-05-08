@@ -64,8 +64,6 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
   g_cond_broadcast(&(((GstBaseAggregatorPad* )pad)->priv->event_cond)); \
   }
 
-#define G_PRIORITY_VERY_HIGH (G_PRIORITY_HIGH - 100)
-
 struct _GstBaseAggregatorPadPrivate
 {
   gboolean pending_flush_start;
@@ -417,6 +415,10 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
           GST_DEBUG_OBJECT (self, "Flushing, pausing srcpad task");
           _stop_srcpad_task (self, event);
+
+          GST_INFO_OBJECT (self, "Getting STREAM_LOCK while seeking");
+          GST_PAD_STREAM_LOCK (self->srcpad);
+          GST_LOG_OBJECT (self, "GOT STREAM_LOCK");
           event = NULL;
           goto eat;
         }
@@ -473,6 +475,9 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
             g_atomic_int_set (&priv->flush_seeking, FALSE);
 
             _add_aggregate_source (self);
+
+            GST_INFO_OBJECT (self, "Releasing source pad STREAM_LOCK");
+            GST_PAD_STREAM_UNLOCK (self->srcpad);
             _start_srcpad_task (self);
           }
         }
