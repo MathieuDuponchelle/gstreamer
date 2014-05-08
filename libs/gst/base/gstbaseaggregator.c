@@ -64,6 +64,8 @@ GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
   g_cond_broadcast(&(((GstBaseAggregatorPad* )pad)->priv->event_cond)); \
   }
 
+#define G_PRIORITY_VERY_HIGH (G_PRIORITY_HIGH - 100)
+
 struct _GstBaseAggregatorPadPrivate
 {
   gboolean pending_flush_start;
@@ -248,12 +250,8 @@ gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
   if (g_atomic_int_get (&self->priv->send_segment)) {
     if (!g_atomic_int_get (&self->priv->flush_seeking)) {
       GST_INFO_OBJECT (self, "pushing segment");
-      if (gst_pad_push_event (self->srcpad,
-              gst_event_new_segment (&self->segment)))
-        g_atomic_int_set (&self->priv->send_segment, FALSE);
-      else
-        GST_WARNING_OBJECT (self, "Could not send segment (is flushing: %i)",
-            GST_PAD_IS_FLUSHING (self->srcpad));
+      gst_pad_push_event (self->srcpad, gst_event_new_segment (&self->segment));
+      g_atomic_int_set (&self->priv->send_segment, FALSE);
     }
   }
   if (!g_atomic_int_get (&self->priv->flush_seeking) &&
@@ -266,19 +264,6 @@ gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
   }
 }
 
-static gboolean
-_send_flush_stop_func (GstBaseAggregator * self)
-{
-  GstBaseAggregatorPrivate *priv = self->priv;
-
-  g_return_val_if_fail (priv->flush_stop_evt, G_SOURCE_REMOVE);
-
-  GST_INFO_OBJECT (self, "Sending flush stop event");
-  gst_pad_push_event (self->srcpad, priv->flush_stop_evt);
-  gst_event_replace (&priv->flush_stop_evt, NULL);
-
-  return G_SOURCE_REMOVE;
-}
 
 static gboolean
 aggregate_func (GstBaseAggregator * self)
@@ -349,8 +334,6 @@ _check_pending_flush_stop (GstBaseAggregatorPad * pad)
   return (!pad->priv->pending_flush_stop && !pad->priv->pending_flush_start);
 }
 
-/* Pauses the srcpad task if @flush_start != NULL
- * otherwize actually stops it. */
 static gboolean
 _stop_srcpad_task (GstBaseAggregator * self, GstEvent * flush_start)
 {
@@ -359,10 +342,11 @@ _stop_srcpad_task (GstBaseAggregator * self, GstEvent * flush_start)
   GST_INFO_OBJECT (self, "%s srcpad task",
       flush_start ? "Pausing" : "Stopping");
 
-  g_atomic_int_set (&self->priv->running, FALSE);
+  self->priv->running = FALSE;
 
-  _remove_all_sources (self);
+  /*  Clean the stack of GSource set on the MainContext */
   g_main_context_wakeup (self->priv->mcontext);
+  _remove_all_sources (self);
   if (flush_start) {
     res = gst_pad_push_event (self->srcpad, flush_start);
     gst_pad_pause_task (self->srcpad);
@@ -378,7 +362,7 @@ _start_srcpad_task (GstBaseAggregator * self)
 {
   GST_INFO_OBJECT (self, "Starting srcpad task");
 
-  g_atomic_int_set (&self->priv->running, TRUE);
+  self->priv->running = TRUE;
   gst_pad_start_task (GST_PAD (self->srcpad),
       (GstTaskFunction) iterate_main_context_func, self, NULL);
 }
@@ -477,19 +461,19 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
             GST_DEBUG_OBJECT (self, "I shall send segment");
             g_atomic_int_set (&priv->send_segment, TRUE);
-            g_atomic_int_set (&priv->flush_seeking, FALSE);
-            _start_srcpad_task (self);
+            gst_event_replace (&priv->flush_stop_evt, gst_event_copy (event));
+            GST_DEBUG_OBJECT (self,
+                "Going back to PLAYING -- vent: %" GST_PTR_FORMAT,
+                priv->flush_stop_evt);
 
-            /* Send the event as soon as possible from the
+            /* We need to send a flush_stop event ASAP in our srcpad
              * streaming thread */
-            gst_event_replace (&priv->flush_stop_evt, event);
+            gst_pad_push_event (self->srcpad, event);
             event = NULL;
-            MAIN_CONTEXT_LOCK (self);
-            g_main_context_invoke_full (self->priv->mcontext,
-                G_PRIORITY_HIGH, (GSourceFunc) _send_flush_stop_func,
-                self, NULL);
-            MAIN_CONTEXT_UNLOCK (self);
+            g_atomic_int_set (&priv->flush_seeking, FALSE);
+
             _add_aggregate_source (self);
+            _start_srcpad_task (self);
           }
         }
       }
@@ -642,7 +626,7 @@ _request_new_pad (GstElement * element,
 
   GST_DEBUG_OBJECT (element, "Adding pad %s", GST_PAD_NAME (agg_pad));
 
-  if (g_atomic_int_get (&priv->running))
+  if (priv->running)
     gst_pad_set_active (GST_PAD (agg_pad), TRUE);
 
   /* add the pad to the element */
@@ -842,7 +826,7 @@ src_activate_mode (GstPad * pad,
 
   /* desactivating */
   GST_INFO_OBJECT (self, "Desactivating srcpad");
-  _stop_srcpad_task (self, NULL);
+  _stop_srcpad_task (self, FALSE);
 
   return TRUE;
 }
