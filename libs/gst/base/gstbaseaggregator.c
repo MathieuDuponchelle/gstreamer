@@ -997,7 +997,9 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
     goto flushing;
 
   PAD_LOCK_EVENT (aggpad);
-  gst_buffer_replace (&aggpad->buffer, buffer);
+  if (aggpad->buffer)
+    gst_buffer_unref (aggpad->buffer);
+  aggpad->buffer = buffer;
   PAD_UNLOCK_EVENT (aggpad);
 
   _add_aggregate_source (self);
