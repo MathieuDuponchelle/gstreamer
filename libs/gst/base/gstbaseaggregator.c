@@ -28,6 +28,8 @@
 
 #include "../../../gst/glib-compat-private.h"
 
+#include <string.h>
+
 GST_DEBUG_CATEGORY_STATIC (base_aggregator_debug);
 #define GST_CAT_DEFAULT base_aggregator_debug
 
@@ -614,16 +616,27 @@ _request_new_pad (GstElement * element,
   self = GST_BASE_AGGREGATOR (element);
 
   if (templ == gst_element_class_get_pad_template (klass, "sink_%u")) {
+    guint serial = 0;
     gchar *name = NULL;
 
     GST_OBJECT_LOCK (element);
-    /* create new pad with the name */
-    name = g_strdup_printf ("sink_%u", (self->priv->padcount)++);
-    agg_pad =
-        g_object_new (GST_BASE_AGGREGATOR_GET_CLASS (self)->sinkpads_type,
+    if (req_name == NULL || strlen (req_name) < 6
+        || !g_str_has_prefix (req_name, "sink_")) {
+      /* no name given when requesting the pad, use next available int */
+      serial = priv->padcount++;
+    } else {
+      /* parse serial number from requested padname */
+      serial = g_ascii_strtoull (&req_name[5], NULL, 10);
+      if (serial >= priv->padcount)
+        priv->padcount = serial + 1;
+    }
+
+    name = g_strdup_printf ("sink_%u", priv->padcount++);
+    agg_pad = g_object_new (GST_BASE_AGGREGATOR_GET_CLASS (self)->sinkpads_type,
         "name", name, "direction", GST_PAD_SINK, "template", templ, NULL);
     g_free (name);
     GST_OBJECT_UNLOCK (element);
+
   } else {
     return NULL;
   }
