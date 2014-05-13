@@ -114,7 +114,6 @@ struct _GstBaseAggregatorPrivate
   gboolean flush_seeking;
   gboolean pending_flush_start;
   GstFlowReturn flow_return;
-  GstEvent *flush_stop_evt;
 
   GstCaps *srccaps;
 };
@@ -376,6 +375,22 @@ _add_aggregate_gsource (GstBaseAggregator * self)
   MAIN_CONTEXT_UNLOCK (self);
 }
 
+static GstFlowReturn
+_flush (GstBaseAggregator * self)
+{
+  GstFlowReturn ret = GST_FLOW_OK;
+  GstBaseAggregatorPrivate *priv = self->priv;
+  GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
+
+  GST_DEBUG_OBJECT (self, "Flushing everything");
+  g_atomic_int_set (&priv->send_segment, TRUE);
+  g_atomic_int_set (&priv->flush_seeking, FALSE);
+  if (klass->flush)
+    ret = klass->flush (self);
+
+  return ret;
+}
+
 /* GstBaseAggregator vmethods default implementations */
 static gboolean
 _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
@@ -408,13 +423,6 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
         /* If flush_seeking we forward the first FLUSH_START */
         if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
                 TRUE, FALSE) == TRUE) {
-          GstBaseAggregatorClass *klass = GST_BASE_AGGREGATOR_GET_CLASS (self);
-
-          if (klass->flush)
-            klass->flush (self);
-
-          priv->flow_return = GST_FLOW_OK;
-
           GST_DEBUG_OBJECT (self, "Flushing, pausing srcpad task");
           _stop_srcpad_task (self, event);
 
@@ -460,24 +468,12 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
 
           if (last_flush_stop) {
             /* That means we received FLUSH_STOP/FLUSH_STOP on
-             * all sinkpads -- Seeking is Done... let our src pad
-             * task start over*/
-
-            GST_DEBUG_OBJECT (self, "I shall send segment");
-            g_atomic_int_set (&priv->send_segment, TRUE);
-            gst_event_replace (&priv->flush_stop_evt, gst_event_copy (event));
-            GST_DEBUG_OBJECT (self,
-                "Going back to PLAYING -- vent: %" GST_PTR_FORMAT,
-                priv->flush_stop_evt);
-
-            /* We need to send a flush_stop event ASAP in our srcpad
-             * streaming thread */
+             * all sinkpads -- Seeking is Done... sending FLUSH_STOP */
+            _flush (self);
             gst_pad_push_event (self->srcpad, event);
+
             event = NULL;
-            g_atomic_int_set (&priv->flush_seeking, FALSE);
-
             _add_aggregate_gsource (self);
-
             GST_INFO_OBJECT (self, "Releasing source pad STREAM_LOCK");
             GST_PAD_STREAM_UNLOCK (self->srcpad);
             _start_srcpad_task (self);
