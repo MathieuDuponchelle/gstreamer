@@ -801,13 +801,20 @@ _src_event (GstBaseAggregator * self, GstEvent * event)
       event = NULL;
       goto done;
     }
+    case GST_EVENT_NAVIGATION:
+    {
+      /* navigation is rather pointless. */
+      res = FALSE;
+      gst_event_unref (event);
+      goto done;
+    }
     default:
     {
       break;
     }
   }
 
-  return gst_pad_event_default (self->srcpad, GST_OBJECT (self), event);
+  return _forward_event_to_all_sinkpads (self, event, FALSE);
 
 done:
   return res;
