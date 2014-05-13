@@ -507,10 +507,10 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     }
     case GST_EVENT_SEGMENT:
     {
-      GstSegment seg;
-      gst_event_copy_segment (event, &seg);
+      PAD_LOCK_EVENT (aggpad);
+      gst_event_copy_segment (event, &aggpad->segment);
+      PAD_UNLOCK_EVENT (aggpad);
 
-      aggpad->segment = seg;
       goto eat;
     }
     case GST_EVENT_STREAM_START:
