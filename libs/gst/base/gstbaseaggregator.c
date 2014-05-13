@@ -391,6 +391,28 @@ _flush (GstBaseAggregator * self)
   return ret;
 }
 
+static gboolean
+_all_flush_stop_received (GstBaseAggregator * self)
+{
+  GList *tmp;
+  GstBaseAggregatorPad *tmppad;
+
+  GST_OBJECT_LOCK (self);
+  for (tmp = GST_ELEMENT (self)->sinkpads; tmp; tmp = tmp->next) {
+    tmppad = (GstBaseAggregatorPad *) tmp->data;
+
+    if (_check_pending_flush_stop (tmppad) == FALSE) {
+      GST_DEBUG_OBJECT (tmppad, "Is not last %i -- %i",
+          tmppad->priv->pending_flush_start, tmppad->priv->pending_flush_stop);
+      GST_OBJECT_UNLOCK (self);
+      return FALSE;
+    }
+  }
+  GST_OBJECT_UNLOCK (self);
+
+  return TRUE;
+}
+
 /* GstBaseAggregator vmethods default implementations */
 static gboolean
 _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
@@ -440,40 +462,20 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     case GST_EVENT_FLUSH_STOP:
     {
       GST_DEBUG_OBJECT (aggpad, "Got FLUSH_STOP");
+
       g_atomic_int_set (&aggpad->flushing, FALSE);
       if (g_atomic_int_get (&priv->flush_seeking)) {
         g_atomic_int_set (&aggpad->priv->pending_flush_stop, FALSE);
 
         if (g_atomic_int_get (&priv->flush_seeking)) {
-          gboolean last_flush_stop = FALSE;
-
-          GST_OBJECT_LOCK (self);
-          {
-            GList *tmp;
-            GstBaseAggregatorPad *tmppad;
-
-            for (tmp = GST_ELEMENT (self)->sinkpads; tmp; tmp = tmp->next) {
-              tmppad = (GstBaseAggregatorPad *) tmp->data;
-              last_flush_stop = _check_pending_flush_stop (tmp->data);
-
-              if (last_flush_stop == FALSE) {
-                GST_DEBUG_OBJECT (tmppad, "Is not last %i -- %i",
-                    tmppad->priv->pending_flush_start,
-                    tmppad->priv->pending_flush_stop);
-                break;
-              }
-            }
-          }
-          GST_OBJECT_UNLOCK (self);
-
-          if (last_flush_stop) {
+          if (_all_flush_stop_received (self)) {
             /* That means we received FLUSH_STOP/FLUSH_STOP on
              * all sinkpads -- Seeking is Done... sending FLUSH_STOP */
             _flush (self);
             gst_pad_push_event (self->srcpad, event);
-
             event = NULL;
             _add_aggregate_gsource (self);
+
             GST_INFO_OBJECT (self, "Releasing source pad STREAM_LOCK");
             GST_PAD_STREAM_UNLOCK (self->srcpad);
             _start_srcpad_task (self);
