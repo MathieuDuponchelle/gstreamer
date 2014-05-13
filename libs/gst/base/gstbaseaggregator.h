@@ -27,6 +27,13 @@
 
 G_BEGIN_DECLS
 
+/******************************
+ * GstBaseAggregator Structs  *
+ ******************************/
+typedef struct _GstBaseAggregator GstBaseAggregator;
+typedef struct _GstBaseAggregatorPrivate GstBaseAggregatorPrivate;
+typedef struct _GstBaseAggregatorClass GstBaseAggregatorClass;
+
 /**********************
  * GstBaseAggregatorPad API   *
  *********************/
@@ -68,6 +75,8 @@ struct _GstBaseAggregatorPadClass
 {
   GstPadClass parent_class;
 
+  GstFlowReturn (*flush)     (GstBaseAggregatorPad * aggpad, GstBaseAggregator * aggregator);
+
   /*< private >*/
   gpointer _gst_reserved[GST_PADDING];
 };
@@ -87,10 +96,6 @@ GstBaseAggregatorPad * gst_base_aggregator_pad_new     (void);
 #define GST_BASE_AGGREGATOR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),GST_TYPE_BASE_AGGREGATOR,GstBaseAggregatorClass))
 #define GST_IS_BASE_AGGREGATOR(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_BASE_AGGREGATOR))
 #define GST_IS_BASE_AGGREGATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_BASE_AGGREGATOR))
-
-typedef struct _GstBaseAggregator GstBaseAggregator;
-typedef struct _GstBaseAggregatorPrivate GstBaseAggregatorPrivate;
-typedef struct _GstBaseAggregatorClass GstBaseAggregatorClass;
 
 #define GST_FLOW_CUSTOM_SUCCESS GST_FLOW_NOT_HANDLED
 

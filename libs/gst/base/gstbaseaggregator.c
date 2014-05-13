@@ -76,6 +76,20 @@ struct _GstBaseAggregatorPadPrivate
   GCond event_cond;
 };
 
+static gboolean
+_aggpad_flush (GstBaseAggregatorPad * aggpad, GstBaseAggregator * agg)
+{
+  GstBaseAggregatorPadClass *klass = GST_BASE_AGGREGATOR_PAD_GET_CLASS (agg);
+
+  aggpad->eos = FALSE;
+  aggpad->flushing = FALSE;
+
+  if (klass->flush)
+    return klass->flush (aggpad, agg);
+
+  return TRUE;
+}
+
 /*************************************
  * GstBaseAggregator implementation  *
  *************************************/
@@ -429,12 +443,9 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
       GstBuffer *tmpbuf;
 
       g_atomic_int_set (&aggpad->flushing, TRUE);
-      aggpad->eos = FALSE;
-
       /*  Remove pad buffer and wake up the streaming thread */
       tmpbuf = gst_base_aggregator_pad_get_buffer (aggpad);
       gst_buffer_replace (&tmpbuf, NULL);
-
       if (g_atomic_int_compare_and_exchange (&padpriv->pending_flush_start,
               TRUE, FALSE) == TRUE) {
         GST_DEBUG_OBJECT (aggpad, "Expecting FLUSH_STOP now");
@@ -445,6 +456,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
         /* If flush_seeking we forward the first FLUSH_START */
         if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
                 TRUE, FALSE) == TRUE) {
+
           GST_DEBUG_OBJECT (self, "Flushing, pausing srcpad task");
           _stop_srcpad_task (self, event);
 
@@ -463,7 +475,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
     {
       GST_DEBUG_OBJECT (aggpad, "Got FLUSH_STOP");
 
-      g_atomic_int_set (&aggpad->flushing, FALSE);
+      _aggpad_flush (aggpad, self);
       if (g_atomic_int_get (&priv->flush_seeking)) {
         g_atomic_int_set (&aggpad->priv->pending_flush_stop, FALSE);
 
