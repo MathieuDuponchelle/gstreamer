@@ -209,9 +209,9 @@ _check_all_pads_with_data_or_eos (GstBaseAggregatorPad * aggpad)
 }
 
 void
-gst_base_aggregator_set_src_caps (GstBaseAggregator * agg, GstCaps * caps)
+gst_base_aggregator_set_src_caps (GstBaseAggregator * self, GstCaps * caps)
 {
-  agg->priv->srccaps = caps;
+  self->priv->srccaps = caps;
 }
 
 static void
@@ -366,7 +366,7 @@ _start_srcpad_task (GstBaseAggregator * self)
 }
 
 static inline void
-_add_aggregate_source (GstBaseAggregator * self)
+_add_aggregate_gsource (GstBaseAggregator * self)
 {
   MAIN_CONTEXT_LOCK (self);
   g_main_context_invoke (self->priv->mcontext, (GSourceFunc) aggregate_func,
@@ -474,7 +474,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
             event = NULL;
             g_atomic_int_set (&priv->flush_seeking, FALSE);
 
-            _add_aggregate_source (self);
+            _add_aggregate_gsource (self);
 
             GST_INFO_OBJECT (self, "Releasing source pad STREAM_LOCK");
             GST_PAD_STREAM_UNLOCK (self->srcpad);
@@ -502,7 +502,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
       }
       PAD_UNLOCK_EVENT (aggpad);
 
-      _add_aggregate_source (self);
+      _add_aggregate_gsource (self);
       goto eat;
     }
     case GST_EVENT_SEGMENT:
@@ -586,8 +586,8 @@ static void
 _release_pad (GstElement * element, GstPad * pad)
 {
   GstBuffer *tmpbuf;
-  GstBaseAggregator *self = GST_BASE_AGGREGATOR (element);
 
+  GstBaseAggregator *self = GST_BASE_AGGREGATOR (element);
   GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
   GST_INFO_OBJECT (pad, "Removing pad");
@@ -597,31 +597,30 @@ _release_pad (GstElement * element, GstPad * pad)
   gst_buffer_replace (&tmpbuf, NULL);
   gst_element_remove_pad (element, pad);
 
-  /* Something change make sure we try to aggregate */
-  _add_aggregate_source (self);
-
+  /* Something changed make sure we try to aggregate */
+  _add_aggregate_gsource (self);
 }
 
 static GstPad *
 _request_new_pad (GstElement * element,
     GstPadTemplate * templ, const gchar * req_name, const GstCaps * caps)
 {
-  GstBaseAggregator *agg;
+  GstBaseAggregator *self;
   GstBaseAggregatorPad *agg_pad;
 
   GstElementClass *klass = GST_ELEMENT_GET_CLASS (element);
   GstBaseAggregatorPrivate *priv = GST_BASE_AGGREGATOR (element)->priv;
 
-  agg = GST_BASE_AGGREGATOR (element);
+  self = GST_BASE_AGGREGATOR (element);
 
   if (templ == gst_element_class_get_pad_template (klass, "sink_%u")) {
     gchar *name = NULL;
 
     GST_OBJECT_LOCK (element);
     /* create new pad with the name */
-    name = g_strdup_printf ("sink_%u", (agg->priv->padcount)++);
+    name = g_strdup_printf ("sink_%u", (self->priv->padcount)++);
     agg_pad =
-        g_object_new (GST_BASE_AGGREGATOR_GET_CLASS (agg)->sinkpads_type,
+        g_object_new (GST_BASE_AGGREGATOR_GET_CLASS (self)->sinkpads_type,
         "name", name, "direction", GST_PAD_SINK, "template", templ, NULL);
     g_free (name);
     GST_OBJECT_UNLOCK (element);
@@ -1002,7 +1001,7 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   aggpad->buffer = buffer;
   PAD_UNLOCK_EVENT (aggpad);
 
-  _add_aggregate_source (self);
+  _add_aggregate_gsource (self);
 
   GST_DEBUG_OBJECT (aggpad, "Done chaining");
 
