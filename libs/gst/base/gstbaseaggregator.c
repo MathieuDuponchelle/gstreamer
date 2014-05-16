@@ -699,14 +699,18 @@ event_forward_func (GstPad * pad, EventData * evdata)
 
   if (peer) {
     ret = gst_pad_send_event (peer, gst_event_ref (evdata->event));
-    GST_DEBUG_OBJECT (pad, "return of seeking is %d", ret);
+    GST_DEBUG_OBJECT (pad, "return of event push is %d", ret);
     gst_object_unref (peer);
   }
 
   evdata->result &= ret;
 
   if (ret == FALSE) {
-    GST_ERROR_OBJECT (pad, "Seek %" GST_PTR_FORMAT " failed", evdata->event);
+    if (GST_EVENT_TYPE (evdata->event) == GST_EVENT_SEEK)
+      GST_ERROR_OBJECT (pad, "Event %" GST_PTR_FORMAT " failed", evdata->event);
+    else
+      GST_INFO_OBJECT (pad, "Event %" GST_PTR_FORMAT " failed", evdata->event);
+
     if (evdata->flush) {
       padpriv->pending_flush_start = FALSE;
       padpriv->pending_flush_stop = FALSE;
