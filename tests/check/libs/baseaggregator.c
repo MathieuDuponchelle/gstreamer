@@ -244,6 +244,7 @@ push_buffer (gpointer user_data)
   GST_DEBUG ("Pushing buffer on pad: %s:%s",
       GST_DEBUG_PAD_NAME (chain_data->sinkpad));
   flow = gst_pad_push (chain_data->srcpad, chain_data->buffer);
+  chain_data->buffer = NULL;
   fail_unless (flow == chain_data->expected_result,
       "got flow %s instead of %s on %s:%s", gst_flow_get_name (flow),
       gst_flow_get_name (chain_data->expected_result),
