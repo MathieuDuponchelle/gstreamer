@@ -739,7 +739,8 @@ _forward_event_to_all_sinkpads (GstBaseAggregator * self, GstEvent * event,
   /* We first need to set all pads as flushing in a first pass
    * as flush_start flush_stop is sometimes sent synchronously
    * while we send the seek event */
-  _iterate_all_sinkpads (self, (PadForeachFunc) _set_flush_pending, NULL);
+  if (flush)
+    _iterate_all_sinkpads (self, (PadForeachFunc) _set_flush_pending, NULL);
   gst_pad_forward (self->srcpad, (GstPadForwardFunction) event_forward_func,
       &evdata);
 
