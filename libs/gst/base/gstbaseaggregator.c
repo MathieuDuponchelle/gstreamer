@@ -452,6 +452,7 @@ _pad_event (GstBaseAggregator * self, GstBaseAggregatorPad * aggpad,
         g_atomic_int_set (&padpriv->pending_flush_stop, TRUE);
       }
 
+      priv->flow_return = GST_FLOW_OK;
       if (g_atomic_int_get (&priv->flush_seeking)) {
         /* If flush_seeking we forward the first FLUSH_START */
         if (g_atomic_int_compare_and_exchange (&priv->pending_flush_start,
