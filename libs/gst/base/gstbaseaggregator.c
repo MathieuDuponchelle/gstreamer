@@ -79,7 +79,7 @@ struct _GstBaseAggregatorPadPrivate
 static gboolean
 _aggpad_flush (GstBaseAggregatorPad * aggpad, GstBaseAggregator * agg)
 {
-  GstBaseAggregatorPadClass *klass = GST_BASE_AGGREGATOR_PAD_GET_CLASS (agg);
+  GstBaseAggregatorPadClass *klass = GST_BASE_AGGREGATOR_PAD_GET_CLASS (aggpad);
 
   aggpad->eos = FALSE;
   aggpad->flushing = FALSE;
@@ -1011,8 +1011,7 @@ _chain (GstPad * pad, GstObject * object, GstBuffer * buffer)
   GstBaseAggregatorPrivate *priv = self->priv;
   GstBaseAggregatorPad *aggpad = GST_BASE_AGGREGATOR_PAD (pad);
 
-  GST_DEBUG_OBJECT (aggpad, "Start chaining a buffer of size %d",
-      (gint) gst_buffer_get_size (buffer));
+  GST_DEBUG_OBJECT (aggpad, "Start chaining a buffer %" GST_PTR_FORMAT, buffer);
 
   if (g_atomic_int_get (&aggpad->flushing) == TRUE)
     goto flushing;
@@ -1177,7 +1176,7 @@ gst_base_aggregator_pad_get_buffer (GstBaseAggregatorPad * pad)
       pad->eos = TRUE;
     }
     PAD_BROADCAST_EVENT (pad);
-    GST_DEBUG_OBJECT (pad, "Consummed");
+    GST_DEBUG_OBJECT (pad, "Consummed: %" GST_PTR_FORMAT, buffer);
   }
   PAD_UNLOCK_EVENT (pad);
 
