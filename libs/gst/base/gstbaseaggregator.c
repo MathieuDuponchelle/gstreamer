@@ -237,8 +237,8 @@ _reset_flow_values (GstBaseAggregator * self)
   gst_segment_init (&self->segment, GST_FORMAT_TIME);
 }
 
-GstFlowReturn
-gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
+static void
+_push_mandatory_events (GstBaseAggregator * self)
 {
   if (g_atomic_int_get (&self->priv->send_stream_start)) {
     gchar s_id[32];
@@ -267,16 +267,31 @@ gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
       g_atomic_int_set (&self->priv->send_segment, FALSE);
     }
   }
+}
+
+GstFlowReturn
+gst_base_aggregator_finish_buffer (GstBaseAggregator * self, GstBuffer * buf)
+{
+  _push_mandatory_events (self);
+
   if (!g_atomic_int_get (&self->priv->flush_seeking) &&
       gst_pad_is_active (self->srcpad)) {
-    GST_LOG_OBJECT (self, "pushing buffer");
+    GST_ERROR_OBJECT (self, "pushing buffer");
     return gst_pad_push (self->srcpad, buf);
   } else {
-
+    GST_ERROR ("fuck that mister");
     return GST_FLOW_OK;
   }
 }
 
+static void
+_push_eos (GstBaseAggregator * self)
+{
+  _push_mandatory_events (self);
+
+  GST_ERROR ("pushing eos");
+  gst_pad_push_event (self->srcpad, gst_event_new_eos ());
+}
 
 static gboolean
 aggregate_func (GstBaseAggregator * self)
@@ -287,9 +302,13 @@ aggregate_func (GstBaseAggregator * self)
   GST_LOG_OBJECT (self, "Checking aggregate");
   while (_iterate_all_sinkpads (self,
           (PadForeachFunc) _check_all_pads_with_data_or_eos, NULL)) {
-    GST_DEBUG_OBJECT (self, "Actually aggregating!");
+    GST_ERROR_OBJECT (self, "Actually aggregating!");
 
     priv->flow_return = klass->aggregate (self);
+
+    if (priv->flow_return == GST_FLOW_EOS) {
+      _push_eos (self);
+    }
 
     if (priv->flow_return == GST_FLOW_FLUSHING &&
         g_atomic_int_get (&priv->flush_seeking))
