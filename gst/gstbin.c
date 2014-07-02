@@ -2837,10 +2837,12 @@ gst_bin_send_event (GstElement * element, GstEvent * event)
   gboolean res = TRUE;
   gboolean done = FALSE;
   GValue data = { 0, };
+  gboolean one_sucess_is_enough = FALSE;
 
   if (GST_EVENT_TYPE (event) == GST_EVENT_SEEK) {
     gst_event_replace (&bin->priv->seek_event, event);
     iter = gst_bin_iterate_elements (bin);
+    one_sucess_is_enough = TRUE;
     GST_DEBUG_OBJECT (bin, "Sending %s event to all children",
         GST_EVENT_TYPE_NAME (event));
   } else if (GST_EVENT_IS_DOWNSTREAM (event)) {
@@ -2857,10 +2859,17 @@ gst_bin_send_event (GstElement * element, GstEvent * event)
     switch (gst_iterator_next (iter, &data)) {
       case GST_ITERATOR_OK:
       {
+        gboolean tmpres;
         GstElement *child = g_value_get_object (&data);
 
         gst_event_ref (event);
-        res &= gst_element_send_event (child, event);
+        tmpres = gst_element_send_event (child, event);
+
+        if (one_sucess_is_enough && tmpres)
+          res = TRUE;
+        else
+          res &= tmpres;
+
 
         GST_LOG_OBJECT (child, "After handling %s event: %d",
             GST_EVENT_TYPE_NAME (event), res);
