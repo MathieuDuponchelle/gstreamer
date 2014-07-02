@@ -2838,8 +2838,14 @@ gst_bin_send_event (GstElement * element, GstEvent * event)
   gboolean done = FALSE;
   GValue data = { 0, };
   gboolean one_sucess_is_enough = FALSE;
+  GstState state;
 
-  if (GST_EVENT_TYPE (event) == GST_EVENT_SEEK) {
+  GST_STATE_LOCK (element);
+  state = GST_STATE (element);
+
+  GST_ERROR ("state = %d", state);
+
+  if (GST_EVENT_TYPE (event) == GST_EVENT_SEEK && state < GST_STATE_PAUSED) {
     gst_event_replace (&bin->priv->seek_event, event);
     iter = gst_bin_iterate_elements (bin);
     one_sucess_is_enough = TRUE;
@@ -2891,6 +2897,8 @@ gst_bin_send_event (GstElement * element, GstEvent * event)
   }
   g_value_unset (&data);
   gst_iterator_free (iter);
+
+  GST_STATE_UNLOCK (element);
 
   if (GST_EVENT_IS_DOWNSTREAM (event)) {
     iter = gst_element_iterate_sink_pads (GST_ELEMENT (bin));
