@@ -553,7 +553,6 @@ gst_parse_perform_delayed_link (GstElement *src, const gchar *src_pad,
 static gint
 gst_parse_perform_link (link_t *link, graph_t *graph)
 {
-  GstElement *parent;
   GstElement *src = link->src.element;
   GstElement *sink = link->sink.element;
   GSList *srcs = link->src.pads;
@@ -561,21 +560,11 @@ gst_parse_perform_link (link_t *link, graph_t *graph)
   g_assert (GST_IS_ELEMENT (src));
   g_assert (GST_IS_ELEMENT (sink));
 
-
   GST_CAT_INFO (GST_CAT_PIPELINE,
       "linking %s:%s to %s:%s (%u/%u) with caps \"%" GST_PTR_FORMAT "\"",
       GST_ELEMENT_NAME (src), link->src.name ? link->src.name : "(any)",
       GST_ELEMENT_NAME (sink), link->sink.name ? link->sink.name : "(any)",
       g_slist_length (srcs), g_slist_length (sinks), link->caps);
-
-  parent = GST_ELEMENT (gst_object_get_parent (GST_OBJECT (src)));
-  if (GST_IS_BIN (parent) && ! GST_IS_PIPELINE (parent)) {
-    gst_object_unref (src);
-    link->src.element = parent;
-    src = link->src.element;
-  } else {
-    gst_object_unref (parent);
-  }
 
   if (!srcs || !sinks) {
     if (gst_element_link_pads_filtered (src,
