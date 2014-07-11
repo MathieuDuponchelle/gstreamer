@@ -914,8 +914,14 @@ gst_base_src_set_caps (GstBaseSrc * src, GstCaps * caps)
   if (bclass->set_caps)
     res = bclass->set_caps (src, caps);
 
-  if (res)
-    res = gst_pad_push_event (src->srcpad, gst_event_new_caps (caps));
+  if (res) {
+    GstEvent *caps_event = gst_event_new_caps (caps);
+
+    if (src->priv->seqnum != 0)
+      gst_event_set_seqnum (caps_event, src->priv->seqnum);
+
+    res = gst_pad_push_event (src->srcpad, caps_event);
+  }
 
   return res;
 }
