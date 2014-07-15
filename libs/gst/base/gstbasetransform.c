@@ -267,6 +267,8 @@ struct _GstBaseTransformPrivate
   GstAllocator *allocator;
   GstAllocationParams params;
   GstQuery *query;
+
+  guint32 seqnum;
 };
 
 
@@ -1367,9 +1369,15 @@ gst_base_transform_setcaps (GstBaseTransform * trans, GstPad * pad,
 
   prevcaps = gst_pad_get_current_caps (trans->srcpad);
 
-  if (!prevcaps || !gst_caps_is_equal (outcaps, prevcaps))
+  if (!prevcaps || !gst_caps_is_equal (outcaps, prevcaps)) {
+    GstEvent *seek_event = gst_event_new_caps (outcaps);
+
+    if (priv->seqnum)
+      gst_event_set_seqnum (seek_event, priv->seqnum);
+
     /* let downstream know about our caps */
-    ret = gst_pad_set_caps (trans->srcpad, outcaps);
+    ret = gst_pad_push_event (trans->srcpad, seek_event);
+  }
 
   if (prevcaps)
     gst_caps_unref (prevcaps);
@@ -1863,6 +1871,7 @@ gst_base_transform_sink_eventfunc (GstBaseTransform * trans, GstEvent * event)
       priv->discont = FALSE;
       priv->processed = 0;
       priv->dropped = 0;
+      priv->seqnum = 0;
       GST_OBJECT_UNLOCK (trans);
       /* we need new segment info after the flush. */
       trans->have_segment = FALSE;
@@ -1877,6 +1886,9 @@ gst_base_transform_sink_eventfunc (GstBaseTransform * trans, GstEvent * event)
     {
       GstCaps *caps;
 
+      if (priv->seqnum == 0)
+        trans->priv->seqnum = GST_EVENT_SEQNUM (event);
+
       gst_event_parse_caps (event, &caps);
       /* clear any pending reconfigure flag */
       gst_pad_check_reconfigure (trans->srcpad);
@@ -1887,6 +1899,9 @@ gst_base_transform_sink_eventfunc (GstBaseTransform * trans, GstEvent * event)
     }
     case GST_EVENT_SEGMENT:
     {
+      if (priv->seqnum == 0)
+        trans->priv->seqnum = GST_EVENT_SEQNUM (event);
+
       gst_event_copy_segment (event, &trans->segment);
       trans->have_segment = TRUE;
 
@@ -1934,6 +1949,7 @@ gst_base_transform_src_eventfunc (GstBaseTransform * trans, GstEvent * event)
 
   switch (GST_EVENT_TYPE (event)) {
     case GST_EVENT_SEEK:
+      trans->priv->seqnum = GST_EVENT_SEQNUM (event);
       break;
     case GST_EVENT_NAVIGATION:
       break;
