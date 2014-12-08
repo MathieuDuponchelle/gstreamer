@@ -504,8 +504,12 @@ gst_registry_remove_features_for_plugin_unlocked (GstRegistry * registry,
   while (f != NULL) {
     GList *next = g_list_next (f);
     GstPluginFeature *feature = f->data;
+    GstPlugin *existing_plugin = NULL;
 
-    if (G_UNLIKELY (feature && feature->plugin == plugin)) {
+    if (feature)
+      existing_plugin = gst_plugin_feature_get_plugin (feature);
+
+    if (G_UNLIKELY (feature && existing_plugin == plugin)) {
       GST_DEBUG_OBJECT (registry, "removing feature %p (%s) for plugin %p (%s)",
           feature, gst_plugin_feature_get_name (feature), plugin,
           plugin->desc.name);
@@ -516,6 +520,10 @@ gst_registry_remove_features_for_plugin_unlocked (GstRegistry * registry,
           GST_OBJECT_NAME (feature));
       gst_object_unparent (GST_OBJECT_CAST (feature));
     }
+
+    if (existing_plugin)
+      gst_object_unref (existing_plugin);
+
     f = next;
   }
   registry->priv->cookie++;
@@ -568,7 +576,8 @@ gst_registry_add_feature (GstRegistry * registry, GstPluginFeature * feature)
   g_return_val_if_fail (GST_IS_REGISTRY (registry), FALSE);
   g_return_val_if_fail (GST_IS_PLUGIN_FEATURE (feature), FALSE);
   g_return_val_if_fail (GST_OBJECT_NAME (feature) != NULL, FALSE);
-  g_return_val_if_fail (feature->plugin_name != NULL, FALSE);
+  g_return_val_if_fail (gst_plugin_feature_get_plugin_name (feature) != NULL,
+      FALSE);
 
   GST_OBJECT_LOCK (registry);
   existing_feature = gst_registry_lookup_feature_locked (registry,
@@ -738,8 +747,11 @@ static gint
 type_find_factory_rank_cmp (const GstPluginFeature * fac1,
     const GstPluginFeature * fac2)
 {
-  if (G_LIKELY (fac1->rank != fac2->rank))
-    return fac2->rank - fac1->rank;
+  guint rank1 = gst_plugin_feature_get_rank (GST_PLUGIN_FEATURE (fac1));
+  guint rank2 = gst_plugin_feature_get_rank (GST_PLUGIN_FEATURE (fac2));
+
+  if (G_LIKELY (rank1 != rank2))
+    return rank2 - rank1;
 
   /* to make the order in which things happen more deterministic,
    * sort by name when the ranks are the same. */
@@ -1401,7 +1413,8 @@ static gboolean
 _gst_plugin_feature_filter_plugin_name (GstPluginFeature * feature,
     gpointer user_data)
 {
-  return (strcmp (feature->plugin_name, (gchar *) user_data) == 0);
+  return (strcmp (gst_plugin_feature_get_plugin_name (feature),
+          (gchar *) user_data) == 0);
 }
 
 /**

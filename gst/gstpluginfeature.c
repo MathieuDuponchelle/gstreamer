@@ -40,6 +40,14 @@
 
 #define GST_CAT_DEFAULT GST_CAT_PLUGIN_LOADING
 
+struct _GstPluginFeaturePrivate
+{
+  gboolean loaded;
+  guint rank;
+  const gchar *plugin_name;
+  GstPlugin *plugin;            /* weak ref */
+};
+
 static void gst_plugin_feature_finalize (GObject * object);
 
 /* static guint gst_plugin_feature_signals[LAST_SIGNAL] = { 0 }; */
@@ -50,12 +58,16 @@ static void
 gst_plugin_feature_class_init (GstPluginFeatureClass * klass)
 {
   G_OBJECT_CLASS (klass)->finalize = gst_plugin_feature_finalize;
+
+  g_type_class_add_private (klass, sizeof (GstPluginFeaturePrivate));
 }
 
 static void
 gst_plugin_feature_init (GstPluginFeature * feature)
 {
-  /* do nothing, needed because of G_DEFINE_TYPE */
+  feature->priv =
+      G_TYPE_INSTANCE_GET_PRIVATE (feature, GST_TYPE_PLUGIN_FEATURE,
+      GstPluginFeaturePrivate);
 }
 
 static void
@@ -65,9 +77,9 @@ gst_plugin_feature_finalize (GObject * object)
 
   GST_DEBUG ("finalizing feature %p: '%s'", feature, GST_OBJECT_NAME (feature));
 
-  if (feature->plugin != NULL) {
-    g_object_remove_weak_pointer ((GObject *) feature->plugin,
-        (gpointer *) & feature->plugin);
+  if (feature->priv->plugin != NULL) {
+    g_object_remove_weak_pointer ((GObject *) feature->priv->plugin,
+        (gpointer *) & feature->priv->plugin);
   }
 
   G_OBJECT_CLASS (gst_plugin_feature_parent_class)->finalize (object);
@@ -104,15 +116,15 @@ gst_plugin_feature_load (GstPluginFeature * feature)
 
   GST_DEBUG ("loading plugin for feature %p; '%s'", feature,
       GST_OBJECT_NAME (feature));
-  if (feature->loaded)
+  if (feature->priv->loaded)
     return gst_object_ref (feature);
 
-  GST_DEBUG ("loading plugin %s", feature->plugin_name);
-  plugin = gst_plugin_load_by_name (feature->plugin_name);
+  GST_DEBUG ("loading plugin %s", feature->priv->plugin_name);
+  plugin = gst_plugin_load_by_name (feature->priv->plugin_name);
   if (!plugin)
     goto load_failed;
 
-  GST_DEBUG ("loaded plugin %s", feature->plugin_name);
+  GST_DEBUG ("loaded plugin %s", feature->priv->plugin_name);
   gst_object_unref (plugin);
 
   real_feature = gst_registry_lookup_feature (gst_registry_get (),
@@ -120,7 +132,7 @@ gst_plugin_feature_load (GstPluginFeature * feature)
 
   if (real_feature == NULL)
     goto disappeared;
-  else if (!real_feature->loaded)
+  else if (!real_feature->priv->loaded)
     goto not_found;
 
   return real_feature;
@@ -161,7 +173,7 @@ gst_plugin_feature_set_rank (GstPluginFeature * feature, guint rank)
   g_return_if_fail (feature != NULL);
   g_return_if_fail (GST_IS_PLUGIN_FEATURE (feature));
 
-  feature->rank = rank;
+  feature->priv->rank = rank;
 }
 
 /**
@@ -177,7 +189,35 @@ gst_plugin_feature_get_rank (GstPluginFeature * feature)
 {
   g_return_val_if_fail (GST_IS_PLUGIN_FEATURE (feature), GST_RANK_NONE);
 
-  return feature->rank;
+  return feature->priv->rank;
+}
+
+/**
+ * gst_plugin_feature_set_plugin:
+ * @feature: feature to set plugin on
+ * @plugin: Set the plugin that provides this feature
+ *
+ * Sets the plugin that provides this feature.
+ */
+void
+gst_plugin_feature_set_plugin (GstPluginFeature * feature, GstPlugin * plugin)
+{
+  g_return_if_fail (feature != NULL);
+  g_return_if_fail (GST_IS_PLUGIN_FEATURE (feature));
+
+  if (feature->priv->plugin)
+    g_object_remove_weak_pointer ((GObject *) plugin,
+        (gpointer *) & feature->priv->plugin);
+
+  if (plugin) {
+    g_object_add_weak_pointer ((GObject *) plugin,
+        (gpointer *) & feature->priv->plugin);
+    feature->priv->plugin_name = plugin->desc.name;
+  } else {
+    feature->priv->plugin_name = "NULL";
+  }
+
+  feature->priv->plugin = plugin;
 }
 
 /**
@@ -195,10 +235,10 @@ gst_plugin_feature_get_plugin (GstPluginFeature * feature)
 {
   g_return_val_if_fail (GST_IS_PLUGIN_FEATURE (feature), NULL);
 
-  if (feature->plugin == NULL)
+  if (feature->priv->plugin == NULL)
     return NULL;
 
-  return (GstPlugin *) gst_object_ref (feature->plugin);
+  return (GstPlugin *) gst_object_ref (feature->priv->plugin);
 }
 
 /**
@@ -218,10 +258,39 @@ gst_plugin_feature_get_plugin_name (GstPluginFeature * feature)
 {
   g_return_val_if_fail (GST_IS_PLUGIN_FEATURE (feature), NULL);
 
-  if (feature->plugin == NULL)
-    return NULL;
+  return feature->priv->plugin_name;
+}
 
-  return gst_plugin_get_name (feature->plugin);
+/**
+ * gst_plugin_feature_set_loaded:
+ * @feature: feature to set as loaded
+ * @loaded: whether the feature is loaded
+ *
+ * Specifies whether a feature is loaded.
+ */
+void
+gst_plugin_feature_set_loaded (GstPluginFeature * feature, gboolean loaded)
+{
+  g_return_if_fail (feature != NULL);
+  g_return_if_fail (GST_IS_PLUGIN_FEATURE (feature));
+
+  feature->priv->loaded = loaded;
+}
+
+/**
+ * gst_plugin_feature_get_loaded:
+ * @feature: a feature
+ *
+ * Gets whether a plugin feature is loaded.
+ *
+ * Returns: TRUE if the plugin is loaded, FALSE otherwise
+ */
+gboolean
+gst_plugin_feature_get_loaded (GstPluginFeature * feature)
+{
+  g_return_val_if_fail (GST_IS_PLUGIN_FEATURE (feature), FALSE);
+
+  return feature->priv->loaded;
 }
 
 /**
@@ -325,10 +394,10 @@ gst_plugin_feature_check_version (GstPluginFeature * feature,
   g_return_val_if_fail (GST_IS_PLUGIN_FEATURE (feature), FALSE);
 
   GST_DEBUG ("Looking up plugin '%s' containing plugin feature '%s'",
-      feature->plugin_name, GST_OBJECT_NAME (feature));
+      feature->priv->plugin_name, GST_OBJECT_NAME (feature));
 
   registry = gst_registry_get ();
-  plugin = gst_registry_find_plugin (registry, feature->plugin_name);
+  plugin = gst_registry_find_plugin (registry, feature->priv->plugin_name);
 
   if (plugin) {
     const gchar *ver_str;
@@ -363,12 +432,12 @@ gst_plugin_feature_check_version (GstPluginFeature * feature,
           micro, min_major, min_minor, min_micro, (ret) ? "yes" : "no");
     } else {
       GST_WARNING ("Could not parse version string '%s' of plugin '%s'",
-          ver_str, feature->plugin_name);
+          ver_str, feature->priv->plugin_name);
     }
 
     gst_object_unref (plugin);
   } else {
-    GST_DEBUG ("Could not find plugin '%s'", feature->plugin_name);
+    GST_DEBUG ("Could not find plugin '%s'", feature->priv->plugin_name);
   }
 
   return ret;
@@ -396,7 +465,7 @@ gst_plugin_feature_rank_compare_func (gconstpointer p1, gconstpointer p2)
   f1 = (GstPluginFeature *) p1;
   f2 = (GstPluginFeature *) p2;
 
-  diff = f2->rank - f1->rank;
+  diff = f2->priv->rank - f1->priv->rank;
   if (diff != 0)
     return diff;
 

@@ -190,7 +190,7 @@ gst_device_provider_register (GstPlugin * plugin, const gchar * name,
         existing_feature, name);
     factory = GST_DEVICE_PROVIDER_FACTORY_CAST (existing_feature);
     factory->type = type;
-    existing_feature->loaded = TRUE;
+    gst_plugin_feature_set_loaded (existing_feature, TRUE);
     g_type_set_qdata (type, __gst_deviceproviderclass_factory, factory);
     gst_object_unref (existing_feature);
     return TRUE;
@@ -216,16 +216,12 @@ gst_device_provider_register (GstPlugin * plugin, const gchar * name,
   factory->metadata = gst_structure_copy ((GstStructure *) klass->metadata);
 
   if (plugin && plugin->desc.name) {
-    GST_PLUGIN_FEATURE_CAST (factory)->plugin_name = plugin->desc.name;
-    GST_PLUGIN_FEATURE_CAST (factory)->plugin = plugin;
-    g_object_add_weak_pointer ((GObject *) plugin,
-        (gpointer *) & GST_PLUGIN_FEATURE_CAST (factory)->plugin);
+    gst_plugin_feature_set_plugin (GST_PLUGIN_FEATURE_CAST (factory), plugin);
   } else {
-    GST_PLUGIN_FEATURE_CAST (factory)->plugin_name = "NULL";
-    GST_PLUGIN_FEATURE_CAST (factory)->plugin = NULL;
+    gst_plugin_feature_set_plugin (GST_PLUGIN_FEATURE_CAST (factory), NULL);
   }
   gst_plugin_feature_set_rank (GST_PLUGIN_FEATURE_CAST (factory), rank);
-  GST_PLUGIN_FEATURE_CAST (factory)->loaded = TRUE;
+  gst_plugin_feature_set_loaded (GST_PLUGIN_FEATURE_CAST (factory), TRUE);
 
   gst_registry_add_feature (registry, GST_PLUGIN_FEATURE_CAST (factory));
 

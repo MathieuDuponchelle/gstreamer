@@ -363,7 +363,7 @@ gst_registry_chunks_save_feature (GList ** list, GstPluginFeature * feature)
   }
 
   if (pf) {
-    pf->rank = feature->rank;
+    pf->rank = gst_plugin_feature_get_rank (feature);
     *list = g_list_prepend (*list, chk);
 
     /* pack plugin feature strings */
@@ -712,12 +712,9 @@ gst_registry_chunks_load_feature (GstRegistry * registry, gchar ** in,
     goto fail;
   }
 
-  feature->rank = pf->rank;
+  gst_plugin_feature_set_rank (feature, pf->rank);
 
-  feature->plugin_name = plugin_name;
-  feature->plugin = plugin;
-  g_object_add_weak_pointer ((GObject *) plugin,
-      (gpointer *) & feature->plugin);
+  gst_plugin_feature_set_plugin (feature, plugin);
 
   gst_registry_add_feature (registry, feature);
   GST_DEBUG ("Added feature %s, plugin %p %s", GST_OBJECT_NAME (feature),
