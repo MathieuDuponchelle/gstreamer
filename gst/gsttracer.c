@@ -149,7 +149,7 @@ gst_tracer_register (GstPlugin * plugin, const gchar * name, GType type)
         existing_feature, name);
     factory = GST_TRACER_FACTORY_CAST (existing_feature);
     factory->type = type;
-    existing_feature->loaded = TRUE;
+    gst_plugin_feature_set_loaded (existing_feature, TRUE);
     gst_object_unref (existing_feature);
     return TRUE;
   }
@@ -166,16 +166,12 @@ gst_tracer_register (GstPlugin * plugin, const gchar * name, GType type)
       (guint) type, g_type_name (type));
 
   if (plugin && plugin->desc.name) {
-    GST_PLUGIN_FEATURE_CAST (factory)->plugin_name = plugin->desc.name; /* interned string */
-    GST_PLUGIN_FEATURE_CAST (factory)->plugin = plugin;
-    g_object_add_weak_pointer ((GObject *) plugin,
-        (gpointer *) & GST_PLUGIN_FEATURE_CAST (factory)->plugin);
+    gst_plugin_feature_set_plugin (GST_PLUGIN_FEATURE_CAST (factory), plugin);
   } else {
-    GST_PLUGIN_FEATURE_CAST (factory)->plugin_name = "NULL";
-    GST_PLUGIN_FEATURE_CAST (factory)->plugin = NULL;
+    gst_plugin_feature_set_plugin (GST_PLUGIN_FEATURE_CAST (factory), NULL);
   }
-  GST_PLUGIN_FEATURE_CAST (factory)->loaded = TRUE;
 
+  gst_plugin_feature_set_loaded (GST_PLUGIN_FEATURE_CAST (factory), TRUE);
   gst_registry_add_feature (gst_registry_get (),
       GST_PLUGIN_FEATURE_CAST (factory));
 
