@@ -633,6 +633,7 @@ gst_element_add_pad (GstElement * element, GstPad * pad)
 {
   gchar *pad_name;
   gboolean flushing;
+  gboolean res = TRUE;
 
   g_return_val_if_fail (GST_IS_ELEMENT (element), FALSE);
   g_return_val_if_fail (GST_IS_PAD (pad), FALSE);
@@ -691,7 +692,7 @@ gst_element_add_pad (GstElement * element, GstPad * pad)
   /* emit the PAD_ADDED signal */
   g_signal_emit (element, gst_element_signals[PAD_ADDED], 0, pad);
 
-  return TRUE;
+  goto done;
 
   /* ERROR cases */
 name_exists:
@@ -700,7 +701,8 @@ name_exists:
         pad_name, GST_ELEMENT_NAME (element));
     GST_OBJECT_UNLOCK (element);
     g_free (pad_name);
-    return FALSE;
+    res = FALSE;
+    goto done;
   }
 had_parent:
   {
@@ -709,7 +711,8 @@ had_parent:
         pad_name, GST_ELEMENT_NAME (element));
     GST_OBJECT_UNLOCK (element);
     g_free (pad_name);
-    return FALSE;
+    res = FALSE;
+    goto done;
   }
 no_direction:
   {
@@ -719,8 +722,12 @@ no_direction:
         GST_OBJECT_NAME (pad), GST_ELEMENT_NAME (element));
     GST_OBJECT_UNLOCK (pad);
     GST_OBJECT_UNLOCK (element);
-    return FALSE;
+    res = FALSE;
+    goto done;
   }
+
+done:
+  return res;
 }
 
 /**
