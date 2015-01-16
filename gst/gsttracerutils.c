@@ -148,6 +148,24 @@ _priv_gst_tracing_deinit (void)
   _priv_tracers = NULL;
 }
 
+static void
+gst_tracing_register_hook_full (GstTracer * tracer, GQuark detail,
+    GCallback func, gpointer target)
+{
+  gpointer key = GINT_TO_POINTER (detail);
+  GList *list = g_hash_table_lookup (_priv_tracers, key);
+  GstTracerHook *hook = g_slice_new0 (GstTracerHook);
+  hook->tracer = gst_object_ref (tracer);
+  hook->func = func;
+  hook->target = target;
+
+  list = g_list_prepend (list, hook);
+  g_hash_table_replace (_priv_tracers, key, list);
+  GST_DEBUG ("registering tracer for '%s', list.len=%d",
+      (detail ? g_quark_to_string (detail) : "*"), g_list_length (list));
+  _priv_tracer_enabled = TRUE;
+}
+
 /**
  * gst_tracing_register_hook_id:
  * @tracer: the tracer
@@ -159,17 +177,24 @@ _priv_gst_tracing_deinit (void)
 void
 gst_tracing_register_hook_id (GstTracer * tracer, GQuark detail, GCallback func)
 {
-  gpointer key = GINT_TO_POINTER (detail);
-  GList *list = g_hash_table_lookup (_priv_tracers, key);
-  GstTracerHook *hook = g_slice_new0 (GstTracerHook);
-  hook->tracer = gst_object_ref (tracer);
-  hook->func = func;
+  gst_tracing_register_hook_full (tracer, detail, func, NULL);
+}
 
-  list = g_list_prepend (list, hook);
-  g_hash_table_replace (_priv_tracers, key, list);
-  GST_DEBUG ("registering tracer for '%s', list.len=%d",
-      (detail ? g_quark_to_string (detail) : "*"), g_list_length (list));
-  _priv_tracer_enabled = TRUE;
+/**
+ * gst_tracing_register_hook_id_for_target:
+ * @tracer: the tracer
+ * @detail: the detailed hook
+ * @func: (scope async): the callback
+ * @target: the object that triggers the hook, for example for pad-push-pre, the
+ * hook will be invoked only if the pad is the target.
+ *
+ * Register @func to be called when the trace hook @detail is getting invoked.
+ */
+void
+gst_tracing_register_hook_id_for_target (GstTracer * tracer, GQuark detail,
+    GCallback func, gpointer target)
+{
+  gst_tracing_register_hook_full (tracer, detail, func, target);
 }
 
 /**
@@ -185,6 +210,24 @@ gst_tracing_register_hook (GstTracer * tracer, const gchar * detail,
     GCallback func)
 {
   gst_tracing_register_hook_id (tracer, g_quark_try_string (detail), func);
+}
+
+/**
+ * gst_tracing_register_hook:
+ * @tracer: the tracer
+ * @detail: the detailed hook
+ * @func: (scope async): the callback
+ * @target: the object that triggers the hook, for example for pad-push-pre, the
+ * hook will be invoked only if the pad is the target.
+ *
+ * Register @func to be called when the trace hook @detail is getting invoked.
+ */
+void
+gst_tracing_register_hook_for_target (GstTracer * tracer, const gchar * detail,
+    GCallback func, gpointer target)
+{
+  gst_tracing_register_hook_id_for_target (tracer, g_quark_try_string (detail),
+      func, target);
 }
 
 #endif /* GST_DISABLE_GST_DEBUG */

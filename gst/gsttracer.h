@@ -66,6 +66,10 @@ void gst_tracing_register_hook (GstTracer *tracer, const gchar *detail,
   GCallback func);
 void gst_tracing_register_hook_id (GstTracer *tracer, GQuark detail, 
   GCallback func);
+void gst_tracing_register_hook_for_target (GstTracer *tracer, const gchar * detail,
+    GCallback func, gpointer target);
+void
+gst_tracing_register_hook_id_for_target (GstTracer * tracer, GQuark detail, GCallback func, gpointer target);
 
 void gst_tracer_log_trace (GstStructure * s);
 
