@@ -58,11 +58,157 @@ GQuark _priv_gst_tracer_quark_table[GST_TRACER_QUARK_MAX];
 gboolean _priv_tracer_enabled = FALSE;
 GHashTable *_priv_tracers = NULL;
 
+/**
+ * gst_tracer_factory_create:
+ * @factory: factory to instantiate
+ * @params: (allow-none): params for new tracer, or %NULL
+ *
+ * Create a new tracer of the type defined by the given tracerfactory.
+ * It will be given the parameters supplied.
+ *
+ * Returns: (transfer floating) (nullable): new #GstTracer or %NULL
+ *     if the tracer couldn't be created
+ */
+GstTracer *
+gst_tracer_factory_create (GstTracerFactory * factory, const gchar * params)
+{
+  GstTracer *tracer;
+  GstTracerFactory *newfactory;
+
+  g_return_val_if_fail (factory != NULL, NULL);
+
+  newfactory =
+      GST_TRACER_FACTORY (gst_plugin_feature_load (GST_PLUGIN_FEATURE
+          (factory)));
+
+  if (newfactory == NULL)
+    goto load_failed;
+
+  factory = newfactory;
+
+  if (params)
+    GST_INFO ("creating tracer \"%s\" with params \"%s\"",
+        GST_OBJECT_NAME (factory), GST_STR_NULL (params));
+  else
+    GST_INFO ("creating element \"%s\"", GST_OBJECT_NAME (factory));
+
+  if (factory->type == 0)
+    goto no_type;
+
+  /* create an instance of the element, cast so we don't assert on NULL
+   * also set params as early as we can
+   */
+  tracer =
+      GST_TRACER_CAST (g_object_new (factory->type, "params", params, NULL));
+  if (G_UNLIKELY (tracer == NULL))
+    goto no_tracer;
+
+  GST_DEBUG ("created tracer \"%s\"", GST_OBJECT_NAME (factory));
+
+  return tracer;
+
+  /* ERRORS */
+load_failed:
+  {
+    GST_WARNING_OBJECT (factory, "loading plugin returned NULL!");
+    return NULL;
+  }
+no_type:
+  {
+    GST_WARNING_OBJECT (factory, "factory has no type");
+    gst_object_unref (factory);
+    return NULL;
+  }
+no_tracer:
+  {
+    GST_WARNING_OBJECT (factory, "could not create tracer");
+    gst_object_unref (factory);
+    return NULL;
+  }
+}
+
+/**
+ * gst_tracer_factory_find:
+ * @name: name of factory to find
+ *
+ * Search for a tracer factory of the given name. Refs the returned
+ * tracer factory; caller is responsible for unreffing.
+ *
+ * Returns: (transfer full) (nullable): #GstTracerFactory if found,
+ * %NULL otherwise
+ */
+GstTracerFactory *
+gst_tracer_factory_find (const gchar * name)
+{
+  GstPluginFeature *feature;
+
+  g_return_val_if_fail (name != NULL, NULL);
+
+  feature = gst_registry_find_feature (gst_registry_get (), name,
+      GST_TYPE_TRACER_FACTORY);
+  if (feature)
+    return GST_TRACER_FACTORY (feature);
+
+  /* this isn't an error, for instance when you query if an element factory is
+   * present */
+  GST_LOG ("no such element factory \"%s\"", name);
+  return NULL;
+}
+
+/**
+ * gst_tracer_factory_make:
+ * @tracername: a named factory to instantiate
+ * @params: (allow-none): params for the new tracer, that will be set at
+ * construction time.
+ *
+ * Create a new tracer of the type defined by the given tracer factory name.
+ *
+ * Returns: (transfer floating) (nullable): new #GstTracer or %NULL
+ * if unable to create tracer
+ */
+GstTracer *
+gst_tracer_factory_make (const gchar * factoryname, const gchar * name)
+{
+  GstTracerFactory *factory;
+  GstTracer *tracer;
+
+  g_return_val_if_fail (factoryname != NULL, NULL);
+
+  GST_LOG ("gsttracerfactory: make \"%s\" \"%s\"",
+      factoryname, GST_STR_NULL (name));
+
+  factory = gst_tracer_factory_find (factoryname);
+  if (factory == NULL)
+    goto no_factory;
+
+  GST_LOG_OBJECT (factory, "found factory %p", factory);
+  tracer = gst_tracer_factory_create (factory, name);
+  if (tracer == NULL)
+    goto create_failed;
+
+  gst_object_unref (factory);
+  return tracer;
+
+  /* ERRORS */
+no_factory:
+  {
+    GST_INFO ("no such tracer factory \"%s\"!", factoryname);
+    return NULL;
+  }
+create_failed:
+  {
+    GST_INFO_OBJECT (factory, "couldn't create instance!");
+    gst_object_unref (factory);
+    return NULL;
+  }
+}
+
 /* Initialize the tracing system */
 void
 _priv_gst_tracing_init (void)
 {
   const gchar *env = g_getenv ("GST_TRACE");
+  GstTracer *tracer;
   gint i = 0;
 
   _priv_tracers = g_hash_table_new (NULL, NULL);
@@ -76,9 +222,6 @@ _priv_gst_tracing_init (void)
   }
 
   if (env != NULL && *env != '\0') {
-    GstRegistry *registry = gst_registry_get ();
-    GstPluginFeature *feature;
-    GstTracerFactory *factory;
     gchar **t = g_strsplit_set (env, ";", 0);
     gchar *params;
 
@@ -100,20 +243,10 @@ _priv_gst_tracing_init (void)
 
       GST_INFO ("checking tracer: '%s'", t[i]);
 
-      if ((feature = gst_registry_lookup_feature (registry, t[i]))) {
-        factory = GST_TRACER_FACTORY (gst_plugin_feature_load (feature));
-        if (factory) {
-          GST_INFO_OBJECT (factory,
-              "creating tracer: type-id=%u, parameters = %s",
-              (guint) factory->type, params);
-
-          /* tracers register them self to the hooks */
-          gst_object_unref (g_object_new (factory->type, "params", params,
-                  NULL));
-        } else {
-          GST_WARNING_OBJECT (feature,
-              "loading plugin containing feature %s failed!", t[i]);
-        }
+      tracer = gst_tracer_factory_make (t[i], params);
+      if (tracer) {
+        /* tracers register them self to the hooks */
+        gst_object_unref (tracer);
       } else {
         GST_WARNING ("no tracer named '%s'", t[i]);
       }

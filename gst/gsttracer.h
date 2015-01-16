@@ -31,6 +31,7 @@
 #include <glib-object.h>
 #include <gst/gstconfig.h>
 #include <gst/gsttracerutils.h>
+#include "gsttracerfactory.h"
 
 G_BEGIN_DECLS
 
@@ -72,6 +73,10 @@ void
 gst_tracing_register_hook_id_for_target (GstTracer * tracer, GQuark detail, GCallback func, gpointer target);
 
 void gst_tracer_log_trace (GstStructure * s);
+
+GstTracer *        gst_tracer_factory_make              (const gchar *, const gchar *);
+GstTracer *        gst_tracer_factory_create            (GstTracerFactory * factory, const gchar * params);
+GstTracerFactory * gst_tracer_factory_find              (const gchar * name);
 
 G_END_DECLS
 
