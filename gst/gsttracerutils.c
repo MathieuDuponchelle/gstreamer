@@ -63,27 +63,27 @@ void
 _priv_gst_tracing_init (void)
 {
   const gchar *env = g_getenv ("GST_TRACE");
+  gint i = 0;
+
+  _priv_tracers = g_hash_table_new (NULL, NULL);
+  if (G_N_ELEMENTS (_quark_strings) != GST_TRACER_QUARK_MAX)
+    g_warning ("the quark table is not consistent! %d != %d",
+        (gint) G_N_ELEMENTS (_quark_strings), GST_TRACER_QUARK_MAX);
+
+  for (i = 0; i < GST_TRACER_QUARK_MAX; i++) {
+    _priv_gst_tracer_quark_table[i] =
+        g_quark_from_static_string (_quark_strings[i]);
+  }
 
   if (env != NULL && *env != '\0') {
     GstRegistry *registry = gst_registry_get ();
     GstPluginFeature *feature;
     GstTracerFactory *factory;
     gchar **t = g_strsplit_set (env, ";", 0);
-    gint i = 0;
     gchar *params;
 
     GST_INFO ("enabling tracers: '%s'", env);
 
-    if (G_N_ELEMENTS (_quark_strings) != GST_TRACER_QUARK_MAX)
-      g_warning ("the quark table is not consistent! %d != %d",
-          (gint) G_N_ELEMENTS (_quark_strings), GST_TRACER_QUARK_MAX);
-
-    for (i = 0; i < GST_TRACER_QUARK_MAX; i++) {
-      _priv_gst_tracer_quark_table[i] =
-          g_quark_from_static_string (_quark_strings[i]);
-    }
-
-    _priv_tracers = g_hash_table_new (NULL, NULL);
 
     i = 0;
     while (t[i]) {
