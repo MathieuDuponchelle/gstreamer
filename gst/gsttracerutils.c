@@ -47,7 +47,8 @@ static const gchar *_quark_strings[] = {
   "pad-push-pre", "pad-push-post", "pad-push-list-pre", "pad-push-list-post",
   "pad-pull-range-pre", "pad-pull-range-post", "pad-push-event-pre",
   "pad-push-event-post", "element-post-message-pre",
-  "element-post-message-post", "element-query-pre", "element-query-post"
+  "element-post-message-post", "element-query-pre", "element-query-post",
+  "element-add-pad-pre", "element-add-pad-post"
 };
 
 GQuark _priv_gst_tracer_quark_table[GST_TRACER_QUARK_MAX];
@@ -102,8 +103,9 @@ _priv_gst_tracing_init (void)
       if ((feature = gst_registry_lookup_feature (registry, t[i]))) {
         factory = GST_TRACER_FACTORY (gst_plugin_feature_load (feature));
         if (factory) {
-          GST_INFO_OBJECT (factory, "creating tracer: type-id=%u",
-              (guint) factory->type);
+          GST_INFO_OBJECT (factory,
+              "creating tracer: type-id=%u, parameters = %s",
+              (guint) factory->type, params);
 
           /* tracers register them self to the hooks */
           gst_object_unref (g_object_new (factory->type, "params", params,

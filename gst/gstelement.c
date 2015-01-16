@@ -638,6 +638,7 @@ gst_element_add_pad (GstElement * element, GstPad * pad)
   g_return_val_if_fail (GST_IS_ELEMENT (element), FALSE);
   g_return_val_if_fail (GST_IS_PAD (pad), FALSE);
 
+  GST_TRACER_ELEMENT_ADD_PAD_PRE (element, pad);
   /* locking pad to look at the name */
   GST_OBJECT_LOCK (pad);
   pad_name = g_strdup (GST_PAD_NAME (pad));
@@ -725,6 +726,8 @@ no_direction:
     res = FALSE;
     goto done;
   }
+
+  GST_TRACER_ELEMENT_ADD_PAD_POST (element, res);
 
 done:
   return res;
