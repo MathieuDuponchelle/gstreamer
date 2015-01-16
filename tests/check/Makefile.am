@@ -133,6 +133,7 @@ check_PROGRAMS =				\
 	gst/gsttask				\
 	gst/gsttoc				\
 	gst/gsttocsetter			\
+	gst/gsttracer                           \
 	gst/gstvalue				\
 	generic/states				\
 	$(PARSE_CHECKS)				\
@@ -182,7 +183,7 @@ noinst_HEADERS = \
 EXTRA_DIST = \
 	libs/test_transform.c
 
-AM_CFLAGS = $(GST_OBJ_CFLAGS) -UG_DISABLE_ASSERT -UG_DISABLE_CAST_CHECKS
+AM_CFLAGS = $(GST_OBJ_CFLAGS) -UG_DISABLE_ASSERT -UG_DISABLE_CAST_CHECKS -DGST_USE_UNSTABLE_API
 AM_CXXFLAGS = $(GST_OBJ_CXXFLAGS) -UG_DISABLE_ASSERT -UG_DISABLE_CAST_CHECKS
 LDADD = $(top_builddir)/libs/gst/check/libgstcheck-@GST_API_VERSION@.la \
 	$(top_builddir)/libs/gst/base/libgstbase-@GST_API_VERSION@.la \
