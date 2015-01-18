@@ -16,10 +16,8 @@ Use cases
 * I'd like to know about ref-counts of parts in the pipeline to find ref-count
   issues.
 
-Non use-cases
--------------
 * Some element in the pipeline does not play along the rules, find out which
-  one. This could be done with generic tests.
+  one.
 
 Design
 ------
@@ -88,9 +86,9 @@ we can create them ad-hoc and avoid the GST_TRACE_TIMERS var.
 
 Hooks (* already implemented)
 -----
-- gst_bin_add
+* gst_bin_add
 - gst_bin_remove
-- gst_element_add_pad
+* gst_element_add_pad
 * gst_element_post_message
 * gst_element_query
 - gst_element_remove_pad
@@ -99,6 +97,7 @@ Hooks (* already implemented)
 * gst_pad_push
 * gst_pad_push_list
 * gst_pad_push_event
+* gst_pad_send_event
 - gst_pad_unlink
 
 Tracer api

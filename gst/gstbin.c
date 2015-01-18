@@ -161,6 +161,7 @@
 #include "gstbin.h"
 #include "gstinfo.h"
 #include "gsterror.h"
+#include "gsttracerutils.h"
 
 #include "gstutils.h"
 #include "gstchildproxy.h"
@@ -1300,7 +1301,9 @@ gst_bin_add (GstBin * bin, GstElement * element)
       GST_STR_NULL (GST_ELEMENT_NAME (element)),
       GST_STR_NULL (GST_ELEMENT_NAME (bin)));
 
+  GST_TRACER_BIN_ADD_ELEMENT_PRE (bin, element);
   result = bclass->add_element (bin, element);
+  GST_TRACER_BIN_ADD_ELEMENT_POST (bin, result);
 
   return result;
 

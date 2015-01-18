@@ -4776,6 +4776,8 @@ gst_pad_push_event_unchecked (GstPad * pad, GstEvent * event,
    * there is no peer pad because of the probes. */
   event = apply_pad_offset (pad, event, GST_PAD_IS_SINK (pad));
 
+  GST_TRACER_PAD_PUSH_EVENT_PRE (pad, event);
+
   /* Two checks to be made:
    * . (un)set the FLUSHING flag for flushing events,
    * . handle pad blocking */
@@ -4870,20 +4872,22 @@ gst_pad_push_event_unchecked (GstPad * pad, GstEvent * event,
     PROBE_NO_DATA (pad, GST_PAD_PROBE_TYPE_PUSH | GST_PAD_PROBE_TYPE_IDLE,
         idle_probe_stopped, ret);
   }
-  return ret;
+  goto done;
 
   /* ERROR handling */
 flushed:
   {
     GST_DEBUG_OBJECT (pad, "We're flushing");
     gst_event_unref (event);
-    return GST_FLOW_FLUSHING;
+    ret = GST_FLOW_FLUSHING;
+    goto done;
   }
 inactive:
   {
     GST_DEBUG_OBJECT (pad, "flush-stop on inactive pad");
     gst_event_unref (event);
-    return GST_FLOW_FLUSHING;
+    ret = GST_FLOW_FLUSHING;
+    goto done;
   }
 probe_stopped:
   {
@@ -4898,7 +4902,7 @@ probe_stopped:
         GST_DEBUG_OBJECT (pad, "an error occurred %s", gst_flow_get_name (ret));
         break;
     }
-    return ret;
+    goto done;
   }
 not_linked:
   {
@@ -4909,15 +4913,20 @@ not_linked:
 
     /* unlinked pads should not influence latency configuration */
     if (event_type == GST_EVENT_LATENCY)
-      return GST_FLOW_OK;
-
-    return GST_FLOW_NOT_LINKED;
+      ret = GST_FLOW_OK;
+    else
+      ret = GST_FLOW_NOT_LINKED;
+    goto done;
   }
 idle_probe_stopped:
   {
     GST_DEBUG_OBJECT (pad, "Idle probe returned %s", gst_flow_get_name (ret));
-    return ret;
+    goto done;
   }
+
+done:
+  GST_TRACER_PAD_PUSH_EVENT_POST (pad, event, ret);
+  return ret;
 }
 
 /**
@@ -4946,7 +4955,6 @@ gst_pad_push_event (GstPad * pad, GstEvent * event)
   g_return_val_if_fail (GST_IS_PAD (pad), FALSE);
   g_return_val_if_fail (GST_IS_EVENT (event), FALSE);
 
-  GST_TRACER_PAD_PUSH_EVENT_PRE (pad, event);
 
   if (GST_PAD_IS_SRC (pad)) {
     if (G_UNLIKELY (!GST_EVENT_IS_DOWNSTREAM (event)))
@@ -5001,7 +5009,6 @@ gst_pad_push_event (GstPad * pad, GstEvent * event)
   }
   GST_OBJECT_UNLOCK (pad);
 
-  GST_TRACER_PAD_PUSH_EVENT_POST (pad, res);
   return res;
 
   /* ERROR handling */
@@ -5032,7 +5039,6 @@ eos:
     goto done;
   }
 done:
-  GST_TRACER_PAD_PUSH_EVENT_POST (pad, FALSE);
   return FALSE;
 }
 
@@ -5079,6 +5085,7 @@ gst_pad_send_event_unchecked (GstPad * pad, GstEvent * event,
   GST_OBJECT_LOCK (pad);
 
   event = apply_pad_offset (pad, event, GST_PAD_IS_SRC (pad));
+  GST_TRACER_PAD_SEND_EVENT_PRE (pad, event);
 
   if (GST_PAD_IS_SINK (pad))
     serialized = GST_EVENT_IS_SERIALIZED (event);
@@ -5209,7 +5216,7 @@ gst_pad_send_event_unchecked (GstPad * pad, GstEvent * event,
   if (need_unlock)
     GST_PAD_STREAM_UNLOCK (pad);
 
-  return ret;
+  goto done;
 
   /* ERROR handling */
 flushing:
@@ -5220,7 +5227,8 @@ flushing:
     GST_CAT_INFO_OBJECT (GST_CAT_EVENT, pad,
         "Received event on flushing pad. Discarding");
     gst_event_unref (event);
-    return GST_FLOW_FLUSHING;
+    ret = GST_FLOW_FLUSHING;
+    goto done;
   }
 inactive:
   {
@@ -5230,7 +5238,8 @@ inactive:
     GST_CAT_INFO_OBJECT (GST_CAT_EVENT, pad,
         "Received flush-stop on inactive pad. Discarding");
     gst_event_unref (event);
-    return GST_FLOW_FLUSHING;
+    ret = GST_FLOW_FLUSHING;
+    goto done;
   }
 eos:
   {
@@ -5240,7 +5249,8 @@ eos:
     GST_CAT_INFO_OBJECT (GST_CAT_EVENT, pad,
         "Received event on EOS pad. Discarding");
     gst_event_unref (event);
-    return GST_FLOW_EOS;
+    ret = GST_FLOW_EOS;
+    goto done;
   }
 probe_stopped:
   {
@@ -5258,7 +5268,7 @@ probe_stopped:
         GST_DEBUG_OBJECT (pad, "an error occurred %s", gst_flow_get_name (ret));
         break;
     }
-    return ret;
+    goto done;
   }
 no_function:
   {
@@ -5268,7 +5278,8 @@ no_function:
     if (need_unlock)
       GST_PAD_STREAM_UNLOCK (pad);
     gst_event_unref (event);
-    return GST_FLOW_NOT_SUPPORTED;
+    ret = GST_FLOW_NOT_SUPPORTED;
+    goto done;
   }
 no_parent:
   {
@@ -5277,7 +5288,8 @@ no_parent:
     if (need_unlock)
       GST_PAD_STREAM_UNLOCK (pad);
     gst_event_unref (event);
-    return GST_FLOW_FLUSHING;
+    ret = GST_FLOW_FLUSHING;
+    goto done;
   }
 precheck_failed:
   {
@@ -5286,8 +5298,12 @@ precheck_failed:
     if (need_unlock)
       GST_PAD_STREAM_UNLOCK (pad);
     gst_event_unref (event);
-    return ret;
+    goto done;
   }
+
+done:
+  GST_TRACER_PAD_SEND_EVENT_POST (pad, ret);
+  return ret;
 }
 
 /**

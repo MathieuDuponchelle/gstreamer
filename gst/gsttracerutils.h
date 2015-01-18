@@ -55,12 +55,16 @@ typedef enum _GstTracerQuarkId
   GST_TRACER_QUARK_HOOK_PAD_PULL_RANGE_POST,
   GST_TRACER_QUARK_HOOK_PAD_PUSH_EVENT_PRE ,
   GST_TRACER_QUARK_HOOK_PAD_PUSH_EVENT_POST,
+  GST_TRACER_QUARK_HOOK_PAD_SEND_EVENT_PRE ,
+  GST_TRACER_QUARK_HOOK_PAD_SEND_EVENT_POST,
   GST_TRACER_QUARK_HOOK_ELEMENT_POST_MESSAGE_PRE,
   GST_TRACER_QUARK_HOOK_ELEMENT_POST_MESSAGE_POST,
   GST_TRACER_QUARK_HOOK_ELEMENT_QUERY_PRE,
   GST_TRACER_QUARK_HOOK_ELEMENT_QUERY_POST,
   GST_TRACER_QUARK_HOOK_ELEMENT_ADD_PAD_PRE,
   GST_TRACER_QUARK_HOOK_ELEMENT_ADD_PAD_POST,
+  GST_TRACER_QUARK_HOOK_BIN_ADD_ELEMENT_PRE,
+  GST_TRACER_QUARK_HOOK_BIN_ADD_ELEMENT_POST,
   GST_TRACER_QUARK_MAX
 } GstTracerQuarkId;
 
@@ -155,15 +159,31 @@ typedef void (*GstTracerHookPadPullRangePost) (GObject *, GstClockTime,
 typedef void (*GstTracerHookPadPushEventPre) (GObject *, GstClockTime, GstPad *, 
     GstEvent *);
 #define GST_TRACER_PAD_PUSH_EVENT_PRE(pad, event) G_STMT_START{ \
+  gst_event_ref (event);                                        \
   GST_TRACER_DISPATCH(GST_TRACER_QUARK(HOOK_PAD_PUSH_EVENT_PRE), \
     GstTracerHookPadPushEventPre, pad, (GST_TRACER_ARGS, pad, event)); \
 }G_STMT_END
 
 typedef void (*GstTracerHookPadPushEventPost) (GObject *, GstClockTime, 
-    GstPad *, gboolean);
-#define GST_TRACER_PAD_PUSH_EVENT_POST(pad, res) G_STMT_START{ \
+    GstPad *, GstEvent *, GstFlowReturn);
+#define GST_TRACER_PAD_PUSH_EVENT_POST(pad, event, res) G_STMT_START{ \
   GST_TRACER_DISPATCH(GST_TRACER_QUARK(HOOK_PAD_PUSH_EVENT_POST), \
-    GstTracerHookPadPushEventPost, pad, (GST_TRACER_ARGS, pad, res)); \
+    GstTracerHookPadPushEventPost, pad, (GST_TRACER_ARGS, pad, event, res)); \
+  gst_event_unref (event);                                         \
+}G_STMT_END
+
+typedef void (*GstTracerHookPadSendEventPre) (GObject *, GstClockTime, GstPad *,
+    GstEvent *);
+#define GST_TRACER_PAD_SEND_EVENT_PRE(pad, event) G_STMT_START{ \
+  GST_TRACER_DISPATCH(GST_TRACER_QUARK(HOOK_PAD_SEND_EVENT_PRE), \
+    GstTracerHookPadSendEventPre, pad, (GST_TRACER_ARGS, pad, event)); \
+}G_STMT_END
+
+typedef void (*GstTracerHookPadSendEventPost) (GObject *, GstClockTime,
+    GstPad *, GstFlowReturn);
+#define GST_TRACER_PAD_SEND_EVENT_POST(pad, res) G_STMT_START{ \
+  GST_TRACER_DISPATCH(GST_TRACER_QUARK(HOOK_PAD_SEND_EVENT_POST), \
+    GstTracerHookPadSendEventPost, pad, (GST_TRACER_ARGS, pad, res)); \
 }G_STMT_END
 
 typedef void (*GstTracerHookElementPostMessagePre) (GObject *, GstClockTime,
@@ -208,6 +228,20 @@ typedef void (*GstTracerHookElementAddPadPost) (GObject *, GstClockTime,
     GstTracerHookElementAddPadPost, element, (GST_TRACER_ARGS, element, res)); \
 }G_STMT_END
 
+typedef void (*GstTracerHookBinAddElementPre) (GObject *, GstClockTime,
+    GstBin *, GstElement *);
+#define GST_TRACER_BIN_ADD_ELEMENT_PRE(bin, element) G_STMT_START{ \
+  GST_TRACER_DISPATCH(GST_TRACER_QUARK(HOOK_BIN_ADD_ELEMENT_PRE), \
+    GstTracerHookBinAddElementPre, bin, (GST_TRACER_ARGS, bin, element)); \
+}G_STMT_END
+
+typedef void (*GstTracerHookBinAddElementPost) (GObject *, GstClockTime,
+    GstBin *, gboolean);
+#define GST_TRACER_BIN_ADD_ELEMENT_POST(bin, res) G_STMT_START{ \
+  GST_TRACER_DISPATCH(GST_TRACER_QUARK(HOOK_BIN_ADD_ELEMENT_POST), \
+    GstTracerHookBinAddElementPost, bin, (GST_TRACER_ARGS, bin, res)); \
+}G_STMT_END
+
 #else /* !GST_DISABLE_GST_DEBUG */
 
 #define GST_TRACER_PAD_PUSH_PRE(pad, buffer)
@@ -217,13 +251,17 @@ typedef void (*GstTracerHookElementAddPadPost) (GObject *, GstClockTime,
 #define GST_TRACER_PAD_PULL_RANGE_PRE(pad, offset, size)
 #define GST_TRACER_PAD_PULL_RANGE_POST(pad, buffer, res)
 #define GST_TRACER_PAD_PUSH_EVENT_PRE(pad, event)
-#define GST_TRACER_PAD_PUSH_EVENT_POST(pad, res)
+#define GST_TRACER_PAD_PUSH_EVENT_POST(pad, event, res)
+#define GST_TRACER_PAD_SEND_EVENT_PRE(pad, event)
+#define GST_TRACER_PAD_SEND_EVENT_POST(pad, res)
 #define GST_TRACER_ELEMENT_POST_MESSAGE_PRE(element, message)
 #define GST_TRACER_ELEMENT_POST_MESSAGE_POST(element, res)
 #define GST_TRACER_ELEMENT_QUERY_PRE(element, query)
 #define GST_TRACER_ELEMENT_QUERY_POST(element, res)
 #define GST_TRACER_ELEMENT_ADD_PAD_PRE (element, pad)
 #define GST_TRACER_ELEMENT_ADD_PAD_POST(element, res)
+#define GST_TRACER_BIN_ADD_ELEMENT_PRE (bin, element)
+#define GST_TRACER_BIN_ADD_ELEMENT_POST(bin, res)
 
 #endif /* GST_DISABLE_GST_DEBUG */
 
