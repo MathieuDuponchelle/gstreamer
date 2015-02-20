@@ -11,6 +11,14 @@ gst_typefind_@GST_API_VERSION@_SOURCES = gst-typefind.c tools.h
 gst_typefind_@GST_API_VERSION@_CFLAGS = $(GST_OBJ_CFLAGS)
 gst_typefind_@GST_API_VERSION@_LDADD = $(GST_OBJ_LIBS)
 
+if ENABLE_BASH_COMPLETION
+bin_PROGRAMS += gst-completion-helper-@GST_API_VERSION@
+
+gst_completion_helper_@GST_API_VERSION@_SOURCES = gst-completion-helper.c tools.h
+gst_completion_helper_@GST_API_VERSION@_CFLAGS = $(GST_OBJ_CFLAGS)
+gst_completion_helper_@GST_API_VERSION@_LDADD = $(GST_OBJ_LIBS)
+endif
+
 if !GST_DISABLE_PARSE
 bin_PROGRAMS += gst-launch-@GST_API_VERSION@
 
