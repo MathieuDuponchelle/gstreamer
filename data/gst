@@ -1,0 +1,15 @@
+___gst_debug_level () { _mandatory__argument; }
+___gst_debug () { _mandatory__argument; }
+___gst_debug_color_mode () { _mandatory__argument; }
+___gst_plugin_path () { _mandatory__argument; }
+___gst_plugin_load () { _mandatory__argument; }
+
+_mandatory__argument ()
+{
+	if [[ "$prev" != "$command" ]]
+	then
+		COMPREPLY=( $(compgen -W "$(ges-launch-1.0 --help-all | grep -oh '[[:graph:]]*--[[:graph:]]*' | cut -d'=' -f1)" -- $cur) )
+	else
+		COMPREPLY=("$cur")
+	fi
+}

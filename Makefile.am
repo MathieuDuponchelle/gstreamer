@@ -17,6 +17,11 @@ if BUILD_TOOLS
 SUBDIRS += tools
 endif
 
+if ENABLE_BASH_COMPLETION
+bashcompletiondir = $(BASH_COMPLETION_DIR)
+dist_bashcompletion_DATA = data/gst-inspect-1.0 data/gst
+endif
+
 # These are all the possible subdirs
 DIST_SUBDIRS = pkgconfig \
 	gst libs plugins tools tests \
