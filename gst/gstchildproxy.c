@@ -138,6 +138,8 @@ GObject *
 gst_child_proxy_get_child_by_index (GstChildProxy * parent, guint index)
 {
   g_return_val_if_fail (GST_IS_CHILD_PROXY (parent), NULL);
+  g_return_val_if_fail (GST_CHILD_PROXY_GET_INTERFACE
+      (parent)->get_child_by_index != NULL, 0);
 
   return (GST_CHILD_PROXY_GET_INTERFACE (parent)->get_child_by_index (parent,
           index));
@@ -157,6 +159,8 @@ guint
 gst_child_proxy_get_children_count (GstChildProxy * parent)
 {
   g_return_val_if_fail (GST_IS_CHILD_PROXY (parent), 0);
+  g_return_val_if_fail (GST_CHILD_PROXY_GET_INTERFACE
+      (parent)->get_children_count != NULL, 0);
 
   return (GST_CHILD_PROXY_GET_INTERFACE (parent)->get_children_count (parent));
 }
