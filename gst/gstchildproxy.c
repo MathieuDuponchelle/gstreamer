@@ -61,6 +61,7 @@ gst_child_proxy_default_get_child_by_name (GstChildProxy * parent,
   guint count, i;
   GObject *object, *result;
   gchar *object_name;
+  GstChildProxyInterface *iface = GST_CHILD_PROXY_GET_INTERFACE (parent);
 
   g_return_val_if_fail (GST_IS_CHILD_PROXY (parent), NULL);
   g_return_val_if_fail (name != NULL, NULL);
@@ -77,7 +78,8 @@ gst_child_proxy_default_get_child_by_name (GstChildProxy * parent,
     if (!GST_IS_OBJECT (object)) {
       goto next;
     }
-    object_name = gst_object_get_name (GST_OBJECT_CAST (object));
+    object_name = iface->get_child_name (parent, object);
+
     if (object_name == NULL) {
       g_warning ("child %u of parent %s has no name", i,
           GST_OBJECT_NAME (parent));
@@ -94,6 +96,14 @@ gst_child_proxy_default_get_child_by_name (GstChildProxy * parent,
     g_object_unref (object);
   }
   return result;
+}
+
+static gchar *
+gst_child_proxy_default_get_child_name (GstChildProxy * parent, GObject * child)
+{
+  if (!GST_IS_OBJECT (child))
+    return NULL;
+  return gst_object_get_name (GST_OBJECT (child));
 }
 
 
@@ -499,6 +509,7 @@ gst_child_proxy_class_init (gpointer g_class, gpointer class_data)
   GstChildProxyInterface *iface = (GstChildProxyInterface *) g_class;
 
   iface->get_child_by_name = gst_child_proxy_default_get_child_by_name;
+  iface->get_child_name = gst_child_proxy_default_get_child_name;
 }
 
 static void

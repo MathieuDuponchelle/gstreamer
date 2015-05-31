@@ -47,6 +47,11 @@ typedef struct _GstChildProxyInterface GstChildProxyInterface;
  * @get_child_by_name:  virtual method to fetch the child by name
  * @get_child_by_index: virtual method to fetch the child by index
  * @get_children_count: virtual method to get the children count
+ * @get_child_name:     virtual method to get the name of a child
+ *                      Implement it if you want to override the default
+ *                      behaviour of get_child_by_name() without having
+ *                      to implement it. The returned string will be
+ *                      g_free'd.
  *
  * #GstChildProxy interface.
  */
@@ -58,6 +63,7 @@ struct _GstChildProxyInterface
   GObject * (*get_child_by_name)  (GstChildProxy * parent, const gchar * name);
   GObject * (*get_child_by_index) (GstChildProxy * parent, guint index);
   guint     (*get_children_count) (GstChildProxy * parent);
+  gchar   * (*get_child_name)     (GstChildProxy * parent, GObject *child);
   /*< private >*/
   /* signals */
   void      (*child_added)        (GstChildProxy * parent, GObject * child, const gchar * name);
