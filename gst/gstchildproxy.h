@@ -63,7 +63,7 @@ struct _GstChildProxyInterface
   GObject * (*get_child_by_name)  (GstChildProxy * parent, const gchar * name);
   GObject * (*get_child_by_index) (GstChildProxy * parent, guint index);
   guint     (*get_children_count) (GstChildProxy * parent);
-  gchar   * (*get_child_name)     (GstChildProxy * parent, GObject *child);
+  gchar   * (*get_object_name)     (GstChildProxy * parent, GObject *child);
   /*< private >*/
   /* signals */
   void      (*child_added)        (GstChildProxy * parent, GObject * child, const gchar * name);
@@ -82,6 +82,7 @@ GObject * gst_child_proxy_get_child_by_index (GstChildProxy * parent, guint inde
 
 gboolean  gst_child_proxy_lookup             (GstChildProxy *object, const gchar *name,
                                               GObject **target, GParamSpec **pspec);
+GList *   gst_child_proxy_lookup_all         (GstChildProxy * object, const gchar * name);
 
 void      gst_child_proxy_get_property       (GstChildProxy * object, const gchar *name,
                                               GValue *value);

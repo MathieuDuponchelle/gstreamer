@@ -298,6 +298,7 @@ EXPORTS
 	gst_child_proxy_get_type
 	gst_child_proxy_get_valist
 	gst_child_proxy_lookup
+	gst_child_proxy_lookup_all
 	gst_child_proxy_set
 	gst_child_proxy_set_property
 	gst_child_proxy_set_valist

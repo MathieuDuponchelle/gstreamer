@@ -78,7 +78,7 @@ gst_child_proxy_default_get_child_by_name (GstChildProxy * parent,
     if (!GST_IS_OBJECT (object)) {
       goto next;
     }
-    object_name = iface->get_child_name (parent, object);
+    object_name = iface->get_object_name (parent, object);
 
     if (object_name == NULL) {
       g_warning ("child %u of parent %s has no name", i,
@@ -99,13 +99,91 @@ gst_child_proxy_default_get_child_by_name (GstChildProxy * parent,
 }
 
 static gchar *
-gst_child_proxy_default_get_child_name (GstChildProxy * parent, GObject * child)
+gst_child_proxy_default_get_object_name (GstChildProxy * parent,
+    GObject * child)
 {
   if (!GST_IS_OBJECT (child))
     return NULL;
   return gst_object_get_name (GST_OBJECT (child));
 }
 
+static void
+_lookup_all (GstChildProxy * proxy, const gchar * prop_name,
+    const gchar * prop_path, const gchar * parent_path, GList ** elements)
+{
+  guint count, i;
+  GObject *object;
+  gchar *current_path;
+  GstChildProxyInterface *iface = GST_CHILD_PROXY_GET_INTERFACE (proxy);
+  gchar *object_name = iface->get_object_name (proxy, G_OBJECT (proxy));
+
+  if (object_name == NULL)
+    return;
+
+  current_path = g_strconcat (parent_path, "::", object_name, NULL);
+
+  g_free (object_name);
+  count = gst_child_proxy_get_children_count (proxy);
+
+  for (i = 0; i < count; i++) {
+    GObjectClass *klass;
+    GParamSpec *spec;
+    gchar *object_name, *object_path;
+
+    if (!(object = gst_child_proxy_get_child_by_index (proxy, i)))
+      continue;
+
+    object_name = iface->get_object_name (proxy, object);
+
+    if (object_name == NULL) {
+      g_warning ("child %u has no name", i);
+      continue;
+    }
+
+    object_path = g_strconcat (current_path, "::", object_name, NULL);
+    g_free (object_name);
+
+    if (g_str_has_suffix (object_path, prop_path)) {
+      klass = G_OBJECT_GET_CLASS (object);
+      spec = g_object_class_find_property (klass, prop_name);
+      if (spec) {
+        *elements = g_list_append (*elements, g_object_ref (object));
+      }
+    }
+
+    g_free (object_path);
+    if (GST_IS_CHILD_PROXY (object))
+      _lookup_all (GST_CHILD_PROXY (object), prop_name, prop_path, current_path,
+          elements);
+
+    g_object_unref (object);
+  }
+
+  g_free (current_path);
+}
+
+static gchar *
+_split_property_path (const gchar * name, gchar ** path)
+{
+  gchar **names, **current;
+  gchar *prop_name = NULL;
+
+  names = current = g_strsplit (name, "::", -1);
+
+  while (*current) {
+    if (!current[1]) {
+      prop_name = g_strdup (*current);
+      g_free (*current);
+      *current = NULL;
+    }
+    current++;
+  }
+
+  *path = g_strjoinv ("::", names);
+  g_strfreev (names);
+
+  return prop_name;
+}
 
 /**
  * gst_child_proxy_get_child_by_name:
@@ -246,6 +324,43 @@ gst_child_proxy_lookup (GstChildProxy * object, const gchar * name,
   g_object_unref (obj);
   g_strfreev (names);
   return res;
+}
+
+/**
+ * gst_child_proxy_lookup_all:
+ * @object: child proxy object to lookup the property in.
+ * @name: Name of the property to lookup.
+ *
+ * Looks up all the objects that would be affected by a given property name.
+ *
+ * The name of the property can be fully specified
+ * (object1::object2::property_name), in which case the list will
+ * contain exactly the result of gst_child_proxy_lookup() , partially specified
+ * (object2::property_name), or unspecified (property_name), in which case
+ * the list might contain more than one object.
+ *
+ * Returns: (transfer full) (element-type GObject): a #GList of children
+ * objects that implement the given property.
+ *
+ * MT safe.
+ *
+ * Since: 1.6
+ */
+GList *
+gst_child_proxy_lookup_all (GstChildProxy * object, const gchar * name)
+{
+  gchar *prop_name;
+  gchar *prop_path;
+  GList *objects = NULL;
+
+  prop_name = _split_property_path (name, &prop_path);
+
+  _lookup_all (object, prop_name, prop_path, "", &objects);
+
+  g_free (prop_name);
+  g_free (prop_path);
+
+  return objects;
 }
 
 /**
@@ -509,7 +624,7 @@ gst_child_proxy_class_init (gpointer g_class, gpointer class_data)
   GstChildProxyInterface *iface = (GstChildProxyInterface *) g_class;
 
   iface->get_child_by_name = gst_child_proxy_default_get_child_by_name;
-  iface->get_child_name = gst_child_proxy_default_get_child_name;
+  iface->get_object_name = gst_child_proxy_default_get_object_name;
 }
 
 static void

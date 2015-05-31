@@ -60,6 +60,44 @@ GST_START_TEST (test_child_get)
 
 GST_END_TEST;
 
+GST_START_TEST (test_nested_property_lookup)
+{
+  GstElement *pipeline, *bin, *elem;
+  GList *elements;
+
+  pipeline = gst_pipeline_new (NULL);
+  bin = gst_bin_new (NULL);
+  fail_unless (pipeline != NULL, "Could not create pipeline");
+
+  elem = gst_element_factory_make ("fakesrc", "src");
+  fail_if (elem == NULL, "Could not create fakesrc");
+  gst_bin_add (GST_BIN (bin), elem);
+
+  elem = gst_element_factory_make ("fakesrc", "src2");
+  gst_bin_add (GST_BIN (bin), elem);
+
+  gst_bin_add (GST_BIN (pipeline), bin);
+
+  elements = gst_child_proxy_lookup_all (GST_CHILD_PROXY (pipeline), "is-live");
+  fail_unless_equals_int (g_list_length (elements), 2);
+  g_list_free_full (elements, g_object_unref);
+  elements =
+      gst_child_proxy_lookup_all (GST_CHILD_PROXY (pipeline), "src::is-live");
+  fail_unless_equals_int (g_list_length (elements), 1);
+  g_list_free_full (elements, g_object_unref);
+  elements =
+      gst_child_proxy_lookup_all (GST_CHILD_PROXY (pipeline), "src2::is-live");
+  fail_unless_equals_int (g_list_length (elements), 1);
+  g_list_free_full (elements, g_object_unref);
+  elements =
+      gst_child_proxy_lookup_all (GST_CHILD_PROXY (pipeline), "src3::is-live");
+  fail_unless (g_list_length (elements) == 0);
+  g_list_free_full (elements, g_object_unref);
+
+  gst_object_unref (pipeline);
+}
+
+GST_END_TEST;
 
 static Suite *
 gst_child_proxy_suite (void)
@@ -72,6 +110,7 @@ gst_child_proxy_suite (void)
   suite_add_tcase (s, tc_chain);
   tcase_add_test (tc_chain, test_get);
   tcase_add_test (tc_chain, test_child_get);
+  tcase_add_test (tc_chain, test_nested_property_lookup);
 
   return s;
 }
