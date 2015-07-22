@@ -29,9 +29,9 @@
 /**
  * SECTION:gstsegment
  * @short_description: Structure describing the configured region of interest
- *                     in a media file.
- * @see_also: #GstEvent
+ * @see_also: [GstEvent]()
  *
+ * in a media file.
  * This helper structure holds the relevant values for tracking the region of
  * interest in a media file, called a segment.
  *
@@ -47,7 +47,7 @@
  * The configured segment is then propagated back downstream with a newsegment event.
  * This information is then used to clip media to the segment boundaries.
  *
- * A segment structure is initialized with gst_segment_init(), which takes a #GstFormat
+ * A segment structure is initialized with [gst_segment_init](), which takes a [GstFormat]()
  * that will be used as the format of the segment values. The segment will be configured
  * with a start value of 0 and a stop/duration of -1, which is undefined. The default
  * rate and applied_rate is 1.0.
@@ -61,35 +61,35 @@
  * member in the structure.
  *
  * For elements that perform seeks, the current segment should be updated with the
- * gst_segment_do_seek() and the values from the seek event. This method will update
+ * [gst_segment_do_seek]() and the values from the seek event. This method will update
  * all the segment fields. The position field will contain the new playback position.
  * If the start_type was different from GST_SEEK_TYPE_NONE, playback continues from
  * the position position, possibly with updated flags or rate.
  *
- * For elements that want to use #GstSegment to track the playback region,
+ * For elements that want to use [GstSegment]() to track the playback region,
  * update the segment fields with the information from the newsegment event.
- * The gst_segment_clip() method can be used to check and clip
+ * The [gst_segment_clip]() method can be used to check and clip
  * the media data to the segment boundaries.
  *
- * For elements that want to synchronize to the pipeline clock, gst_segment_to_running_time()
+ * For elements that want to synchronize to the pipeline clock, [gst_segment_to_running_time]()
  * can be used to convert a timestamp to a value that can be used to synchronize
  * to the clock. This function takes into account the base as well as
  * any rate or applied_rate conversions.
  *
  * For elements that need to perform operations on media data in stream_time,
- * gst_segment_to_stream_time() can be used to convert a timestamp and the segment
+ * [gst_segment_to_stream_time]() can be used to convert a timestamp and the segment
  * info to stream time (which is always between 0 and the duration of the stream).
  */
 
 /**
  * gst_segment_copy:
- * @segment: (transfer none): a #GstSegment
+ * @segment: (transfer none): a [GstSegment]()
  *
- * Create a copy of given @segment.
+ * Create a copy of given _segment_.
  *
  * Free-function: gst_segment_free
  *
- * Returns: (transfer full): a new #GstSegment, free with gst_segment_free().
+ * Returns: (transfer full): a new [GstSegment](), free with [gst_segment_free]().
  */
 GstSegment *
 gst_segment_copy (const GstSegment * segment)
@@ -104,10 +104,10 @@ gst_segment_copy (const GstSegment * segment)
 
 /**
  * gst_segment_copy_into:
- * @src: (transfer none): a #GstSegment
- * @dest: (transfer none): a #GstSegment
+ * @src: (transfer none): a [GstSegment]()
+ * @dest: (transfer none): a [GstSegment]()
  *
- * Copy the contents of @src into @dest.
+ * Copy the contents of _src_ into _dest_.
  */
 void
 gst_segment_copy_into (const GstSegment * src, GstSegment * dest)
@@ -121,12 +121,12 @@ G_DEFINE_BOXED_TYPE (GstSegment, gst_segment,
 /**
  * gst_segment_new:
  *
- * Allocate a new #GstSegment structure and initialize it using
- * gst_segment_init().
+ * Allocate a new [GstSegment]() structure and initialize it using
+ * [gst_segment_init]().
  *
  * Free-function: gst_segment_free
  *
- * Returns: (transfer full): a new #GstSegment, free with gst_segment_free().
+ * Returns: (transfer full): a new [GstSegment](), free with [gst_segment_free]().
  */
 GstSegment *
 gst_segment_new (void)
@@ -141,9 +141,9 @@ gst_segment_new (void)
 
 /**
  * gst_segment_free:
- * @segment: (in) (transfer full): a #GstSegment
+ * @segment: (in) (transfer full): a [GstSegment]()
  *
- * Free the allocated segment @segment.
+ * Free the allocated segment _segment_.
  */
 void
 gst_segment_free (GstSegment * segment)
@@ -153,14 +153,14 @@ gst_segment_free (GstSegment * segment)
 
 /**
  * gst_segment_init:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @format: the format of the segment.
  *
  * The start/position fields are set to 0 and the stop/duration
  * fields are set to -1 (unknown). The default rate of 1.0 and no
  * flags are set.
  *
- * Initialize @segment to its default values.
+ * Initialize _segment_ to its default values.
  */
 void
 gst_segment_init (GstSegment * segment, GstFormat format)
@@ -182,7 +182,7 @@ gst_segment_init (GstSegment * segment, GstFormat format)
 
 /**
  * gst_segment_do_seek:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @rate: the rate of the segment.
  * @format: the format of the segment.
  * @flags: the segment flags for the segment
@@ -193,34 +193,34 @@ gst_segment_init (GstSegment * segment, GstFormat format)
  * @update: boolean holding whether position was updated.
  *
  * Update the segment structure with the field values of a seek event (see
- * gst_event_new_seek()).
+ * [gst_event_new_seek]()).
  *
  * After calling this method, the segment field position and time will
  * contain the requested new position in the segment. The new requested
- * position in the segment depends on @rate and @start_type and @stop_type.
+ * position in the segment depends on _rate_ and _start_type_ and _stop_type_.
  *
- * For positive @rate, the new position in the segment is the new @segment
- * start field when it was updated with a @start_type different from
- * #GST_SEEK_TYPE_NONE. If no update was performed on @segment start position
- * (#GST_SEEK_TYPE_NONE), @start is ignored and @segment position is
+ * For positive _rate_, the new position in the segment is the new _segment_
+ * start field when it was updated with a _start_type_ different from
+ * [GST_SEEK_TYPE_NONE](). If no update was performed on _segment_ start position
+ * ([GST_SEEK_TYPE_NONE]()), _start_ is ignored and _segment_ position is
  * unmodified.
  *
- * For negative @rate, the new position in the segment is the new @segment
- * stop field when it was updated with a @stop_type different from
- * #GST_SEEK_TYPE_NONE. If no stop was previously configured in the segment, the
+ * For negative _rate_, the new position in the segment is the new _segment_
+ * stop field when it was updated with a _stop_type_ different from
+ * [GST_SEEK_TYPE_NONE](). If no stop was previously configured in the segment, the
  * duration of the segment will be used to update the stop position.
- * If no update was performed on @segment stop position (#GST_SEEK_TYPE_NONE),
- * @stop is ignored and @segment position is unmodified.
+ * If no update was performed on _segment_ stop position ([GST_SEEK_TYPE_NONE]()),
+ * _stop_ is ignored and _segment_ position is unmodified.
  *
  * The applied rate of the segment will be set to 1.0 by default.
- * If the caller can apply a rate change, it should update @segment
+ * If the caller can apply a rate change, it should update _segment_
  * rate and applied_rate after calling this function.
  *
- * @update will be set to %TRUE if a seek should be performed to the segment
- * position field. This field can be %FALSE if, for example, only the @rate
+ * _update_ will be set to [TRUE]() if a seek should be performed to the segment
+ * position field. This field can be [FALSE]() if, for example, only the _rate_
  * has been changed but not the playback position.
  *
- * Returns: %TRUE if the seek could be performed.
+ * Returns: [TRUE]() if the seek could be performed.
  */
 gboolean
 gst_segment_do_seek (GstSegment * segment, gdouble rate,
@@ -376,17 +376,17 @@ gst_segment_do_seek (GstSegment * segment, gdouble rate,
 
 /**
  * gst_segment_to_stream_time:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @format: the format of the segment.
  * @position: the position in the segment
  *
- * Translate @position to stream time using the currently configured
- * segment. The @position value must be between @segment start and
+ * Translate _position_ to stream time using the currently configured
+ * segment. The _position_ value must be between _segment_ start and
  * stop value.
  *
  * This function is typically used by elements that need to operate on
  * the stream time of the buffers it receives, such as effect plugins.
- * In those use cases, @position is typically the buffer timestamp or
+ * In those use cases, _position_ is typically the buffer timestamp or
  * clock time that one wants to convert to the stream time.
  * The stream time is always between 0 and the total duration of the
  * media stream.
@@ -454,29 +454,28 @@ gst_segment_to_stream_time (const GstSegment * segment, GstFormat format,
 
 /**
  * gst_segment_to_running_time_full:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @format: the format of the segment.
  * @position: the position in the segment
  * @running_time: result running-time
  *
- * Translate @position to the total running time using the currently configured
- * segment. Compared to gst_segment_to_running_time() this function can return
+ * Translate _position_ to the total running time using the currently configured
+ * segment. Compared to [gst_segment_to_running_time]() this function can return
  * negative running-time.
  *
  * This function is typically used by elements that need to synchronize buffers
  * against the clock or eachother.
  *
- * @position can be any value and the result of this function for values outside
+ * _position_ can be any value and the result of this function for values outside
  * of the segment is extrapolated.
  *
- * When 1 is returned, @position resulted in a positive running-time returned
- * in @running_time.
+ * When 1 is returned, _position_ resulted in a positive running-time returned
+ * in _running_time_.
  *
- * When this function returns -1, the returned @running_time should be negated
+ * When this function returns -1, the returned _running_time_ should be negated
  * to get the real negative running time.
  *
  * Returns: a 1 or -1 on success, 0 on failure.
- *
  * Since: 1.6
  */
 gint
@@ -564,19 +563,19 @@ done:
 
 /**
  * gst_segment_to_running_time:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @format: the format of the segment.
  * @position: the position in the segment
  *
- * Translate @position to the total running time using the currently configured
- * segment. Position is a value between @segment start and stop time.
+ * Translate _position_ to the total running time using the currently configured
+ * segment. Position is a value between _segment_ start and stop time.
  *
  * This function is typically used by elements that need to synchronize to the
  * global clock in a pipeline. The running time is a constantly increasing value
- * starting from 0. When gst_segment_init() is called, this value will reset to
+ * starting from 0. When [gst_segment_init]() is called, this value will reset to
  * 0.
  *
- * This function returns -1 if the position is outside of @segment start and stop.
+ * This function returns -1 if the position is outside of _segment_ start and stop.
  *
  * Returns: the position as the total running time or -1 when an invalid position
  * was given.
@@ -612,29 +611,29 @@ gst_segment_to_running_time (const GstSegment * segment, GstFormat format,
 
 /**
  * gst_segment_clip:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @format: the format of the segment.
  * @start: the start position in the segment
  * @stop: the stop position in the segment
  * @clip_start: (out) (allow-none): the clipped start position in the segment
  * @clip_stop: (out) (allow-none): the clipped stop position in the segment
  *
- * Clip the given @start and @stop values to the segment boundaries given
- * in @segment. @start and @stop are compared and clipped to @segment
+ * Clip the given _start_ and _stop_ values to the segment boundaries given
+ * in _segment_. _start_ and _stop_ are compared and clipped to _segment_
  * start and stop values.
  *
- * If the function returns %FALSE, @start and @stop are known to fall
- * outside of @segment and @clip_start and @clip_stop are not updated.
+ * If the function returns [FALSE](), _start_ and _stop_ are known to fall
+ * outside of _segment_ and _clip_start_ and _clip_stop_ are not updated.
  *
- * When the function returns %TRUE, @clip_start and @clip_stop will be
- * updated. If @clip_start or @clip_stop are different from @start or @stop
+ * When the function returns [TRUE](), _clip_start_ and _clip_stop_ will be
+ * updated. If _clip_start_ or _clip_stop_ are different from _start_ or _stop_
  * respectively, the region fell partially in the segment.
  *
- * Note that when @stop is -1, @clip_stop will be set to the end of the
+ * Note that when _stop_ is -1, _clip_stop_ will be set to the end of the
  * segment. Depending on the use case, this may or may not be what you want.
  *
- * Returns: %TRUE if the given @start and @stop times fall partially or
- *     completely in @segment, %FALSE if the values are completely outside
+ * Returns: [TRUE]() if the given _start_ and _stop_ times fall partially or
+ *     completely in _segment_, [FALSE]() if the values are completely outside
  *     of the segment.
  */
 gboolean
@@ -678,15 +677,15 @@ gst_segment_clip (const GstSegment * segment, GstFormat format, guint64 start,
 
 /**
  * gst_segment_to_position:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @format: the format of the segment.
  * @running_time: the running_time in the segment
  *
- * Convert @running_time into a position in the segment so that
- * gst_segment_to_running_time() with that position returns @running_time.
+ * Convert _running_time_ into a position in the segment so that
+ * [gst_segment_to_running_time]() with that position returns _running_time_.
  *
- * Returns: the position in the segment for @running_time. This function returns
- * -1 when @running_time is -1 or when it is not inside @segment.
+ * Returns: the position in the segment for _running_time_. This function returns
+ * -1 when _running_time_ is -1 or when it is not inside _segment_.
  */
 guint64
 gst_segment_to_position (const GstSegment * segment, GstFormat format,
@@ -740,15 +739,15 @@ gst_segment_to_position (const GstSegment * segment, GstFormat format,
 
 /**
  * gst_segment_set_running_time:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @format: the format of the segment.
  * @running_time: the running_time in the segment
  *
- * Adjust the start/stop and base values of @segment such that the next valid
- * buffer will be one with @running_time.
+ * Adjust the start/stop and base values of _segment_ such that the next valid
+ * buffer will be one with _running_time_.
  *
- * Returns: %TRUE if the segment could be updated successfully. If %FALSE is
- * returned, @running_time is -1 or not in @segment.
+ * Returns: [TRUE]() if the segment could be updated successfully. If [FALSE]() is
+ * returned, _running_time_ is -1 or not in _segment_.
  */
 gboolean
 gst_segment_set_running_time (GstSegment * segment, GstFormat format,
@@ -785,17 +784,16 @@ gst_segment_set_running_time (GstSegment * segment, GstFormat format,
 
 /**
  * gst_segment_offset_running_time:
- * @segment: a #GstSegment structure.
+ * @segment: a [GstSegment]() structure.
  * @format: the format of the segment.
  * @offset: the offset to apply in the segment
  *
- * Adjust the values in @segment so that @offset is applied to all
+ * Adjust the values in _segment_ so that _offset_ is applied to all
  * future running-time calculations.
  *
  * Since: 1.2.3
- *
- * Returns: %TRUE if the segment could be updated successfully. If %FALSE is
- * returned, @offset is not in @segment.
+ * Returns: [TRUE]() if the segment could be updated successfully. If [FALSE]() is
+ * returned, _offset_ is not in _segment_.
  */
 gboolean
 gst_segment_offset_running_time (GstSegment * segment, GstFormat format,
@@ -833,15 +831,14 @@ gst_segment_offset_running_time (GstSegment * segment, GstFormat format,
 
 /**
  * gst_segment_is_equal:
- * @s0: a #GstSegment structure.
- * @s1: a #GstSegment structure.
+ * @s0: a [GstSegment]() structure.
+ * @s1: a [GstSegment]() structure.
  *
  * Checks for two segments being equal. Equality here is defined
  * as perfect equality, including floating point values.
  *
  * Since: 1.6
- *
- * Returns: %TRUE if the segments are equal, %FALSE otherwise.
+ * Returns: [TRUE]() if the segments are equal, [FALSE]() otherwise.
  */
 gboolean
 gst_segment_is_equal (const GstSegment * s0, const GstSegment * s1)

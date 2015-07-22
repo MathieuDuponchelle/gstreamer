@@ -33,7 +33,7 @@ G_BEGIN_DECLS
  * @user_data: user data passed to the function
  *
  * A function that will repeatedly be called in the thread created by
- * a #GstTask.
+ * a [GstTask]().
  */
 typedef void         (*GstTaskFunction)          (gpointer user_data);
 
@@ -111,8 +111,8 @@ typedef enum {
 
 /**
  * GstTaskThreadFunc:
- * @task: The #GstTask
- * @thread: The #GThread
+ * @task: The [GstTask]()
+ * @thread: The [GThread]()
  * @user_data: user data
  *
  * Custom GstTask thread callback functions that can be installed.
@@ -126,10 +126,10 @@ typedef void (*GstTaskThreadFunc) (GstTask *task, GThread *thread, gpointer user
  * @lock: The lock taken when iterating the task function
  * @func: the function executed by this task
  * @user_data: user_data passed to the task function
- * @notify: GDestroyNotify for @user_data
+ * @notify: GDestroyNotify for _user_data_
  * @running: a flag indicating that the task is running
  *
- * The #GstTask object.
+ * The [GstTask]() object.
  */
 struct _GstTask {
   GstObject      object;

@@ -32,12 +32,12 @@ G_BEGIN_DECLS
 
 /**
  * GstIteratorResult:
- * @GST_ITERATOR_DONE:   No more items in the iterator
- * @GST_ITERATOR_OK:     An item was retrieved
+ * @GST_ITERATOR_DONE: No more items in the iterator
+ * @GST_ITERATOR_OK: An item was retrieved
  * @GST_ITERATOR_RESYNC: Datastructure changed while iterating
- * @GST_ITERATOR_ERROR:  An error happened
+ * @GST_ITERATOR_ERROR: An error happened
  *
- * The result of gst_iterator_next().
+ * The result of [gst_iterator_next]().
  */
 typedef enum {
   GST_ITERATOR_DONE     = 0,
@@ -50,11 +50,11 @@ typedef struct _GstIterator GstIterator;
 
 /**
  * GstIteratorItem:
- * @GST_ITERATOR_ITEM_SKIP:  Skip this item
- * @GST_ITERATOR_ITEM_PASS:  Return item
- * @GST_ITERATOR_ITEM_END:   Stop after this item.
+ * @GST_ITERATOR_ITEM_SKIP: Skip this item
+ * @GST_ITERATOR_ITEM_PASS: Return item
+ * @GST_ITERATOR_ITEM_END: Stop after this item.
  *
- * The result of a #GstIteratorItemFunction.
+ * The result of a [GstIteratorItemFunction]().
  */
 typedef enum {
   GST_ITERATOR_ITEM_SKIP        = 0,
@@ -67,7 +67,7 @@ typedef enum {
  * @it: The original iterator
  * @copy: The copied iterator
  *
- * This function will be called when creating a copy of @it and should
+ * This function will be called when creating a copy of _it_ and should
  * create a copy of all custom iterator fields or increase their
  * reference counts.
  */
@@ -96,7 +96,7 @@ typedef GstIteratorItem   (*GstIteratorItemFunction)    (GstIterator *it, const 
  * The function that will be called when the next element of the iterator
  * should be retrieved.
  *
- * Implementors of a #GstIterator should implement this
+ * Implementors of a [GstIterator]() should implement this
  * function and pass it to the constructor of the custom iterator.
  * The function will be called with the iterator lock held.
  *
@@ -112,7 +112,7 @@ typedef GstIteratorResult (*GstIteratorNextFunction)    (GstIterator *it, GValue
  * restart the iterator from the beginning and clean up any state it might
  * have.
  *
- * Implementors of a #GstIterator should implement this
+ * Implementors of a [GstIterator]() should implement this
  * function and pass it to the constructor of the custom iterator.
  * The function will be called with the iterator lock held.
  */
@@ -123,7 +123,7 @@ typedef void              (*GstIteratorResyncFunction)  (GstIterator *it);
  *
  * This function will be called when the iterator is freed.
  *
- * Implementors of a #GstIterator should implement this
+ * Implementors of a [GstIterator]() should implement this
  * function and pass it to the constructor of the custom iterator.
  * The function will be called with the iterator lock held.
  */
@@ -134,41 +134,41 @@ typedef void              (*GstIteratorFreeFunction)    (GstIterator *it);
  * @item: The item
  * @user_data: User data
  *
- * A function that is called by gst_iterator_foreach() for every element.
+ * A function that is called by [gst_iterator_foreach]() for every element.
  */
 typedef void         (*GstIteratorForeachFunction)     (const GValue * item, gpointer user_data);
 
 /**
  * GstIteratorFoldFunction:
  * @item: the item to fold
- * @ret: a #GValue collecting the result
- * @user_data: data passed to gst_iterator_fold()
+ * @ret: a [GValue]() collecting the result
+ * @user_data: data passed to [gst_iterator_fold]()
  *
- * A function to be passed to gst_iterator_fold().
+ * A function to be passed to [gst_iterator_fold]().
  *
- * Returns: %TRUE if the fold should continue, %FALSE if it should stop.
+ * Returns: [TRUE]() if the fold should continue, [FALSE]() if it should stop.
  */
 typedef gboolean          (*GstIteratorFoldFunction)    (const GValue * item, GValue * ret, gpointer user_data);
 
 /**
  * GST_ITERATOR:
- * @it: the #GstIterator value
+ * @it: the [GstIterator]() value
  *
- * Macro to cast to a #GstIterator
+ * Macro to cast to a [GstIterator]()
  */
 #define GST_ITERATOR(it)                ((GstIterator*)(it))
 /**
  * GST_ITERATOR_LOCK:
- * @it: the #GstIterator to get the lock of
+ * @it: the [GstIterator]() to get the lock of
  *
  * Macro to get the lock protecting the datastructure being iterated.
  */
 #define GST_ITERATOR_LOCK(it)           (GST_ITERATOR(it)->lock)
 /**
  * GST_ITERATOR_COOKIE:
- * @it: the #GstIterator to get the cookie of
+ * @it: the [GstIterator]() to get the cookie of
  *
- * Macro to get the cookie of a #GstIterator. The cookie of the
+ * Macro to get the cookie of a [GstIterator](). The cookie of the
  * iterator is the value of the master cookie when the iterator
  * was created.
  * Whenever the iterator is iterated, the value is compared to the
@@ -178,7 +178,7 @@ typedef gboolean          (*GstIteratorFoldFunction)    (const GValue * item, GV
 #define GST_ITERATOR_COOKIE(it)         (GST_ITERATOR(it)->cookie)
 /**
  * GST_ITERATOR_ORIG_COOKIE:
- * @it: the #GstIterator to get the master cookie of
+ * @it: the [GstIterator]() to get the master cookie of
  *
  * Macro to get a pointer to where the master cookie is stored. The
  * master cookie protects the structure being iterated and gets updated
@@ -193,7 +193,7 @@ typedef gboolean          (*GstIteratorFoldFunction)    (const GValue * item, GV
  * @item: The function to be called for each item retrieved
  * @resync: The function to call when a resync is needed.
  * @free: The function to call when the iterator is freed
- * @pushed: The iterator that is currently pushed with gst_iterator_push()
+ * @pushed: The iterator that is currently pushed with [gst_iterator_push]()
  * @type: The type of the object that this iterator will return
  * @lock: The lock protecting the data structure and the cookie.
  * @cookie: The cookie; the value of the master_cookie when this iterator was
@@ -201,8 +201,8 @@ typedef gboolean          (*GstIteratorFoldFunction)    (const GValue * item, GV
  * @master_cookie: A pointer to the master cookie.
  * @size: the size of the iterator
  *
- * #GstIterator base structure. The values of this structure are
- * protected for subclasses, use the methods to use the #GstIterator.
+ * [GstIterator]() base structure. The values of this structure are
+ * protected for subclasses, use the methods to use the [GstIterator]().
  */
 struct _GstIterator {
   /*< protected >*/

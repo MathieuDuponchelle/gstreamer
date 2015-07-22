@@ -23,17 +23,17 @@
 /**
  * SECTION:gstbuffer
  * @short_description: Data-passing buffer type
- * @see_also: #GstPad, #GstMiniObject, #GstMemory, #GstMeta, #GstBufferPool
+ * @see_also: [GstPad](), [GstMiniObject](), [GstMemory](), [GstMeta](), [GstBufferPool]()
  *
  * Buffers are the basic unit of data transfer in GStreamer. They contain the
  * timing and offset along with other arbitrary metadata that is associated
- * with the #GstMemory blocks that the buffer contains.
+ * with the [GstMemory]() blocks that the buffer contains.
  *
- * Buffers are usually created with gst_buffer_new(). After a buffer has been
+ * Buffers are usually created with [gst_buffer_new](). After a buffer has been
  * created one will typically allocate memory for it and add it to the buffer.
  * The following example creates a buffer that can hold a given video frame
  * with a given width, height and bits per plane.
- * |[
+ * ```
  *   GstBuffer *buffer;
  *   GstMemory *memory;
  *   gint size, width, height, bpp;
@@ -43,19 +43,19 @@
  *   memory = gst_allocator_alloc (NULL, size, NULL);
  *   gst_buffer_insert_memory (buffer, -1, memory);
  *   ...
- * ]|
+ * ```
  *
- * Alternatively, use gst_buffer_new_allocate() to create a buffer with
+ * Alternatively, use [gst_buffer_new_allocate]() to create a buffer with
  * preallocated data of a given size.
  *
- * Buffers can contain a list of #GstMemory objects. You can retrieve how many
- * memory objects with gst_buffer_n_memory() and you can get a pointer
- * to memory with gst_buffer_peek_memory()
+ * Buffers can contain a list of [GstMemory]() objects. You can retrieve how many
+ * memory objects with [gst_buffer_n_memory]() and you can get a pointer
+ * to memory with [gst_buffer_peek_memory]()
  *
  * A buffer will usually have timestamps, and a duration, but neither of these
- * are guaranteed (they may be set to #GST_CLOCK_TIME_NONE). Whenever a
+ * are guaranteed (they may be set to [GST_CLOCK_TIME_NONE]()). Whenever a
  * meaningful value can be given for these, they should be set. The timestamps
- * and duration are measured in nanoseconds (they are #GstClockTime values).
+ * and duration are measured in nanoseconds (they are [GstClockTime]() values).
  *
  * The buffer DTS refers to the timestamp when the buffer should be decoded and
  * is usually monotonically increasing. The buffer PTS refers to the timestamp when
@@ -69,51 +69,50 @@
  * source or destination file. Likewise, the end offset will be the offset of
  * the end of the buffer. These can only be meaningfully interpreted if you
  * know the media type of the buffer (the preceding CAPS event). Either or both
- * can be set to #GST_BUFFER_OFFSET_NONE.
+ * can be set to [GST_BUFFER_OFFSET_NONE]().
  *
- * gst_buffer_ref() is used to increase the refcount of a buffer. This must be
+ * [gst_buffer_ref]() is used to increase the refcount of a buffer. This must be
  * done when you want to keep a handle to the buffer after pushing it to the
  * next element. The buffer refcount determines the writability of the buffer, a
  * buffer is only writable when the refcount is exactly 1, i.e. when the caller
  * has the only reference to the buffer.
  *
  * To efficiently create a smaller buffer out of an existing one, you can
- * use gst_buffer_copy_region(). This method tries to share the memory objects
+ * use [gst_buffer_copy_region](). This method tries to share the memory objects
  * between the two buffers.
  *
  * If a plug-in wants to modify the buffer data or metadata in-place, it should
  * first obtain a buffer that is safe to modify by using
- * gst_buffer_make_writable().  This function is optimized so that a copy will
+ * [gst_buffer_make_writable]().  This function is optimized so that a copy will
  * only be made when it is necessary.
  *
  * Several flags of the buffer can be set and unset with the
- * GST_BUFFER_FLAG_SET() and GST_BUFFER_FLAG_UNSET() macros. Use
- * GST_BUFFER_FLAG_IS_SET() to test if a certain #GstBufferFlags flag is set.
+ * [GST_BUFFER_FLAG_SET]() and [GST_BUFFER_FLAG_UNSET]() macros. Use
+ * [GST_BUFFER_FLAG_IS_SET]() to test if a certain [GstBufferFlags]() flag is set.
  *
  * Buffers can be efficiently merged into a larger buffer with
- * gst_buffer_append(). Copying of memory will only be done when absolutely
+ * [gst_buffer_append](). Copying of memory will only be done when absolutely
  * needed.
  *
- * Arbitrary extra metadata can be set on a buffer with gst_buffer_add_meta().
- * Metadata can be retrieved with gst_buffer_get_meta(). See also #GstMeta
+ * Arbitrary extra metadata can be set on a buffer with [gst_buffer_add_meta]().
+ * Metadata can be retrieved with [gst_buffer_get_meta](). See also [GstMeta]()
  *
  * An element should either unref the buffer or push it out on a src pad
- * using gst_pad_push() (see #GstPad).
+ * using [gst_pad_push]() (see [GstPad]()).
  *
- * Buffers are usually freed by unreffing them with gst_buffer_unref(). When
+ * Buffers are usually freed by unreffing them with [gst_buffer_unref](). When
  * the refcount drops to 0, any memory and metadata pointed to by the buffer is
- * unreffed as well. Buffers allocated from a #GstBufferPool will be returned to
+ * unreffed as well. Buffers allocated from a [GstBufferPool]() will be returned to
  * the pool when the refcount drops to 0.
  *
- * The #GstParentBufferMeta is a meta which can be attached to a #GstBuffer
+ * The [GstParentBufferMeta]() is a meta which can be attached to a [GstBuffer]()
  * to hold a reference to another buffer that is only released when the child
- * #GstBuffer is released.
+ * [GstBuffer]() is released.
  *
- * Typically, #GstParentBufferMeta is used when the child buffer is directly
- * using the #GstMemory of the parent buffer, and wants to prevent the parent
- * buffer from being returned to a buffer pool until the #GstMemory is available
+ * Typically, [GstParentBufferMeta]() is used when the child buffer is directly
+ * using the [GstMemory]() of the parent buffer, and wants to prevent the parent
+ * buffer from being returned to a buffer pool until the [GstMemory]() is available
  * for re-use. (Since 1.6)
- *
  */
 #include "gst_private.h"
 
@@ -373,7 +372,6 @@ _priv_gst_buffer_initialize (void)
  * together to make room for the new block.
  *
  * Returns: the maximum amount of memory blocks that a buffer can hold.
- *
  * Since: 1.2
  */
 guint
@@ -384,20 +382,20 @@ gst_buffer_get_max_memory (void)
 
 /**
  * gst_buffer_copy_into:
- * @dest: a destination #GstBuffer
- * @src: a source #GstBuffer
+ * @dest: a destination [GstBuffer]()
+ * @src: a source [GstBuffer]()
  * @flags: flags indicating what metadata fields should be copied.
  * @offset: offset to copy from
  * @size: total size to copy. If -1, all data is copied.
  *
- * Copies the information from @src into @dest.
+ * Copies the information from _src_ into _dest_.
  *
- * If @dest already contains memory and @flags contains GST_BUFFER_COPY_MEMORY,
- * the memory from @src will be appended to @dest.
+ * If _dest_ already contains memory and _flags_ contains GST_BUFFER_COPY_MEMORY,
+ * the memory from _src_ will be appended to _dest_.
  *
- * @flags indicate which fields will be copied.
+ * _flags_ indicate which fields will be copied.
  *
- * Returns: %TRUE if the copying succeeded, %FALSE otherwise.
+ * Returns: [TRUE]() if the copying succeeded, [FALSE]() otherwise.
  */
 gboolean
 gst_buffer_copy_into (GstBuffer * dest, GstBuffer * src,
@@ -593,13 +591,12 @@ _gst_buffer_copy (const GstBuffer * buffer)
 
 /**
  * gst_buffer_copy_deep:
- * @buf: a #GstBuffer.
+ * @buf: a [GstBuffer]().
  *
  * Create a copy of the given buffer. This will make a newly allocated
  * copy of the data the source buffer contains.
  *
- * Returns: (transfer full): a new copy of @buf.
- *
+ * Returns: (transfer full): a new copy of _buf_.
  * Since: 1.6
  */
 GstBuffer *
@@ -704,7 +701,7 @@ gst_buffer_init (GstBufferImpl * buffer, gsize size)
  *
  * MT safe.
  *
- * Returns: (transfer full): the new #GstBuffer.
+ * Returns: (transfer full): the new [GstBuffer]().
  */
 GstBuffer *
 gst_buffer_new (void)
@@ -721,22 +718,22 @@ gst_buffer_new (void)
 
 /**
  * gst_buffer_new_allocate:
- * @allocator: (transfer none) (allow-none): the #GstAllocator to use, or %NULL to use the
+ * @allocator: (transfer none) (allow-none): the [GstAllocator]() to use, or [NULL]() to use the
  *     default allocator
  * @size: the size in bytes of the new buffer's data.
  * @params: (transfer none) (allow-none): optional parameters
  *
  * Tries to create a newly allocated buffer with data of the given size and
- * extra parameters from @allocator. If the requested amount of memory can't be
- * allocated, %NULL will be returned. The allocated buffer memory is not cleared.
+ * extra parameters from _allocator_. If the requested amount of memory can't be
+ * allocated, [NULL]() will be returned. The allocated buffer memory is not cleared.
  *
- * When @allocator is %NULL, the default memory allocator will be used.
+ * When _allocator_ is [NULL](), the default memory allocator will be used.
  *
- * Note that when @size == 0, the buffer will not have memory associated with it.
+ * Note that when _size_ == 0, the buffer will not have memory associated with it.
  *
  * MT safe.
  *
- * Returns: (transfer full) (nullable): a new #GstBuffer, or %NULL if
+ * Returns: (transfer full) (nullable): a new [GstBuffer](), or [NULL]() if
  *     the memory couldn't be allocated.
  */
 GstBuffer *
@@ -827,24 +824,24 @@ no_memory:
 
 /**
  * gst_buffer_new_wrapped_full:
- * @flags: #GstMemoryFlags
+ * @flags: [GstMemoryFlags]()
  * @data: (array length=size) (element-type guint8) (transfer none): data to wrap
- * @maxsize: allocated size of @data
- * @offset: offset in @data
+ * @maxsize: allocated size of _data_
+ * @offset: offset in _data_
  * @size: size of valid data
  * @user_data: (allow-none): user_data
- * @notify: (allow-none) (scope async) (closure user_data): called with @user_data when the memory is freed
+ * @notify: (allow-none) (scope async) (closure user_data): called with _user_data_ when the memory is freed
  *
- * Allocate a new buffer that wraps the given memory. @data must point to
- * @maxsize of memory, the wrapped buffer will have the region from @offset and
- * @size visible.
+ * Allocate a new buffer that wraps the given memory. _data_ must point to
+ * _maxsize_ of memory, the wrapped buffer will have the region from _offset_ and
+ * _size_ visible.
  *
- * When the buffer is destroyed, @notify will be called with @user_data.
+ * When the buffer is destroyed, _notify_ will be called with _user_data_.
  *
- * The prefix/padding must be filled with 0 if @flags contains
- * #GST_MEMORY_FLAG_ZERO_PREFIXED and #GST_MEMORY_FLAG_ZERO_PADDED respectively.
+ * The prefix/padding must be filled with 0 if _flags_ contains
+ * [GST_MEMORY_FLAG_ZERO_PREFIXED]() and [GST_MEMORY_FLAG_ZERO_PADDED]() respectively.
  *
- * Returns: (transfer full): a new #GstBuffer
+ * Returns: (transfer full): a new [GstBuffer]()
  */
 GstBuffer *
 gst_buffer_new_wrapped_full (GstMemoryFlags flags, gpointer data,
@@ -868,14 +865,14 @@ gst_buffer_new_wrapped_full (GstMemoryFlags flags, gpointer data,
 /**
  * gst_buffer_new_wrapped:
  * @data: (array length=size) (element-type guint8) (transfer full): data to wrap
- * @size: allocated size of @data
+ * @size: allocated size of _data_
  *
- * Creates a new buffer that wraps the given @data. The memory will be freed
+ * Creates a new buffer that wraps the given _data_. The memory will be freed
  * with g_free and will be marked writable.
  *
  * MT safe.
  *
- * Returns: (transfer full): a new #GstBuffer
+ * Returns: (transfer full): a new [GstBuffer]()
  */
 GstBuffer *
 gst_buffer_new_wrapped (gpointer data, gsize size)
@@ -885,10 +882,10 @@ gst_buffer_new_wrapped (gpointer data, gsize size)
 
 /**
  * gst_buffer_n_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  *
  * Get the amount of memory blocks that this buffer has. This amount is never
- * larger than what gst_buffer_get_max_memory() returns.
+ * larger than what [gst_buffer_get_max_memory]() returns.
  *
  * Returns: (transfer full): the amount of memory block in this buffer.
  */
@@ -902,14 +899,14 @@ gst_buffer_n_memory (GstBuffer * buffer)
 
 /**
  * gst_buffer_prepend_memory:
- * @buffer: a #GstBuffer.
- * @mem: (transfer full): a #GstMemory.
+ * @buffer: a [GstBuffer]().
+ * @mem: (transfer full): a [GstMemory]().
  *
- * Prepend the memory block @mem to @buffer. This function takes
- * ownership of @mem and thus doesn't increase its refcount.
+ * Prepend the memory block _mem_ to _buffer_. This function takes
+ * ownership of _mem_ and thus doesn't increase its refcount.
  *
- * This function is identical to gst_buffer_insert_memory() with an index of 0.
- * See gst_buffer_insert_memory() for more details.
+ * This function is identical to [gst_buffer_insert_memory]() with an index of 0.
+ * See [gst_buffer_insert_memory]() for more details.
  */
 void
 gst_buffer_prepend_memory (GstBuffer * buffer, GstMemory * mem)
@@ -919,14 +916,14 @@ gst_buffer_prepend_memory (GstBuffer * buffer, GstMemory * mem)
 
 /**
  * gst_buffer_append_memory:
- * @buffer: a #GstBuffer.
- * @mem: (transfer full): a #GstMemory.
+ * @buffer: a [GstBuffer]().
+ * @mem: (transfer full): a [GstMemory]().
  *
- * Append the memory block @mem to @buffer. This function takes
- * ownership of @mem and thus doesn't increase its refcount.
+ * Append the memory block _mem_ to _buffer_. This function takes
+ * ownership of _mem_ and thus doesn't increase its refcount.
  *
- * This function is identical to gst_buffer_insert_memory() with an index of -1.
- * See gst_buffer_insert_memory() for more details.
+ * This function is identical to [gst_buffer_insert_memory]() with an index of -1.
+ * See [gst_buffer_insert_memory]() for more details.
  */
 void
 gst_buffer_append_memory (GstBuffer * buffer, GstMemory * mem)
@@ -936,14 +933,14 @@ gst_buffer_append_memory (GstBuffer * buffer, GstMemory * mem)
 
 /**
  * gst_buffer_insert_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: the index to add the memory at, or -1 to append it to the end
- * @mem: (transfer full): a #GstMemory.
+ * @mem: (transfer full): a [GstMemory]().
  *
- * Insert the memory block @mem to @buffer at @idx. This function takes ownership
- * of @mem and thus doesn't increase its refcount.
+ * Insert the memory block _mem_ to _buffer_ at _idx_. This function takes ownership
+ * of _mem_ and thus doesn't increase its refcount.
  *
- * Only gst_buffer_get_max_memory() can be added to a buffer. If more memory is
+ * Only [gst_buffer_get_max_memory]() can be added to a buffer. If more memory is
  * added, existing memory blocks will automatically be merged to make room for
  * the new memory.
  */
@@ -989,14 +986,14 @@ _get_mapped (GstBuffer * buffer, guint idx, GstMapInfo * info,
 
 /**
  * gst_buffer_peek_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  *
- * Get the memory block at @idx in @buffer. The memory block stays valid until
- * the memory block in @buffer is removed, replaced or merged, typically with
- * any call that modifies the memory in @buffer.
+ * Get the memory block at _idx_ in _buffer_. The memory block stays valid until
+ * the memory block in _buffer_ is removed, replaced or merged, typically with
+ * any call that modifies the memory in _buffer_.
  *
- * Returns: (transfer none): the #GstMemory at @idx.
+ * Returns: (transfer none): the [GstMemory]() at _idx_.
  */
 GstMemory *
 gst_buffer_peek_memory (GstBuffer * buffer, guint idx)
@@ -1012,13 +1009,13 @@ gst_buffer_peek_memory (GstBuffer * buffer, guint idx)
 
 /**
  * gst_buffer_get_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  *
- * Get the memory block at index @idx in @buffer.
+ * Get the memory block at index _idx_ in _buffer_.
  *
- * Returns: (transfer full): a #GstMemory that contains the data of the
- * memory block at @idx. Use gst_memory_unref () after usage.
+ * Returns: (transfer full): a [GstMemory]() that contains the data of the
+ * memory block at _idx_. Use [gst_memory_unref]() after usage.
  */
 GstMemory *
 gst_buffer_get_memory (GstBuffer * buffer, guint idx)
@@ -1028,13 +1025,13 @@ gst_buffer_get_memory (GstBuffer * buffer, guint idx)
 
 /**
  * gst_buffer_get_all_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  *
- * Get all the memory block in @buffer. The memory blocks will be merged
- * into one large #GstMemory.
+ * Get all the memory block in _buffer_. The memory blocks will be merged
+ * into one large [GstMemory]().
  *
- * Returns: (transfer full): a #GstMemory that contains the merged memory.
- * Use gst_memory_unref () after usage.
+ * Returns: (transfer full): a [GstMemory]() that contains the merged memory.
+ * Use [gst_memory_unref]() after usage.
  */
 GstMemory *
 gst_buffer_get_all_memory (GstBuffer * buffer)
@@ -1044,17 +1041,17 @@ gst_buffer_get_all_memory (GstBuffer * buffer)
 
 /**
  * gst_buffer_get_memory_range:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  * @length: a length
  *
- * Get @length memory blocks in @buffer starting at @idx. The memory blocks will
- * be merged into one large #GstMemory.
+ * Get _length_ memory blocks in _buffer_ starting at _idx_. The memory blocks will
+ * be merged into one large [GstMemory]().
  *
- * If @length is -1, all memory starting from @idx is merged.
+ * If _length_ is -1, all memory starting from _idx_ is merged.
  *
- * Returns: (transfer full): a #GstMemory that contains the merged data of @length
- *    blocks starting at @idx. Use gst_memory_unref () after usage.
+ * Returns: (transfer full): a [GstMemory]() that contains the merged data of _length_
+ *    blocks starting at _idx_. Use [gst_memory_unref]() after usage.
  */
 GstMemory *
 gst_buffer_get_memory_range (GstBuffer * buffer, guint idx, gint length)
@@ -1076,11 +1073,11 @@ gst_buffer_get_memory_range (GstBuffer * buffer, guint idx, gint length)
 
 /**
  * gst_buffer_replace_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
- * @mem: (transfer full): a #GstMemory
+ * @mem: (transfer full): a [GstMemory]()
  *
- * Replaces the memory block at index @idx in @buffer with @mem.
+ * Replaces the memory block at index _idx_ in _buffer_ with _mem_.
  */
 void
 gst_buffer_replace_memory (GstBuffer * buffer, guint idx, GstMemory * mem)
@@ -1090,10 +1087,10 @@ gst_buffer_replace_memory (GstBuffer * buffer, guint idx, GstMemory * mem)
 
 /**
  * gst_buffer_replace_all_memory:
- * @buffer: a #GstBuffer.
- * @mem: (transfer full): a #GstMemory
+ * @buffer: a [GstBuffer]().
+ * @mem: (transfer full): a [GstMemory]()
  *
- * Replaces all memory in @buffer with @mem.
+ * Replaces all memory in _buffer_ with _mem_.
  */
 void
 gst_buffer_replace_all_memory (GstBuffer * buffer, GstMemory * mem)
@@ -1103,17 +1100,17 @@ gst_buffer_replace_all_memory (GstBuffer * buffer, GstMemory * mem)
 
 /**
  * gst_buffer_replace_memory_range:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  * @length: a length should not be 0
- * @mem: (transfer full): a #GstMemory
+ * @mem: (transfer full): a [GstMemory]()
  *
- * Replaces @length memory blocks in @buffer starting at @idx with @mem.
+ * Replaces _length_ memory blocks in _buffer_ starting at _idx_ with _mem_.
  *
- * If @length is -1, all memory starting from @idx will be removed and
- * replaced with @mem.
+ * If _length_ is -1, all memory starting from _idx_ will be removed and
+ * replaced with _mem_.
  *
- * @buffer should be writable.
+ * _buffer_ should be writable.
  */
 void
 gst_buffer_replace_memory_range (GstBuffer * buffer, guint idx, gint length,
@@ -1138,10 +1135,10 @@ gst_buffer_replace_memory_range (GstBuffer * buffer, guint idx, gint length,
 
 /**
  * gst_buffer_remove_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  *
- * Remove the memory block in @b at index @i.
+ * Remove the memory block in _b_ at index _i_.
  */
 void
 gst_buffer_remove_memory (GstBuffer * buffer, guint idx)
@@ -1151,9 +1148,9 @@ gst_buffer_remove_memory (GstBuffer * buffer, guint idx)
 
 /**
  * gst_buffer_remove_all_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  *
- * Remove all the memory blocks in @buffer.
+ * Remove all the memory blocks in _buffer_.
  */
 void
 gst_buffer_remove_all_memory (GstBuffer * buffer)
@@ -1163,13 +1160,13 @@ gst_buffer_remove_all_memory (GstBuffer * buffer)
 
 /**
  * gst_buffer_remove_memory_range:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  * @length: a length
  *
- * Remove @length memory blocks in @buffer starting from @idx.
+ * Remove _length_ memory blocks in _buffer_ starting from _idx_.
  *
- * @length can be -1, in which case all memory starting from @idx is removed.
+ * _length_ can be -1, in which case all memory starting from _idx_ is removed.
  */
 void
 gst_buffer_remove_memory_range (GstBuffer * buffer, guint idx, gint length)
@@ -1193,26 +1190,26 @@ gst_buffer_remove_memory_range (GstBuffer * buffer, guint idx, gint length)
 
 /**
  * gst_buffer_find_memory:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @offset: an offset
  * @size: a size
  * @idx: (out): pointer to index
  * @length: (out): pointer to length
  * @skip: (out): pointer to skip
  *
- * Find the memory blocks that span @size bytes starting from @offset
- * in @buffer.
+ * Find the memory blocks that span _size_ bytes starting from _offset_
+ * in _buffer_.
  *
- * When this function returns %TRUE, @idx will contain the index of the first
- * memory block where the byte for @offset can be found and @length contains the
- * number of memory blocks containing the @size remaining bytes. @skip contains
- * the number of bytes to skip in the memory block at @idx to get to the byte
- * for @offset.
+ * When this function returns [TRUE](), _idx_ will contain the index of the first
+ * memory block where the byte for _offset_ can be found and _length_ contains the
+ * number of memory blocks containing the _size_ remaining bytes. _skip_ contains
+ * the number of bytes to skip in the memory block at _idx_ to get to the byte
+ * for _offset_.
  *
- * @size can be -1 to get all the memory blocks after @idx.
+ * _size_ can be -1 to get all the memory blocks after _idx_.
  *
- * Returns: %TRUE when @size bytes starting from @offset could be found in
- * @buffer and @idx, @length and @skip will be filled.
+ * Returns: [TRUE]() when _size_ bytes starting from _offset_ could be found in
+ * _buffer_ and _idx_, _length_ and _skip_ will be filled.
  */
 gboolean
 gst_buffer_find_memory (GstBuffer * buffer, gsize offset, gsize size,
@@ -1266,19 +1263,18 @@ gst_buffer_find_memory (GstBuffer * buffer, gsize offset, gsize size,
 
 /**
  * gst_buffer_is_memory_range_writable:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  * @length: a length should not be 0
  *
- * Check if @length memory blocks in @buffer starting from @idx are writable.
+ * Check if _length_ memory blocks in _buffer_ starting from _idx_ are writable.
  *
- * @length can be -1 to check all the memory blocks after @idx.
+ * _length_ can be -1 to check all the memory blocks after _idx_.
  *
- * Note that this function does not check if @buffer is writable, use
- * gst_buffer_is_writable() to check that if needed.
+ * Note that this function does not check if _buffer_ is writable, use
+ * [gst_buffer_is_writable]() to check that if needed.
  *
- * Returns: %TRUE if the memory range is writable
- *
+ * Returns: [TRUE]() if the memory range is writable
  * Since: 1.4
  */
 gboolean
@@ -1309,15 +1305,14 @@ gst_buffer_is_memory_range_writable (GstBuffer * buffer, guint idx, gint length)
 
 /**
  * gst_buffer_is_all_memory_writable:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  *
- * Check if all memory blocks in @buffer are writable.
+ * Check if all memory blocks in _buffer_ are writable.
  *
- * Note that this function does not check if @buffer is writable, use
- * gst_buffer_is_writable() to check that if needed.
+ * Note that this function does not check if _buffer_ is writable, use
+ * [gst_buffer_is_writable]() to check that if needed.
  *
- * Returns: %TRUE if all memory blocks in @buffer are writable
- *
+ * Returns: [TRUE]() if all memory blocks in _buffer_ are writable
  * Since: 1.4
  */
 gboolean
@@ -1328,19 +1323,19 @@ gst_buffer_is_all_memory_writable (GstBuffer * buffer)
 
 /**
  * gst_buffer_get_sizes:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @offset: (out) (allow-none): a pointer to the offset
  * @maxsize: (out) (allow-none): a pointer to the maxsize
  *
- * Get the total size of the memory blocks in @b.
+ * Get the total size of the memory blocks in _b_.
  *
- * When not %NULL, @offset will contain the offset of the data in the
- * first memory block in @buffer and @maxsize will contain the sum of
- * the size and @offset and the amount of extra padding on the last
- * memory block.  @offset and @maxsize can be used to resize the
- * buffer memory blocks with gst_buffer_resize().
+ * When not [NULL](), _offset_ will contain the offset of the data in the
+ * first memory block in _buffer_ and _maxsize_ will contain the sum of
+ * the size and _offset_ and the amount of extra padding on the last
+ * memory block.  _offset_ and _maxsize_ can be used to resize the
+ * buffer memory blocks with [gst_buffer_resize]().
  *
- * Returns: total size of the memory blocks in @buffer.
+ * Returns: total size of the memory blocks in _buffer_.
  */
 gsize
 gst_buffer_get_sizes (GstBuffer * buffer, gsize * offset, gsize * maxsize)
@@ -1350,11 +1345,11 @@ gst_buffer_get_sizes (GstBuffer * buffer, gsize * offset, gsize * maxsize)
 
 /**
  * gst_buffer_get_size:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  *
- * Get the total size of the memory blocks in @buffer.
+ * Get the total size of the memory blocks in _buffer_.
  *
- * Returns: total size of the memory blocks in @buffer.
+ * Returns: total size of the memory blocks in _buffer_.
  */
 gsize
 gst_buffer_get_size (GstBuffer * buffer)
@@ -1364,22 +1359,22 @@ gst_buffer_get_size (GstBuffer * buffer)
 
 /**
  * gst_buffer_get_sizes_range:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  * @length: a length
  * @offset: (out) (allow-none): a pointer to the offset
  * @maxsize: (out) (allow-none): a pointer to the maxsize
  *
- * Get the total size of @length memory blocks stating from @idx in @buffer.
+ * Get the total size of _length_ memory blocks stating from _idx_ in _buffer_.
  *
- * When not %NULL, @offset will contain the offset of the data in the
- * memory block in @buffer at @idx and @maxsize will contain the sum of the size
- * and @offset and the amount of extra padding on the memory block at @idx +
- * @length -1.
- * @offset and @maxsize can be used to resize the buffer memory blocks with
- * gst_buffer_resize_range().
+ * When not [NULL](), _offset_ will contain the offset of the data in the
+ * memory block in _buffer_ at _idx_ and _maxsize_ will contain the sum of the size
+ * and _offset_ and the amount of extra padding on the memory block at _idx_ +
+ * _length_ -1.
+ * _offset_ and _maxsize_ can be used to resize the buffer memory blocks with
+ * [gst_buffer_resize_range]().
  *
- * Returns: total size of @length memory blocks starting at @idx in @buffer.
+ * Returns: total size of _length_ memory blocks starting at _idx_ in _buffer_.
  */
 gsize
 gst_buffer_get_sizes_range (GstBuffer * buffer, guint idx, gint length,
@@ -1436,11 +1431,11 @@ gst_buffer_get_sizes_range (GstBuffer * buffer, guint idx, gint length,
 
 /**
  * gst_buffer_resize:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @offset: the offset adjustment
  * @size: the new size or -1 to just adjust the offset
  *
- * Set the offset and total size of the memory blocks in @buffer.
+ * Set the offset and total size of the memory blocks in _buffer_.
  */
 void
 gst_buffer_resize (GstBuffer * buffer, gssize offset, gssize size)
@@ -1450,10 +1445,10 @@ gst_buffer_resize (GstBuffer * buffer, gssize offset, gssize size)
 
 /**
  * gst_buffer_set_size:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @size: the new size
  *
- * Set the total size of the memory blocks in @buffer.
+ * Set the total size of the memory blocks in _buffer_.
  */
 void
 gst_buffer_set_size (GstBuffer * buffer, gssize size)
@@ -1463,16 +1458,16 @@ gst_buffer_set_size (GstBuffer * buffer, gssize size)
 
 /**
  * gst_buffer_resize_range:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  * @length: a length
  * @offset: the offset adjustment
  * @size: the new size or -1 to just adjust the offset
  *
- * Set the total size of the @length memory blocks starting at @idx in
- * @buffer
+ * Set the total size of the _length_ memory blocks starting at _idx_ in
+ * _buffer_
  *
- * Returns: %TRUE if resizing succeeded, %FALSE otherwise.
+ * Returns: [TRUE]() if resizing succeeded, [FALSE]() otherwise.
  */
 gboolean
 gst_buffer_resize_range (GstBuffer * buffer, guint idx, gint length,
@@ -1567,25 +1562,25 @@ gst_buffer_resize_range (GstBuffer * buffer, guint idx, gint length,
 
 /**
  * gst_buffer_map:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @info: (out): info about the mapping
  * @flags: flags for the mapping
  *
- * This function fills @info with the #GstMapInfo of all merged memory
- * blocks in @buffer.
+ * This function fills _info_ with the [GstMapInfo]() of all merged memory
+ * blocks in _buffer_.
  *
- * @flags describe the desired access of the memory. When @flags is
- * #GST_MAP_WRITE, @buffer should be writable (as returned from
- * gst_buffer_is_writable()).
+ * _flags_ describe the desired access of the memory. When _flags_ is
+ * [GST_MAP_WRITE](), _buffer_ should be writable (as returned from
+ * [gst_buffer_is_writable]()).
  *
- * When @buffer is writable but the memory isn't, a writable copy will
+ * When _buffer_ is writable but the memory isn't, a writable copy will
  * automatically be created and returned. The readonly copy of the
  * buffer memory will then also be replaced with this writable copy.
  *
- * The memory in @info should be unmapped with gst_buffer_unmap() after
+ * The memory in _info_ should be unmapped with [gst_buffer_unmap]() after
  * usage.
  *
- * Returns: %TRUE if the map succeeded and @info contains valid data.
+ * Returns: [TRUE]() if the map succeeded and _info_ contains valid data.
  */
 gboolean
 gst_buffer_map (GstBuffer * buffer, GstMapInfo * info, GstMapFlags flags)
@@ -1595,27 +1590,27 @@ gst_buffer_map (GstBuffer * buffer, GstMapInfo * info, GstMapFlags flags)
 
 /**
  * gst_buffer_map_range:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @idx: an index
  * @length: a length
  * @info: (out): info about the mapping
  * @flags: flags for the mapping
  *
- * This function fills @info with the #GstMapInfo of @length merged memory blocks
- * starting at @idx in @buffer. When @length is -1, all memory blocks starting
- * from @idx are merged and mapped.
+ * This function fills _info_ with the [GstMapInfo]() of _length_ merged memory blocks
+ * starting at _idx_ in _buffer_. When _length_ is -1, all memory blocks starting
+ * from _idx_ are merged and mapped.
  *
- * @flags describe the desired access of the memory. When @flags is
- * #GST_MAP_WRITE, @buffer should be writable (as returned from
- * gst_buffer_is_writable()).
+ * _flags_ describe the desired access of the memory. When _flags_ is
+ * [GST_MAP_WRITE](), _buffer_ should be writable (as returned from
+ * [gst_buffer_is_writable]()).
  *
- * When @buffer is writable but the memory isn't, a writable copy will
+ * When _buffer_ is writable but the memory isn't, a writable copy will
  * automatically be created and returned. The readonly copy of the buffer memory
  * will then also be replaced with this writable copy.
  *
- * The memory in @info should be unmapped with gst_buffer_unmap() after usage.
+ * The memory in _info_ should be unmapped with [gst_buffer_unmap]() after usage.
  *
- * Returns: %TRUE if the map succeeded and @info contains valid
+ * Returns: [TRUE]() if the map succeeded and _info_ contains valid
  * data.
  */
 gboolean
@@ -1695,10 +1690,10 @@ cannot_map:
 
 /**
  * gst_buffer_unmap:
- * @buffer: a #GstBuffer.
- * @info: a #GstMapInfo
+ * @buffer: a [GstBuffer]().
+ * @info: a [GstMapInfo]()
  *
- * Release the memory previously mapped with gst_buffer_map().
+ * Release the memory previously mapped with [gst_buffer_map]().
  */
 void
 gst_buffer_unmap (GstBuffer * buffer, GstMapInfo * info)
@@ -1716,15 +1711,15 @@ gst_buffer_unmap (GstBuffer * buffer, GstMapInfo * info)
 
 /**
  * gst_buffer_fill:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @offset: the offset to fill
  * @src: (array length=size) (element-type guint8): the source address
  * @size: the size to fill
  *
- * Copy @size bytes from @src to @buffer at @offset.
+ * Copy _size_ bytes from _src_ to _buffer_ at _offset_.
  *
- * Returns: The amount of bytes copied. This value can be lower than @size
- *    when @buffer did not contain enough data.
+ * Returns: The amount of bytes copied. This value can be lower than _size_
+ *    when _buffer_ did not contain enough data.
  */
 gsize
 gst_buffer_fill (GstBuffer * buffer, gsize offset, gconstpointer src,
@@ -1768,15 +1763,15 @@ gst_buffer_fill (GstBuffer * buffer, gsize offset, gconstpointer src,
 
 /**
  * gst_buffer_extract:
- * @buffer: a #GstBuffer.
+ * @buffer: a [GstBuffer]().
  * @offset: the offset to extract
  * @dest: the destination address
  * @size: the size to extract
  *
- * Copy @size bytes starting from @offset in @buffer to @dest.
+ * Copy _size_ bytes starting from _offset_ in _buffer_ to _dest_.
  *
- * Returns: The amount of bytes extracted. This value can be lower than @size
- *    when @buffer did not contain enough data.
+ * Returns: The amount of bytes extracted. This value can be lower than _size_
+ *    when _buffer_ did not contain enough data.
  */
 gsize
 gst_buffer_extract (GstBuffer * buffer, gsize offset, gpointer dest, gsize size)
@@ -1818,12 +1813,12 @@ gst_buffer_extract (GstBuffer * buffer, gsize offset, gpointer dest, gsize size)
 
 /**
  * gst_buffer_memcmp:
- * @buffer: a #GstBuffer.
- * @offset: the offset in @buffer
+ * @buffer: a [GstBuffer]().
+ * @offset: the offset in _buffer_
  * @mem: (array length=size) (element-type guint8): the memory to compare
  * @size: the size to compare
  *
- * Compare @size bytes starting from @offset in @buffer with the memory in @mem.
+ * Compare _size_ bytes starting from _offset_ in _buffer_ with the memory in _mem_.
  *
  * Returns: 0 if the memory is equal.
  */
@@ -1871,15 +1866,15 @@ gst_buffer_memcmp (GstBuffer * buffer, gsize offset, gconstpointer mem,
 
 /**
  * gst_buffer_memset:
- * @buffer: a #GstBuffer.
- * @offset: the offset in @buffer
+ * @buffer: a [GstBuffer]().
+ * @offset: the offset in _buffer_
  * @val: the value to set
  * @size: the size to set
  *
- * Fill @buf with @size bytes with @val starting from @offset.
+ * Fill _buf_ with _size_ bytes with _val_ starting from _offset_.
  *
- * Returns: The amount of bytes filled. This value can be lower than @size
- *    when @buffer did not contain enough data.
+ * Returns: The amount of bytes filled. This value can be lower than _size_
+ *    when _buffer_ did not contain enough data.
  */
 gsize
 gst_buffer_memset (GstBuffer * buffer, gsize offset, guint8 val, gsize size)
@@ -1919,25 +1914,25 @@ gst_buffer_memset (GstBuffer * buffer, gsize offset, guint8 val, gsize size)
 
 /**
  * gst_buffer_copy_region:
- * @parent: a #GstBuffer.
- * @flags: the #GstBufferCopyFlags
- * @offset: the offset into parent #GstBuffer at which the new sub-buffer
+ * @parent: a [GstBuffer]().
+ * @flags: the [GstBufferCopyFlags]()
+ * @offset: the offset into parent [GstBuffer]() at which the new sub-buffer
  *          begins.
- * @size: the size of the new #GstBuffer sub-buffer, in bytes. If -1, all
+ * @size: the size of the new [GstBuffer]() sub-buffer, in bytes. If -1, all
  *        data is copied.
  *
- * Creates a sub-buffer from @parent at @offset and @size.
+ * Creates a sub-buffer from _parent_ at _offset_ and _size_.
  * This sub-buffer uses the actual memory space of the parent buffer.
  * This function will copy the offset and timestamp fields when the
- * offset is 0. If not, they will be set to #GST_CLOCK_TIME_NONE and
- * #GST_BUFFER_OFFSET_NONE.
- * If @offset equals 0 and @size equals the total size of @buffer, the
+ * offset is 0. If not, they will be set to [GST_CLOCK_TIME_NONE]() and
+ * [GST_BUFFER_OFFSET_NONE]().
+ * If _offset_ equals 0 and _size_ equals the total size of _buffer_, the
  * duration and offset end fields are also copied. If not they will be set
- * to #GST_CLOCK_TIME_NONE and #GST_BUFFER_OFFSET_NONE.
+ * to [GST_CLOCK_TIME_NONE]() and [GST_BUFFER_OFFSET_NONE]().
  *
  * MT safe.
  *
- * Returns: (transfer full): the new #GstBuffer or %NULL if the arguments were
+ * Returns: (transfer full): the new [GstBuffer]() or [NULL]() if the arguments were
  *     invalid.
  */
 GstBuffer *
@@ -1962,13 +1957,13 @@ gst_buffer_copy_region (GstBuffer * buffer, GstBufferCopyFlags flags,
 
 /**
  * gst_buffer_append:
- * @buf1: (transfer full): the first source #GstBuffer to append.
- * @buf2: (transfer full): the second source #GstBuffer to append.
+ * @buf1: (transfer full): the first source [GstBuffer]() to append.
+ * @buf2: (transfer full): the second source [GstBuffer]() to append.
  *
- * Append all the memory from @buf2 to @buf1. The result buffer will contain a
- * concatenation of the memory of @buf1 and @buf2.
+ * Append all the memory from _buf2_ to _buf1_. The result buffer will contain a
+ * concatenation of the memory of _buf1_ and _buf2_.
  *
- * Returns: (transfer full): the new #GstBuffer that contains the memory
+ * Returns: (transfer full): the new [GstBuffer]() that contains the memory
  *     of the two source buffers.
  */
 GstBuffer *
@@ -1979,16 +1974,16 @@ gst_buffer_append (GstBuffer * buf1, GstBuffer * buf2)
 
 /**
  * gst_buffer_append_region:
- * @buf1: (transfer full): the first source #GstBuffer to append.
- * @buf2: (transfer full): the second source #GstBuffer to append.
- * @offset: the offset in @buf2
- * @size: the size or -1 of @buf2
+ * @buf1: (transfer full): the first source [GstBuffer]() to append.
+ * @buf2: (transfer full): the second source [GstBuffer]() to append.
+ * @offset: the offset in _buf2_
+ * @size: the size or -1 of _buf2_
  *
- * Append @size bytes at @offset from @buf2 to @buf1. The result buffer will
- * contain a concatenation of the memory of @buf1 and the requested region of
- * @buf2.
+ * Append _size_ bytes at _offset_ from _buf2_ to _buf1_. The result buffer will
+ * contain a concatenation of the memory of _buf1_ and the requested region of
+ * _buf2_.
  *
- * Returns: (transfer full): the new #GstBuffer that contains the memory
+ * Returns: (transfer full): the new [GstBuffer]() that contains the memory
  *     of the two source buffers.
  */
 GstBuffer *
@@ -2023,17 +2018,17 @@ gst_buffer_append_region (GstBuffer * buf1, GstBuffer * buf2, gssize offset,
 
 /**
  * gst_buffer_get_meta:
- * @buffer: a #GstBuffer
- * @api: the #GType of an API
+ * @buffer: a [GstBuffer]()
+ * @api: the [GType]() of an API
  *
- * Get the metadata for @api on buffer. When there is no such metadata, %NULL is
- * returned. If multiple metadata with the given @api are attached to this
+ * Get the metadata for _api_ on buffer. When there is no such metadata, [NULL]() is
+ * returned. If multiple metadata with the given _api_ are attached to this
  * buffer only the first one is returned.  To handle multiple metadata with a
- * given API use gst_buffer_iterate_meta() or gst_buffer_foreach_meta() instead
+ * given API use [gst_buffer_iterate_meta]() or [gst_buffer_foreach_meta]() instead
  * and check the meta->info.api member for the API type.
  *
- * Returns: (transfer none) (nullable): the metadata for @api on
- * @buffer.
+ * Returns: (transfer none) (nullable): the metadata for _api_ on
+ * _buffer_.
  */
 GstMeta *
 gst_buffer_get_meta (GstBuffer * buffer, GType api)
@@ -2057,13 +2052,13 @@ gst_buffer_get_meta (GstBuffer * buffer, GType api)
 
 /**
  * gst_buffer_add_meta:
- * @buffer: a #GstBuffer
- * @info: a #GstMetaInfo
- * @params: params for @info
+ * @buffer: a [GstBuffer]()
+ * @info: a [GstMetaInfo]()
+ * @params: params for _info_
  *
- * Add metadata for @info to @buffer using the parameters in @params.
+ * Add metadata for _info_ to _buffer_ using the parameters in _params_.
  *
- * Returns: (transfer none): the metadata for the api in @info on @buffer.
+ * Returns: (transfer none): the metadata for the api in _info_ on _buffer_.
  */
 GstMeta *
 gst_buffer_add_meta (GstBuffer * buffer, const GstMetaInfo * info,
@@ -2108,13 +2103,13 @@ init_failed:
 
 /**
  * gst_buffer_remove_meta:
- * @buffer: a #GstBuffer
- * @meta: a #GstMeta
+ * @buffer: a [GstBuffer]()
+ * @meta: a [GstMeta]()
  *
- * Remove the metadata for @meta on @buffer.
+ * Remove the metadata for _meta_ on _buffer_.
  *
- * Returns: %TRUE if the metadata existed and was removed, %FALSE if no such
- * metadata was on @buffer.
+ * Returns: [TRUE]() if the metadata existed and was removed, [FALSE]() if no such
+ * metadata was on _buffer_.
  */
 gboolean
 gst_buffer_remove_meta (GstBuffer * buffer, GstMeta * meta)
@@ -2154,15 +2149,15 @@ gst_buffer_remove_meta (GstBuffer * buffer, GstMeta * meta)
 
 /**
  * gst_buffer_iterate_meta:
- * @buffer: a #GstBuffer
+ * @buffer: a [GstBuffer]()
  * @state: an opaque state pointer
  *
- * Retrieve the next #GstMeta after @current. If @state points
- * to %NULL, the first metadata is returned.
+ * Retrieve the next [GstMeta]() after _current_. If _state_ points
+ * to [NULL](), the first metadata is returned.
  *
- * @state will be updated with an opaque state pointer
+ * _state_ will be updated with an opaque state pointer
  *
- * Returns: (transfer none) (nullable): The next #GstMeta or %NULL
+ * Returns: (transfer none) (nullable): The next [GstMeta]() or [NULL]()
  * when there are no more items.
  */
 GstMeta *
@@ -2189,17 +2184,17 @@ gst_buffer_iterate_meta (GstBuffer * buffer, gpointer * state)
 
 /**
  * gst_buffer_foreach_meta:
- * @buffer: a #GstBuffer
- * @func: (scope call): a #GstBufferForeachMetaFunc to call
- * @user_data: (closure): user data passed to @func
+ * @buffer: a [GstBuffer]()
+ * @func: (scope call): a [GstBufferForeachMetaFunc]() to call
+ * @user_data: (closure): user data passed to _func_
  *
- * Call @func with @user_data for each meta in @buffer.
+ * Call _func_ with _user_data_ for each meta in _buffer_.
  *
- * @func can modify the passed meta pointer or its contents. The return value
- * of @func define if this function returns or if the remaining metadata items
+ * _func_ can modify the passed meta pointer or its contents. The return value
+ * of _func_ define if this function returns or if the remaining metadata items
  * in the buffer should be skipped.
  *
- * Returns: %FALSE when @func returned %FALSE for one of the metadata.
+ * Returns: [FALSE]() when _func_ returned [FALSE]() for one of the metadata.
  */
 gboolean
 gst_buffer_foreach_meta (GstBuffer * buffer, GstBufferForeachMetaFunc func,
@@ -2252,15 +2247,15 @@ gst_buffer_foreach_meta (GstBuffer * buffer, GstBufferForeachMetaFunc func,
 
 /**
  * gst_buffer_extract_dup:
- * @buffer: a #GstBuffer
+ * @buffer: a [GstBuffer]()
  * @offset: the offset to extract
  * @size: the size to extract
  * @dest: (array length=dest_size) (element-type guint8) (out): A pointer where
  *  the destination array will be written.
- * @dest_size: (out): A location where the size of @dest can be written
+ * @dest_size: (out): A location where the size of _dest_ can be written
  *
- * Extracts a copy of at most @size bytes the data at @offset into a #GBytes.
- * @dest must be freed using g_free() when done.
+ * Extracts a copy of at most _size_ bytes the data at _offset_ into a [GBytes]().
+ * _dest_ must be freed using [g_free]() when done.
  *
  * Since: 1.0.10
  */
@@ -2282,14 +2277,13 @@ GST_DEBUG_CATEGORY (gst_parent_buffer_meta_debug);
 
 /**
  * gst_buffer_add_parent_buffer_meta:
- * @buffer: (transfer none): a #GstBuffer
- * @ref: (transfer none): a #GstBuffer to ref
+ * @buffer: (transfer none): a [GstBuffer]()
+ * @ref: (transfer none): a [GstBuffer]() to ref
  *
- * Add a #GstParentBufferMeta to @buffer that holds a reference on
- * @ref until the buffer is freed.
+ * Add a [GstParentBufferMeta]() to _buffer_ that holds a reference on
+ * _ref_ until the buffer is freed.
  *
- * Returns: (transfer none): The #GstParentBufferMeta that was added to the buffer
- *
+ * Returns: (transfer none): The [GstParentBufferMeta]() that was added to the buffer
  * Since: 1.6
  */
 GstParentBufferMeta *
@@ -2381,10 +2375,9 @@ gst_parent_buffer_meta_api_get_type (void)
 /**
  * gst_parent_buffer_meta_get_info:
  *
- * Get the global #GstMetaInfo describing  the #GstParentBufferMeta meta.
+ * Get the global [GstMetaInfo]() describing  the [GstParentBufferMeta]() meta.
  *
- * Returns: (transfer none): The #GstMetaInfo
- *
+ * Returns: (transfer none): The [GstMetaInfo]()
  * Since: 1.6
  */
 const GstMetaInfo *

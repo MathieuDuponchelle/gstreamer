@@ -34,7 +34,7 @@ G_BEGIN_DECLS
 /**
  * GstTagSetter:
  *
- * Opaque #GstTagSetter data structure.
+ * Opaque [GstTagSetter]() data structure.
  */
 typedef struct _GstTagSetter                    GstTagSetter; /* Dummy typedef */
 typedef struct _GstTagSetterInterface           GstTagSetterInterface;
@@ -43,7 +43,7 @@ typedef struct _GstTagSetterInterface           GstTagSetterInterface;
  * GstTagSetterInterface:
  * @g_iface: parent interface type.
  *
- * #GstTagSetterInterface interface.
+ * [GstTagSetterInterface]() interface.
  */
 /* use an empty interface here to allow detection of elements using user-set
    tags */

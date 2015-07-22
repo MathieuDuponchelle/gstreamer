@@ -32,16 +32,16 @@ typedef struct _GstElementClass GstElementClass;
 /**
  * GstState:
  * @GST_STATE_VOID_PENDING: no pending state.
- * @GST_STATE_NULL        : the NULL state or initial state of an element.
- * @GST_STATE_READY       : the element is ready to go to PAUSED.
- * @GST_STATE_PAUSED      : the element is PAUSED, it is ready to accept and
+ * @GST_STATE_NULL: the NULL state or initial state of an element.
+ * @GST_STATE_READY: the element is ready to go to PAUSED.
+ * @GST_STATE_PAUSED: the element is PAUSED, it is ready to accept and
  *                          process data. Sink elements however only accept one
  *                          buffer and then block.
- * @GST_STATE_PLAYING     : the element is PLAYING, the #GstClock is running and
+ * @GST_STATE_PLAYING: the element is PLAYING, the [GstClock]() is running and
  *                          the data is flowing.
  *
  * The possible states an element can be in. States can be changed using
- * gst_element_set_state() and checked using gst_element_get_state().
+ * [gst_element_set_state]() and checked using [gst_element_get_state]().
  */
 typedef enum {
   GST_STATE_VOID_PENDING        = 0,
@@ -77,15 +77,15 @@ G_BEGIN_DECLS
 
 /**
  * GstStateChangeReturn:
- * @GST_STATE_CHANGE_FAILURE   : the state change failed
- * @GST_STATE_CHANGE_SUCCESS   : the state change succeeded
- * @GST_STATE_CHANGE_ASYNC     : the state change will happen asynchronously
+ * @GST_STATE_CHANGE_FAILURE: the state change failed
+ * @GST_STATE_CHANGE_SUCCESS: the state change succeeded
+ * @GST_STATE_CHANGE_ASYNC: the state change will happen asynchronously
  * @GST_STATE_CHANGE_NO_PREROLL: the state change succeeded but the element
- *                               cannot produce data in %GST_STATE_PAUSED.
+ *                               cannot produce data in [GST_STATE_PAUSED]().
  *                               This typically happens with live sources.
  *
- * The possible return values from a state change function such as 
- * gst_element_set_state(). Only @GST_STATE_CHANGE_FAILURE is a real failure.
+ * The possible return values from a state change function such as
+ * [gst_element_set_state](). Only _GST_STATE_CHANGE_FAILURE_ is a real failure.
  */
 typedef enum {
   GST_STATE_CHANGE_FAILURE             = 0,
@@ -100,52 +100,52 @@ typedef enum {
 
 /**
  * GST_STATE:
- * @elem: a #GstElement to return state for.
+ * @elem: a [GstElement]() to return state for.
  *
- * This macro returns the current #GstState of the element.
+ * This macro returns the current [GstState]() of the element.
  */
 #define GST_STATE(elem)                 (GST_ELEMENT_CAST(elem)->current_state)
 
 /**
  * GST_STATE_NEXT:
- * @elem: a #GstElement to return the next state for.
+ * @elem: a [GstElement]() to return the next state for.
  *
- * This macro returns the next #GstState of the element.
+ * This macro returns the next [GstState]() of the element.
  */
 #define GST_STATE_NEXT(elem)            (GST_ELEMENT_CAST(elem)->next_state)
 
 /**
  * GST_STATE_PENDING:
- * @elem: a #GstElement to return the pending state for.
+ * @elem: a [GstElement]() to return the pending state for.
  *
- * This macro returns the currently pending #GstState of the element.
+ * This macro returns the currently pending [GstState]() of the element.
  */
 #define GST_STATE_PENDING(elem)         (GST_ELEMENT_CAST(elem)->pending_state)
 
 /**
  * GST_STATE_TARGET:
- * @elem: a #GstElement to return the target state for.
+ * @elem: a [GstElement]() to return the target state for.
  *
- * This macro returns the target #GstState of the element.
+ * This macro returns the target [GstState]() of the element.
  */
 #define GST_STATE_TARGET(elem)          (GST_ELEMENT_CAST(elem)->target_state)
 
 /**
  * GST_STATE_RETURN:
- * @elem: a #GstElement to return the last state result for.
+ * @elem: a [GstElement]() to return the last state result for.
  *
- * This macro returns the last #GstStateChangeReturn value.
+ * This macro returns the last [GstStateChangeReturn]() value.
  */
 #define GST_STATE_RETURN(elem)          (GST_ELEMENT_CAST(elem)->last_return)
 
 #define __GST_SIGN(val)                 ((val) < 0 ? -1 : ((val) > 0 ? 1 : 0))
 /**
  * GST_STATE_GET_NEXT:
- * @cur: A starting #GstState
- * @pending: A target #GstState
+ * @cur: A starting [GstState]()
+ * @pending: A target [GstState]()
  *
- * Given a current state @cur and a target state @pending, calculate the next (intermediate)
- * #GstState.
+ * Given a current state _cur_ and a target state _pending_, calculate the next (intermediate)
+ * [GstState]().
  */
 #define GST_STATE_GET_NEXT(cur,pending)         ((GstState)((cur) + __GST_SIGN ((gint)(pending) - (gint)(cur))))
 /**
@@ -153,28 +153,28 @@ typedef enum {
  * @cur: A current state
  * @next: A next state
  *
- * Given a current state @cur and a next state @next, calculate the associated
- * #GstStateChange transition.
+ * Given a current state _cur_ and a next state _next_, calculate the associated
+ * [GstStateChange]() transition.
  */
 #define GST_STATE_TRANSITION(cur,next)          ((GstStateChange)(((cur)<<3)|(next)))
 /**
  * GST_STATE_TRANSITION_CURRENT:
- * @trans: A #GstStateChange
+ * @trans: A [GstStateChange]()
  *
- * Given a state transition @trans, extract the current #GstState.
+ * Given a state transition _trans_, extract the current [GstState]().
  */
 #define GST_STATE_TRANSITION_CURRENT(trans)     ((GstState)((trans)>>3))
 /**
  * GST_STATE_TRANSITION_NEXT:
- * @trans: A #GstStateChange
+ * @trans: A [GstStateChange]()
  *
- * Given a state transition @trans, extract the next #GstState.
+ * Given a state transition _trans_, extract the next [GstState]().
  */
 #define GST_STATE_TRANSITION_NEXT(trans)        ((GstState)((trans)&0x7))
 
 /**
  * GstStateChange:
- * @GST_STATE_CHANGE_NULL_TO_READY    : state change from NULL to READY.
+ * @GST_STATE_CHANGE_NULL_TO_READY: state change from NULL to READY.
  * <itemizedlist>
  *   <listitem><para>
  *     The element must check if the resources it needs are available. Device
@@ -185,24 +185,24 @@ typedef enum {
  *     The element opens the device (in case feature need to be probed).
  *   </para></listitem>
  * </itemizedlist>
- * @GST_STATE_CHANGE_READY_TO_PAUSED  : state change from READY to PAUSED.
+ * @GST_STATE_CHANGE_READY_TO_PAUSED: state change from READY to PAUSED.
  * <itemizedlist>
  *   <listitem><para>
  *     The element pads are activated in order to receive data in PAUSED.
  *     Streaming threads are started.
  *   </para></listitem>
  *   <listitem><para>
- *     Some elements might need to return %GST_STATE_CHANGE_ASYNC and complete
+ *     Some elements might need to return [GST_STATE_CHANGE_ASYNC]() and complete
  *     the state change when they have enough information. It is a requirement
- *     for sinks to return %GST_STATE_CHANGE_ASYNC and complete the state change
- *     when they receive the first buffer or %GST_EVENT_EOS (preroll).
+ *     for sinks to return [GST_STATE_CHANGE_ASYNC]() and complete the state change
+ *     when they receive the first buffer or [GST_EVENT_EOS]() (preroll).
  *     Sinks also block the dataflow when in PAUSED.
  *   </para></listitem>
  *   <listitem><para>
  *     A pipeline resets the running_time to 0.
  *   </para></listitem>
  *   <listitem><para>
- *     Live sources return %GST_STATE_CHANGE_NO_PREROLL and don't generate data.
+ *     Live sources return [GST_STATE_CHANGE_NO_PREROLL]() and don't generate data.
  *   </para></listitem>
  * </itemizedlist>
  * @GST_STATE_CHANGE_PAUSED_TO_PLAYING: state change from PAUSED to PLAYING.
@@ -211,12 +211,12 @@ typedef enum {
  *     Most elements ignore this state change.
  *   </para></listitem>
  *   <listitem><para>
- *     The pipeline selects a #GstClock and distributes this to all the children
+ *     The pipeline selects a [GstClock]() and distributes this to all the children
  *     before setting them to PLAYING. This means that it is only allowed to
- *     synchronize on the #GstClock in the PLAYING state.
+ *     synchronize on the [GstClock]() in the PLAYING state.
  *   </para></listitem>
  *   <listitem><para>
- *     The pipeline uses the #GstClock and the running_time to calculate the
+ *     The pipeline uses the [GstClock]() and the running_time to calculate the
  *     base_time. The base_time is distributed to all children when performing
  *     the state change.
  *   </para></listitem>
@@ -225,15 +225,15 @@ typedef enum {
  *     rendering the data.
  *   </para></listitem>
  *   <listitem><para>
- *     Sinks can post %GST_MESSAGE_EOS in the PLAYING state. It is not allowed
- *     to post %GST_MESSAGE_EOS when not in the PLAYING state.
+ *     Sinks can post [GST_MESSAGE_EOS]() in the PLAYING state. It is not allowed
+ *     to post [GST_MESSAGE_EOS]() when not in the PLAYING state.
  *   </para></listitem>
  *   <listitem><para>
  *     While streaming in PAUSED or PLAYING elements can create and remove
  *     sometimes pads.
  *   </para></listitem>
  *   <listitem><para>
- *     Live sources start generating data and return %GST_STATE_CHANGE_SUCCESS.
+ *     Live sources start generating data and return [GST_STATE_CHANGE_SUCCESS]().
  *   </para></listitem>
  * </itemizedlist>
  * @GST_STATE_CHANGE_PLAYING_TO_PAUSED: state change from PLAYING to PAUSED.
@@ -243,27 +243,27 @@ typedef enum {
  *   </para></listitem>
  *   <listitem><para>
  *     The pipeline calculates the running_time based on the last selected
- *     #GstClock and the base_time. It stores this information to continue
+ *     [GstClock]() and the base_time. It stores this information to continue
  *     playback when going back to the PLAYING state.
  *   </para></listitem>
  *   <listitem><para>
- *     Sinks unblock any #GstClock wait calls.
+ *     Sinks unblock any [GstClock]() wait calls.
  *   </para></listitem>
  *   <listitem><para>
  *     When a sink does not have a pending buffer to play, it returns
- *     %GST_STATE_CHANGE_ASYNC from this state change and completes the state
- *     change when it receives a new buffer or an %GST_EVENT_EOS.
+ *     [GST_STATE_CHANGE_ASYNC]() from this state change and completes the state
+ *     change when it receives a new buffer or an [GST_EVENT_EOS]().
  *   </para></listitem>
  *   <listitem><para>
- *     Any queued %GST_MESSAGE_EOS items are removed since they will be reposted
+ *     Any queued [GST_MESSAGE_EOS]() items are removed since they will be reposted
  *     when going back to the PLAYING state. The EOS messages are queued in
- *     #GstBin containers.
+ *     [GstBin]() containers.
  *   </para></listitem>
  *   <listitem><para>
- *     Live sources stop generating data and return %GST_STATE_CHANGE_NO_PREROLL.
+ *     Live sources stop generating data and return [GST_STATE_CHANGE_NO_PREROLL]().
  *   </para></listitem>
  * </itemizedlist>
- * @GST_STATE_CHANGE_PAUSED_TO_READY  : state change from PAUSED to READY.
+ * @GST_STATE_CHANGE_PAUSED_TO_READY: state change from PAUSED to READY.
  * <itemizedlist>
  *   <listitem><para>
  *     Sinks unblock any waits in the preroll.
@@ -272,7 +272,7 @@ typedef enum {
  *     Elements unblock any waits on devices
  *   </para></listitem>
  *   <listitem><para>
- *     Chain or get_range functions return %GST_FLOW_FLUSHING.
+ *     Chain or get_range functions return [GST_FLOW_FLUSHING]().
  *   </para></listitem>
  *   <listitem><para>
  *     The element pads are deactivated so that streaming becomes impossible and
@@ -285,7 +285,7 @@ typedef enum {
  *     Elements remove all sometimes pads
  *   </para></listitem>
  * </itemizedlist>
- * @GST_STATE_CHANGE_READY_TO_NULL    : state change from READY to NULL.
+ * @GST_STATE_CHANGE_READY_TO_NULL: state change from READY to NULL.
  * <itemizedlist>
  *   <listitem><para>
  *     Elements close devices
@@ -296,8 +296,8 @@ typedef enum {
  * </itemizedlist>
  *
  * These are the different state changes an element goes through.
- * %GST_STATE_NULL &rArr; %GST_STATE_PLAYING is called an upwards state change
- * and %GST_STATE_PLAYING &rArr; %GST_STATE_NULL a downwards state change.
+ * [GST_STATE_NULL]() &rArr; [GST_STATE_PLAYING]() is called an upwards state change
+ * and [GST_STATE_PLAYING]() &rArr; [GST_STATE_NULL]() a downwards state change.
  */
 typedef enum /*< flags=0 >*/
 {
@@ -335,7 +335,7 @@ typedef enum
 
 /**
  * GST_ELEMENT_IS_LOCKED_STATE:
- * @elem: A #GstElement to query
+ * @elem: A [GstElement]() to query
  *
  * Check if the element is in the locked state and therefore will ignore state
  * changes from its parent object.
@@ -344,16 +344,16 @@ typedef enum
 
 /**
  * GST_ELEMENT_NAME:
- * @elem: A #GstElement to query
+ * @elem: A [GstElement]() to query
  *
  * Gets the name of this element. Use only in core as this is not
- * ABI-compatible. Others use gst_element_get_name()
+ * ABI-compatible. Others use [gst_element_get_name]()
  */
 #define GST_ELEMENT_NAME(elem)                  (GST_OBJECT_NAME(elem))
 
 /**
  * GST_ELEMENT_PARENT:
- * @elem: A #GstElement to query
+ * @elem: A [GstElement]() to query
  *
  * Get the parent object of this element.
  */
@@ -361,7 +361,7 @@ typedef enum
 
 /**
  * GST_ELEMENT_BUS:
- * @elem: A #GstElement to query
+ * @elem: A [GstElement]() to query
  *
  * Get the message bus of this element.
  */
@@ -369,7 +369,7 @@ typedef enum
 
 /**
  * GST_ELEMENT_CLOCK:
- * @elem: A #GstElement to query
+ * @elem: A [GstElement]() to query
  *
  * Get the clock of this element
  */
@@ -377,7 +377,7 @@ typedef enum
 
 /**
  * GST_ELEMENT_PADS:
- * @elem: A #GstElement to query
+ * @elem: A [GstElement]() to query
  *
  * Get the pads of this elements.
  */
@@ -385,22 +385,22 @@ typedef enum
 
 /**
  * GST_ELEMENT_START_TIME:
- * @elem: a #GstElement to return the start time for.
+ * @elem: a [GstElement]() to return the start time for.
  *
- * This macro returns the start_time of the @elem. The start_time is the
+ * This macro returns the start_time of the _elem_. The start_time is the
  * running_time of the pipeline when the element went to PAUSED.
  */
 #define GST_ELEMENT_START_TIME(elem)            (GST_ELEMENT_CAST(elem)->start_time)
 
 /**
  * GST_ELEMENT_ERROR:
- * @el:     the element that generates the error
- * @domain: like CORE, LIBRARY, RESOURCE or STREAM (see #gstreamer-GstGError)
- * @code:   error code defined for that domain (see #gstreamer-GstGError)
- * @text:   the message to display (format string and args enclosed in
-            parentheses)
- * @debug:  debugging information for the message (format string and args
-            enclosed in parentheses)
+ * @el: the element that generates the error
+ * @domain: like CORE, LIBRARY, RESOURCE or STREAM (see [gstreamer]()-GstGError)
+ * @code: error code defined for that domain (see [gstreamer]()-GstGError)
+ * @text: the message to display (format string and args enclosed in
+ *             parentheses)
+ * @debug: debugging information for the message (format string and args
+ *             enclosed in parentheses)
  *
  * Utility function that elements can use in case they encountered a fatal
  * data processing error. The pipeline will post an error message and the
@@ -421,13 +421,13 @@ G_STMT_START {                                                          \
 
 /**
  * GST_ELEMENT_WARNING:
- * @el:     the element that generates the warning
- * @domain: like CORE, LIBRARY, RESOURCE or STREAM (see #gstreamer-GstGError)
- * @code:   error code defined for that domain (see #gstreamer-GstGError)
- * @text:   the message to display (format string and args enclosed in
-            parentheses)
- * @debug:  debugging information for the message (format string and args
-            enclosed in parentheses)
+ * @el: the element that generates the warning
+ * @domain: like CORE, LIBRARY, RESOURCE or STREAM (see [gstreamer]()-GstGError)
+ * @code: error code defined for that domain (see [gstreamer]()-GstGError)
+ * @text: the message to display (format string and args enclosed in
+ *             parentheses)
+ * @debug: debugging information for the message (format string and args
+ *             enclosed in parentheses)
  *
  * Utility function that elements can use in case they encountered a non-fatal
  * data processing problem. The pipeline will post a warning message and the
@@ -448,13 +448,13 @@ G_STMT_START {                                                          \
 
 /**
  * GST_ELEMENT_INFO:
- * @el:     the element that generates the information
- * @domain: like CORE, LIBRARY, RESOURCE or STREAM (see #gstreamer-GstGError)
- * @code:   error code defined for that domain (see #gstreamer-GstGError)
- * @text:   the message to display (format string and args enclosed in
-            parentheses)
- * @debug:  debugging information for the message (format string and args
-            enclosed in parentheses)
+ * @el: the element that generates the information
+ * @domain: like CORE, LIBRARY, RESOURCE or STREAM (see [gstreamer]()-GstGError)
+ * @code: error code defined for that domain (see [gstreamer]()-GstGError)
+ * @text: the message to display (format string and args enclosed in
+ *             parentheses)
+ * @debug: debugging information for the message (format string and args
+ *             enclosed in parentheses)
  *
  * Utility function that elements can use in case they want to inform
  * the application of something noteworthy that is not an error.
@@ -477,16 +477,16 @@ G_STMT_START {                                                          \
 /* the state change mutexes and conds */
 /**
  * GST_STATE_GET_LOCK:
- * @elem:   a #GstElement
+ * @elem: a [GstElement]()
  *
- * Get a reference to the state lock of @elem.
+ * Get a reference to the state lock of _elem_.
  * This lock is used by the core.  It is taken while getting or setting
  * the state, during state changes, and while finalizing.
  */
 #define GST_STATE_GET_LOCK(elem)               (&(GST_ELEMENT_CAST(elem)->state_lock))
 /**
  * GST_STATE_GET_COND:
- * @elem: a #GstElement
+ * @elem: a [GstElement]()
  *
  * Get the conditional used to signal the completion of a state change.
  */
@@ -506,23 +506,23 @@ G_STMT_START {                                                          \
 
 /**
  * GstElement:
- * @state_lock: Used to serialize execution of gst_element_set_state()
+ * @state_lock: Used to serialize execution of [gst_element_set_state]()
  * @state_cond: Used to signal completion of a state change
  * @state_cookie: Used to detect concurrent execution of
- * gst_element_set_state() and gst_element_get_state()
+ * [gst_element_set_state]() and [gst_element_get_state]()
  * @target_state: the target state of an element as set by the application
  * @current_state: the current state of an element
- * @next_state: the next state of an element, can be #GST_STATE_VOID_PENDING if
+ * @next_state: the next state of an element, can be [GST_STATE_VOID_PENDING]() if
  * the element is in the correct state.
  * @pending_state: the final state the element should go to, can be
- * #GST_STATE_VOID_PENDING if the element is in the correct state
+ * [GST_STATE_VOID_PENDING]() if the element is in the correct state
  * @last_return: the last return value of an element state change
  * @bus: the bus of the element. This bus is provided to the element by the
- * parent element or the application. A #GstPipeline has a bus of its own.
+ * parent element or the application. A [GstPipeline]() has a bus of its own.
  * @clock: the clock of the element. This clock is usually provided to the
- * element by the toplevel #GstPipeline.
+ * element by the toplevel [GstPipeline]().
  * @base_time: the time of the clock right before the element is set to
- * PLAYING. Subtracting @base_time from the current clock time in the PLAYING
+ * PLAYING. Subtracting _base_time_ from the current clock time in the PLAYING
  * state will yield the running_time against the clock.
  * @start_time: the running_time of the last PAUSED state
  * @numpads: number of pads of the element, includes both source and sink pads.
@@ -576,24 +576,24 @@ struct _GstElement
  * GstElementClass:
  * @parent_class: the parent class structure
  * @metadata: metadata for elements of this class
- * @elementfactory: the #GstElementFactory that creates these elements
- * @padtemplates: a #GList of #GstPadTemplate
+ * @elementfactory: the [GstElementFactory]() that creates these elements
+ * @padtemplates: a [GList]() of [GstPadTemplate]()
  * @numpadtemplates: the number of padtemplates
  * @pad_templ_cookie: changed whenever the padtemplates change
  * @request_new_pad: called when a new pad is requested
  * @release_pad: called when a request pad is to be released
  * @get_state: get the state of the element
  * @set_state: set a new state on the element
- * @change_state: called by @set_state to perform an incremental state change
- * @set_bus: set a #GstBus on the element
- * @provide_clock: gets the #GstClock provided by the element
- * @set_clock: set the #GstClock on the element
- * @send_event: send a #GstEvent to the element
- * @query: perform a #GstQuery on the element
+ * @change_state: called by _set_state_ to perform an incremental state change
+ * @set_bus: set a [GstBus]() on the element
+ * @provide_clock: gets the [GstClock]() provided by the element
+ * @set_clock: set the [GstClock]() on the element
+ * @send_event: send a [GstEvent]() to the element
+ * @query: perform a [GstQuery]() on the element
  * @state_changed: called immediately after a new state was set.
  * @post_message: called when a message is posted on the element. Chain up to
  *                the parent class' handler to have it posted on the bus.
- * @set_context: set a #GstContext on the element
+ * @set_context: set a [GstContext]() on the element
  *
  * GStreamer element class. Override the vmethods to implement the element
  * functionality.
@@ -689,22 +689,21 @@ GType                   gst_element_get_type            (void);
 
 /**
  * gst_element_get_name:
- * @elem: a #GstElement to get the name of @elem.
+ * @elem: a [GstElement]() to get the name of _elem_.
  *
- * Returns a copy of the name of @elem.
- * Caller should g_free() the return value after usage.
- * For a nameless element, this returns %NULL, which you can safely g_free()
+ * Returns a copy of the name of _elem_.
+ * Caller should [g_free]() the return value after usage.
+ * For a nameless element, this returns [NULL](), which you can safely [g_free]()
  * as well.
  *
- * Returns: (transfer full) (nullable): the name of @elem. g_free()
+ * Returns: (transfer full) (nullable): the name of _elem_. [g_free]()
  * after usage. MT safe.
- *
  */
 #define                 gst_element_get_name(elem)      gst_object_get_name(GST_OBJECT_CAST(elem))
 
 /**
  * gst_element_set_name:
- * @elem: a #GstElement to set the name of.
+ * @elem: a [GstElement]() to set the name of.
  * @name: the new name
  *
  * Sets the name of the element, getting rid of the old name if there was one.
@@ -713,7 +712,7 @@ GType                   gst_element_get_type            (void);
 
 /**
  * gst_element_get_parent:
- * @elem: a #GstElement to get the parent of.
+ * @elem: a [GstElement]() to get the parent of.
  *
  * Get the parent of an element.
  *
@@ -723,8 +722,8 @@ GType                   gst_element_get_type            (void);
 
 /**
  * gst_element_set_parent:
- * @elem: a #GstElement to set the parent of.
- * @parent: the new parent #GstObject of the element.
+ * @elem: a [GstElement]() to set the parent of.
+ * @parent: the new parent [GstObject]() of the element.
  *
  * Sets the parent of an element.
  */

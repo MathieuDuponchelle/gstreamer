@@ -22,13 +22,13 @@
 /**
  * SECTION:gstdevicemonitor
  * @short_description: A device monitor and prober
- * @see_also: #GstDevice, #GstDeviceProvider
+ * @see_also: [GstDevice](), [GstDeviceProvider]()
  *
- * Applications should create a #GstDeviceMonitor when they want
+ * Applications should create a [GstDeviceMonitor]() when they want
  * to probe, list and monitor devices of a specific type. The
- * #GstDeviceMonitor will create the appropriate
- * #GstDeviceProvider objects and manage them. It will then post
- * messages on its #GstBus for devices that have been added and
+ * [GstDeviceMonitor]() will create the appropriate
+ * [GstDeviceProvider]() objects and manage them. It will then post
+ * messages on its [GstBus]() for devices that have been added and
  * removed.
  *
  * The device monitor will monitor all devices matching the filters that
@@ -36,7 +36,7 @@
  *
  *
  * The basic use pattern of a device monitor is as follows:
- * |[
+ * ```
  *   static gboolean
  *   my_bus_func (GstBus * bus, GstMessage * message, gpointer user_data)
  *   {
@@ -83,7 +83,7 @@
  *
  *      return monitor;
  *   }
- * ]|
+ * ```
  *
  * Since: 1.4
  */
@@ -244,14 +244,13 @@ gst_device_monitor_dispose (GObject * object)
 
 /**
  * gst_device_monitor_get_devices:
- * @monitor: A #GstDeviceProvider
+ * @monitor: A [GstDeviceProvider]()
  *
  * Gets a list of devices from all of the relevant monitors. This may actually
  * probe the hardware if the monitor is not currently started.
  *
- * Returns: (transfer full) (element-type GstDevice): a #GList of
- *   #GstDevice
- *
+ * Returns: (transfer full) (element-type GstDevice): a [GList]() of
+ *   [GstDevice]()
  * Since: 1.4
  */
 
@@ -329,14 +328,13 @@ again:
 
 /**
  * gst_device_monitor_start:
- * @monitor: A #GstDeviceMonitor
+ * @monitor: A [GstDeviceMonitor]()
  *
  * Starts monitoring the devices, one this has succeeded, the
- * %GST_MESSAGE_DEVICE_ADDED and %GST_MESSAGE_DEVICE_REMOVED messages
+ * [GST_MESSAGE_DEVICE_ADDED]() and [GST_MESSAGE_DEVICE_REMOVED]() messages
  * will be emitted on the bus when the list of devices changes.
  *
- * Returns: %TRUE if the device monitoring could be started
- *
+ * Returns: [TRUE]() if the device monitoring could be started
  * Since: 1.4
  */
 
@@ -437,7 +435,7 @@ start_failed:
 
 /**
  * gst_device_monitor_stop:
- * @monitor: A #GstDeviceProvider
+ * @monitor: A [GstDeviceProvider]()
  *
  * Stops monitoring the devices.
  *
@@ -481,17 +479,16 @@ gst_device_monitor_stop (GstDeviceMonitor * monitor)
 /**
  * gst_device_monitor_add_filter:
  * @monitor: a device monitor
- * @classes: (allow-none): device classes to use as filter or %NULL for any class
- * @caps: (allow-none): the #GstCaps to filter or %NULL for ANY
+ * @classes: (allow-none): device classes to use as filter or [NULL]() for any class
+ * @caps: (allow-none): the [GstCaps]() to filter or [NULL]() for ANY
  *
- * Adds a filter for which #GstDevice will be monitored, any device that matches
- * all classes and the #GstCaps will be returned.
+ * Adds a filter for which [GstDevice]() will be monitored, any device that matches
+ * all classes and the [GstCaps]() will be returned.
  *
- * Filters must be added before the #GstDeviceMonitor is started.
+ * Filters must be added before the [GstDeviceMonitor]() is started.
  *
  * Returns: The id of the new filter or 0 if no provider matched the filter's
  *  classes.
- *
  * Since: 1.4
  */
 guint
@@ -577,11 +574,10 @@ gst_device_monitor_add_filter (GstDeviceMonitor * monitor,
  * @monitor: a device monitor
  * @filter_id: the id of the filter
  *
- * Removes a filter from the #GstDeviceMonitor using the id that was returned
- * by gst_device_monitor_add_filter().
+ * Removes a filter from the [GstDeviceMonitor]() using the id that was returned
+ * by [gst_device_monitor_add_filter]().
  *
- * Returns: %TRUE of the filter id was valid, %FALSE otherwise
- *
+ * Returns: [TRUE]() of the filter id was valid, [FALSE]() otherwise
  * Since: 1.4
  */
 gboolean
@@ -642,10 +638,9 @@ gst_device_monitor_remove_filter (GstDeviceMonitor * monitor, guint filter_id)
 /**
  * gst_device_monitor_new:
  *
- * Create a new #GstDeviceMonitor
+ * Create a new [GstDeviceMonitor]()
  *
  * Returns: (transfer full): a new device monitor.
- *
  * Since: 1.4
  */
 GstDeviceMonitor *
@@ -656,12 +651,11 @@ gst_device_monitor_new (void)
 
 /**
  * gst_device_monitor_get_bus:
- * @monitor: a #GstDeviceProvider
+ * @monitor: a [GstDeviceProvider]()
  *
- * Gets the #GstBus of this #GstDeviceMonitor
+ * Gets the [GstBus]() of this [GstDeviceMonitor]()
  *
- * Returns: (transfer full): a #GstBus
- *
+ * Returns: (transfer full): a [GstBus]()
  * Since: 1.4
  */
 GstBus *

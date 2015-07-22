@@ -22,7 +22,7 @@
 /**
  * SECTION:gsttaskpool
  * @short_description: Pool of GStreamer streaming threads
- * @see_also: #GstTask, #GstPad
+ * @see_also: [GstTask](), [GstPad]()
  *
  * This object provides an abstraction for creating threads. The default
  * implementation uses a regular GThreadPool to start tasks.
@@ -158,7 +158,7 @@ gst_task_pool_finalize (GObject * object)
  * Create a new default task pool. The default task pool will use a regular
  * GThreadPool for threads.
  *
- * Returns: (transfer full): a new #GstTaskPool. gst_object_unref() after usage.
+ * Returns: (transfer full): a new [GstTaskPool](). [gst_object_unref]() after usage.
  */
 GstTaskPool *
 gst_task_pool_new (void)
@@ -172,10 +172,10 @@ gst_task_pool_new (void)
 
 /**
  * gst_task_pool_prepare:
- * @pool: a #GstTaskPool
+ * @pool: a [GstTaskPool]()
  * @error: an error return location
  *
- * Prepare the taskpool for accepting gst_task_pool_push() operations.
+ * Prepare the taskpool for accepting [gst_task_pool_push]() operations.
  *
  * MT safe.
  */
@@ -194,7 +194,7 @@ gst_task_pool_prepare (GstTaskPool * pool, GError ** error)
 
 /**
  * gst_task_pool_cleanup:
- * @pool: a #GstTaskPool
+ * @pool: a [GstTaskPool]()
  *
  * Wait for all tasks to be stopped. This is mainly used internally
  * to ensure proper cleanup of internal data structures in test suites.
@@ -216,16 +216,16 @@ gst_task_pool_cleanup (GstTaskPool * pool)
 
 /**
  * gst_task_pool_push:
- * @pool: a #GstTaskPool
+ * @pool: a [GstTaskPool]()
  * @func: (scope async): the function to call
- * @user_data: (closure): data to pass to @func
+ * @user_data: (closure): data to pass to _func_
  * @error: return location for an error
  *
- * Start the execution of a new thread from @pool.
+ * Start the execution of a new thread from _pool_.
  *
  * Returns: (transfer none) (nullable): a pointer that should be used
- * for the gst_task_pool_join function. This pointer can be %NULL, you
- * must check @error to detect errors.
+ * for the gst_task_pool_join function. This pointer can be [NULL](), you
+ * must check _error_ to detect errors.
  */
 gpointer
 gst_task_pool_push (GstTaskPool * pool, GstTaskPoolFunction func,
@@ -252,11 +252,11 @@ not_supported:
 
 /**
  * gst_task_pool_join:
- * @pool: a #GstTaskPool
+ * @pool: a [GstTaskPool]()
  * @id: the id
  *
- * Join a task and/or return it to the pool. @id is the id obtained from 
- * gst_task_pool_push().
+ * Join a task and/or return it to the pool. _id_ is the id obtained from
+ * [gst_task_pool_push]().
  */
 void
 gst_task_pool_join (GstTaskPool * pool, gpointer id)

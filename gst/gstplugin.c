@@ -23,26 +23,26 @@
 /**
  * SECTION:gstplugin
  * @short_description: Container for features loaded from a shared object module
- * @see_also: #GstPluginFeature, #GstElementFactory
+ * @see_also: [GstPluginFeature](), [GstElementFactory]()
  *
- * GStreamer is extensible, so #GstElement instances can be loaded at runtime.
+ * GStreamer is extensible, so [GstElement]() instances can be loaded at runtime.
  * A plugin system can provide one or more of the basic
- * <application>GStreamer</application> #GstPluginFeature subclasses.
+ * <application>GStreamer</application> [GstPluginFeature]() subclasses.
  *
  * A plugin should export a symbol <symbol>gst_plugin_desc</symbol> that is a
- * struct of type #GstPluginDesc.
+ * struct of type [GstPluginDesc]().
  * the plugin loader will check the version of the core library the plugin was
- * linked against and will create a new #GstPlugin. It will then call the
- * #GstPluginInitFunc function that was provided in the
+ * linked against and will create a new [GstPlugin](). It will then call the
+ * [GstPluginInitFunc]() function that was provided in the
  * <symbol>gst_plugin_desc</symbol>.
  *
- * Once you have a handle to a #GstPlugin (e.g. from the #GstRegistry), you
- * can add any object that subclasses #GstPluginFeature.
+ * Once you have a handle to a [GstPlugin]() (e.g. from the [GstRegistry]()), you
+ * can add any object that subclasses [GstPluginFeature]().
  *
  * Usually plugins are always automatically loaded so you don't need to call
- * gst_plugin_load() explicitly to bring it into memory. There are options to
+ * [gst_plugin_load]() explicitly to bring it into memory. There are options to
  * statically link plugins to an app or even use GStreamer without a plugin
- * repository in which case gst_plugin_load() can be needed to bring the plugin
+ * repository in which case [gst_plugin_load]() can be needed to bring the plugin
  * into memory.
  */
 
@@ -180,7 +180,7 @@ gst_plugin_error_quark (void)
  * @init_func: (scope call): pointer to the init function of this plugin.
  * @version: version string of the plugin
  * @license: effective license of plugin. Must be one of the approved licenses
- *     (see #GstPluginDesc above) or the plugin will not be registered.
+ *     (see [GstPluginDesc]() above) or the plugin will not be registered.
  * @source: source module plugin belongs to
  * @package: shipped package plugin belongs to
  * @origin: URL to provider of plugin
@@ -189,10 +189,10 @@ gst_plugin_error_quark (void)
  * or library and contained within the application or library (as opposed to
  * being shipped as a separate module file).
  *
- * You must make sure that GStreamer has been initialised (with gst_init() or
- * via gst_init_get_option_group()) before calling this function.
+ * You must make sure that GStreamer has been initialised (with [gst_init]() or
+ * via [gst_init_get_option_group]()) before calling this function.
  *
- * Returns: %TRUE if the plugin was registered correctly, otherwise %FALSE.
+ * Returns: [TRUE]() if the plugin was registered correctly, otherwise [FALSE]().
  */
 gboolean
 gst_plugin_register_static (gint major_version, gint minor_version,
@@ -242,7 +242,7 @@ gst_plugin_register_static (gint major_version, gint minor_version,
  *     of this plugin.
  * @version: version string of the plugin
  * @license: effective license of plugin. Must be one of the approved licenses
- *     (see #GstPluginDesc above) or the plugin will not be registered.
+ *     (see [GstPluginDesc]() above) or the plugin will not be registered.
  * @source: source module plugin belongs to
  * @package: shipped package plugin belongs to
  * @origin: URL to provider of plugin
@@ -250,14 +250,14 @@ gst_plugin_register_static (gint major_version, gint minor_version,
  *
  * Registers a static plugin, ie. a plugin which is private to an application
  * or library and contained within the application or library (as opposed to
- * being shipped as a separate module file) with a #GstPluginInitFullFunc
+ * being shipped as a separate module file) with a [GstPluginInitFullFunc]()
  * which allows user data to be passed to the callback function (useful
  * for bindings).
  *
- * You must make sure that GStreamer has been initialised (with gst_init() or
- * via gst_init_get_option_group()) before calling this function.
+ * You must make sure that GStreamer has been initialised (with [gst_init]() or
+ * via [gst_init_get_option_group]()) before calling this function.
  *
- * Returns: %TRUE if the plugin was registered correctly, otherwise %FALSE.
+ * Returns: [TRUE]() if the plugin was registered correctly, otherwise [FALSE]().
  */
 gboolean
 gst_plugin_register_static_full (gint major_version, gint minor_version,
@@ -667,12 +667,12 @@ static GMutex gst_plugin_loading_mutex;
 /**
  * gst_plugin_load_file:
  * @filename: the plugin filename to load
- * @error: pointer to a %NULL-valued GError
+ * @error: pointer to a [NULL]()-valued GError
  *
  * Loads the given plugin and refs it.  Caller needs to unref after use.
  *
- * Returns: (transfer full): a reference to the existing loaded GstPlugin, a 
- * reference to the newly-loaded GstPlugin, or %NULL if an error occurred.
+ * Returns: (transfer full): a reference to the existing loaded GstPlugin, a
+ * reference to the newly-loaded GstPlugin, or [NULL]() if an error occurred.
  */
 GstPlugin *
 gst_plugin_load_file (const gchar * filename, GError ** error)
@@ -1007,7 +1007,7 @@ gst_plugin_get_origin (GstPlugin * plugin)
  *
  * There may be plugins that do not have a valid release date set on them.
  *
- * Returns: (nullable): the date string of the plugin, or %NULL if not
+ * Returns: (nullable): the date string of the plugin, or [NULL]() if not
  * available.
  */
 const gchar *
@@ -1024,7 +1024,7 @@ gst_plugin_get_release_date_string (GstPlugin * plugin)
  *
  * queries if the plugin is loaded into memory
  *
- * Returns: %TRUE is loaded, %FALSE otherwise
+ * Returns: [TRUE]() is loaded, [FALSE]() otherwise
  */
 gboolean
 gst_plugin_is_loaded (GstPlugin * plugin)
@@ -1038,11 +1038,11 @@ gst_plugin_is_loaded (GstPlugin * plugin)
  * gst_plugin_get_cache_data:
  * @plugin: a plugin
  *
- * Gets the plugin specific data cache. If it is %NULL there is no cached data
+ * Gets the plugin specific data cache. If it is [NULL]() there is no cached data
  * stored. This is the case when the registry is getting rebuilt.
  *
  * Returns: (transfer none) (nullable): The cached data as a
- * #GstStructure or %NULL.
+ * [GstStructure]() or [NULL]().
  */
 const GstStructure *
 gst_plugin_get_cache_data (GstPlugin * plugin)
@@ -1058,7 +1058,7 @@ gst_plugin_get_cache_data (GstPlugin * plugin)
  * @cache_data: (transfer full): a structure containing the data to cache
  *
  * Adds plugin specific data to cache. Passes the ownership of the structure to
- * the @plugin.
+ * the _plugin_.
  *
  * The cache is flushed every time the registry is rebuilt.
  */
@@ -1130,7 +1130,7 @@ _feature_filter (GstPlugin * plugin, gpointer user_data)
 
 /**
  * gst_plugin_list_feature_filter:
- * @list: a #GList of plugins to query
+ * @list: a [GList]() of plugins to query
  * @filter: the filter function to use
  * @first: only return first match
  * @user_data: user data passed to the filter function
@@ -1168,7 +1168,7 @@ gst_plugin_list_feature_filter (GList * list,
  *
  * Find a feature of the given name and type in the given plugin.
  *
- * Returns: a GstPluginFeature or %NULL if the feature was not found.
+ * Returns: a GstPluginFeature or [NULL]() if the feature was not found.
  */
 GstPluginFeature *
 gst_plugin_find_feature (GstPlugin * plugin, const gchar * name, GType type)
@@ -1212,7 +1212,7 @@ gst_plugin_feature_name_filter (GstPluginFeature * feature, const gchar * name)
  *
  * Find a feature of the given name in the given plugin.
  *
- * Returns: a GstPluginFeature or %NULL if the feature was not found.
+ * Returns: a GstPluginFeature or [NULL]() if the feature was not found.
  */
 GstPluginFeature *
 gst_plugin_find_feature_by_name (GstPlugin * plugin, const gchar * name)
@@ -1242,7 +1242,7 @@ gst_plugin_find_feature_by_name (GstPlugin * plugin, const gchar * name)
  *
  * Load the named plugin. Refs the plugin.
  *
- * Returns: (transfer full): a reference to a loaded plugin, or %NULL on error.
+ * Returns: (transfer full): a reference to a loaded plugin, or [NULL]() on error.
  */
 GstPlugin *
 gst_plugin_load_by_name (const gchar * name)
@@ -1274,7 +1274,7 @@ gst_plugin_load_by_name (const gchar * name)
  * gst_plugin_load:
  * @plugin: (transfer none): plugin to load
  *
- * Loads @plugin. Note that the *return value* is the loaded plugin; @plugin is
+ * Loads _plugin_. Note that the *return value* is the loaded plugin; _plugin_ is
  * untouched. The normal use pattern of this function goes like this:
  *
  * <programlisting>
@@ -1285,7 +1285,7 @@ gst_plugin_load_by_name (const gchar * name)
  * plugin = loaded_plugin;
  * </programlisting>
  *
- * Returns: (transfer full): a reference to a loaded plugin, or %NULL on error.
+ * Returns: (transfer full): a reference to a loaded plugin, or [NULL]() on error.
  */
 GstPlugin *
 gst_plugin_load (GstPlugin * plugin)
@@ -1312,9 +1312,9 @@ load_error:
 
 /**
  * gst_plugin_list_free:
- * @list: (transfer full) (element-type Gst.Plugin): list of #GstPlugin
+ * @list: (transfer full) (element-type Gst.Plugin): list of [GstPlugin]()
  *
- * Unrefs each member of @list, then frees the list.
+ * Unrefs each member of _list_, then frees the list.
  */
 void
 gst_plugin_list_free (GList * list)
@@ -1713,20 +1713,20 @@ gst_plugin_ext_dep_equals (GstPluginDep * dep, const gchar ** env_vars,
 
 /**
  * gst_plugin_add_dependency:
- * @plugin: a #GstPlugin
- * @env_vars: (allow-none): %NULL-terminated array of environment variables affecting the
+ * @plugin: a [GstPlugin]()
+ * @env_vars: (allow-none): [NULL]()-terminated array of environment variables affecting the
  *     feature set of the plugin (e.g. an environment variable containing
  *     paths where to look for additional modules/plugins of a library),
- *     or %NULL. Environment variable names may be followed by a path component
+ *     or [NULL](). Environment variable names may be followed by a path component
  *      which will be added to the content of the environment variable, e.g.
  *      "HOME/.mystuff/plugins".
- * @paths: (allow-none): %NULL-terminated array of directories/paths where dependent files
- *     may be, or %NULL.
- * @names: (allow-none): %NULL-terminated array of file names (or file name suffixes,
- *     depending on @flags) to be used in combination with the paths from
- *     @paths and/or the paths extracted from the environment variables in
- *     @env_vars, or %NULL.
- * @flags: optional flags, or #GST_PLUGIN_DEPENDENCY_FLAG_NONE
+ * @paths: (allow-none): [NULL]()-terminated array of directories/paths where dependent files
+ *     may be, or [NULL]().
+ * @names: (allow-none): [NULL]()-terminated array of file names (or file name suffixes,
+ *     depending on _flags_) to be used in combination with the paths from
+ *     _paths_ and/or the paths extracted from the environment variables in
+ *     _env_vars_, or [NULL]().
+ * @flags: optional flags, or [GST_PLUGIN_DEPENDENCY_FLAG_NONE]()
  *
  * Make GStreamer aware of external dependencies which affect the feature
  * set of this plugin (ie. the elements or typefinders associated with it).
@@ -1784,16 +1784,16 @@ gst_plugin_add_dependency (GstPlugin * plugin, const gchar ** env_vars,
 
 /**
  * gst_plugin_add_dependency_simple:
- * @plugin: the #GstPlugin
+ * @plugin: the [GstPlugin]()
  * @env_vars: (allow-none): one or more environment variables (separated by ':', ';' or ','),
- *      or %NULL. Environment variable names may be followed by a path component
+ *      or [NULL](). Environment variable names may be followed by a path component
  *      which will be added to the content of the environment variable, e.g.
  *      "HOME/.mystuff/plugins:MYSTUFF_PLUGINS_PATH"
  * @paths: (allow-none): one ore more directory paths (separated by ':' or ';' or ','),
- *      or %NULL. Example: "/usr/lib/mystuff/plugins"
+ *      or [NULL](). Example: "/usr/lib/mystuff/plugins"
  * @names: (allow-none): one or more file names or file name suffixes (separated by commas),
- *      or %NULL
- * @flags: optional flags, or #GST_PLUGIN_DEPENDENCY_FLAG_NONE
+ *      or [NULL]()
+ * @flags: optional flags, or [GST_PLUGIN_DEPENDENCY_FLAG_NONE]()
  *
  * Make GStreamer aware of external dependencies which affect the feature
  * set of this plugin (ie. the elements or typefinders associated with it).
@@ -1805,7 +1805,7 @@ gst_plugin_add_dependency (GstPlugin * plugin, const gchar ** env_vars,
  * codec loader which exposes elements and/or caps dependent on what external
  * codec libraries are currently installed.
  *
- * Convenience wrapper function for gst_plugin_add_dependency() which
+ * Convenience wrapper function for [gst_plugin_add_dependency]() which
  * takes simple strings as arguments instead of string arrays, with multiple
  * arguments separated by predefined delimiters (see above).
  */

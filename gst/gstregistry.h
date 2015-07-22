@@ -44,7 +44,7 @@ typedef struct _GstRegistryPrivate GstRegistryPrivate;
 /**
  * GstRegistry:
  *
- * Opaque #GstRegistry structure.
+ * Opaque [GstRegistry]() structure.
  */
 struct _GstRegistry {
   GstObject      object;

@@ -22,44 +22,44 @@
 /**
  * SECTION:gstmemory
  * @short_description: refcounted wrapper for memory blocks
- * @see_also: #GstBuffer
+ * @see_also: [GstBuffer]()
  *
  * GstMemory is a lightweight refcounted object that wraps a region of memory.
- * They are typically used to manage the data of a #GstBuffer.
+ * They are typically used to manage the data of a [GstBuffer]().
  *
  * A GstMemory object has an allocated region of memory of maxsize. The maximum
  * size does not change during the lifetime of the memory object. The memory
  * also has an offset and size property that specifies the valid range of memory
  * in the allocated region.
  *
- * Memory is usually created by allocators with a gst_allocator_alloc()
- * method call. When %NULL is used as the allocator, the default allocator will
+ * Memory is usually created by allocators with a [gst_allocator_alloc]()
+ * method call. When [NULL]() is used as the allocator, the default allocator will
  * be used.
  *
- * New allocators can be registered with gst_allocator_register().
+ * New allocators can be registered with [gst_allocator_register]().
  * Allocators are identified by name and can be retrieved with
- * gst_allocator_find(). gst_allocator_set_default() can be used to change the
+ * [gst_allocator_find](). [gst_allocator_set_default]() can be used to change the
  * default allocator.
  *
- * New memory can be created with gst_memory_new_wrapped() that wraps the memory
+ * New memory can be created with [gst_memory_new_wrapped]() that wraps the memory
  * allocated elsewhere.
  *
- * Refcounting of the memory block is performed with gst_memory_ref() and
- * gst_memory_unref().
+ * Refcounting of the memory block is performed with [gst_memory_ref]() and
+ * [gst_memory_unref]().
  *
  * The size of the memory can be retrieved and changed with
- * gst_memory_get_sizes() and gst_memory_resize() respectively.
+ * [gst_memory_get_sizes]() and [gst_memory_resize]() respectively.
  *
- * Getting access to the data of the memory is performed with gst_memory_map().
+ * Getting access to the data of the memory is performed with [gst_memory_map]().
  * The call will return a pointer to offset bytes into the region of memory.
- * After the memory access is completed, gst_memory_unmap() should be called.
+ * After the memory access is completed, [gst_memory_unmap]() should be called.
  *
- * Memory can be copied with gst_memory_copy(), which will return a writable
- * copy. gst_memory_share() will create a new memory block that shares the
+ * Memory can be copied with [gst_memory_copy](), which will return a writable
+ * copy. [gst_memory_share]() will create a new memory block that shares the
  * memory with an existing memory block at a custom offset and with a custom
  * size.
  *
- * Memory can be efficiently merged when gst_memory_is_span() returns %TRUE.
+ * Memory can be efficiently merged when [gst_memory_is_span]() returns [TRUE]().
  */
 
 #ifdef HAVE_CONFIG_H
@@ -98,18 +98,18 @@ _gst_memory_free (GstMemory * mem)
 }
 
 /**
- * gst_memory_init: (skip)
- * @mem: a #GstMemory
- * @flags: #GstMemoryFlags
- * @allocator: the #GstAllocator
- * @parent: the parent of @mem
+ * gst_memory_init: (skip):
+ * @mem: a [GstMemory]()
+ * @flags: [GstMemoryFlags]()
+ * @allocator: the [GstAllocator]()
+ * @parent: the parent of _mem_
  * @maxsize: the total size of the memory
  * @align: the alignment of the memory
  * @offset: The offset in the memory
  * @size: the size of valid data in the memory
-
- * Initializes a newly allocated @mem with the given parameters. This function
- * will call gst_mini_object_init() with the default memory parameters.
+ *
+ * Initializes a newly allocated _mem_ with the given parameters. This function
+ * will call [gst_mini_object_init]() with the default memory parameters.
  */
 void
 gst_memory_init (GstMemory * mem, GstMemoryFlags flags,
@@ -140,13 +140,12 @@ gst_memory_init (GstMemory * mem, GstMemoryFlags flags,
 
 /**
  * gst_memory_is_type:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @mem_type: a memory type
  *
- * Check if @mem if allocated with an allocator for @mem_type.
+ * Check if _mem_ if allocated with an allocator for _mem_type_.
  *
- * Returns: %TRUE if @mem was allocated from an allocator for @mem_type.
- *
+ * Returns: [TRUE]() if _mem_ was allocated from an allocator for _mem_type_.
  * Since: 1.2
  */
 gboolean
@@ -161,13 +160,13 @@ gst_memory_is_type (GstMemory * mem, const gchar * mem_type)
 
 /**
  * gst_memory_get_sizes:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @offset: pointer to offset
  * @maxsize: pointer to maxsize
  *
- * Get the current @size, @offset and @maxsize of @mem.
+ * Get the current _size_, _offset_ and _maxsize_ of _mem_.
  *
- * Returns: the current sizes of @mem
+ * Returns: the current sizes of _mem_
  */
 gsize
 gst_memory_get_sizes (GstMemory * mem, gsize * offset, gsize * maxsize)
@@ -184,14 +183,14 @@ gst_memory_get_sizes (GstMemory * mem, gsize * offset, gsize * maxsize)
 
 /**
  * gst_memory_resize:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @offset: a new offset
  * @size: a new size
  *
- * Resize the memory region. @mem should be writable and offset + size should be
- * less than the maxsize of @mem.
+ * Resize the memory region. _mem_ should be writable and offset + size should be
+ * less than the maxsize of _mem_.
  *
- * #GST_MEMORY_FLAG_ZERO_PREFIXED and #GST_MEMORY_FLAG_ZERO_PADDED will be
+ * [GST_MEMORY_FLAG_ZERO_PREFIXED]() and [GST_MEMORY_FLAG_ZERO_PADDED]() will be
  * cleared when offset or padding is increased respectively.
  */
 void
@@ -216,19 +215,19 @@ gst_memory_resize (GstMemory * mem, gssize offset, gsize size)
 
 /**
  * gst_memory_make_mapped:
- * @mem: (transfer full): a #GstMemory
+ * @mem: (transfer full): a [GstMemory]()
  * @info: (out): pointer for info
  * @flags: mapping flags
  *
- * Create a #GstMemory object that is mapped with @flags. If @mem is mappable
- * with @flags, this function returns the mapped @mem directly. Otherwise a
- * mapped copy of @mem is returned.
+ * Create a [GstMemory]() object that is mapped with _flags_. If _mem_ is mappable
+ * with _flags_, this function returns the mapped _mem_ directly. Otherwise a
+ * mapped copy of _mem_ is returned.
  *
- * This function takes ownership of old @mem and returns a reference to a new
- * #GstMemory.
+ * This function takes ownership of old _mem_ and returns a reference to a new
+ * [GstMemory]().
  *
- * Returns: (transfer full) (nullable): a #GstMemory object mapped
- * with @flags or %NULL when a mapping is not possible.
+ * Returns: (transfer full) (nullable): a [GstMemory]() object mapped
+ * with _flags_ or [NULL]() when a mapping is not possible.
  */
 GstMemory *
 gst_memory_make_mapped (GstMemory * mem, GstMapInfo * info, GstMapFlags flags)
@@ -266,24 +265,24 @@ cannot_map:
 
 /**
  * gst_memory_map:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @info: (out): pointer for info
  * @flags: mapping flags
  *
- * Fill @info with the pointer and sizes of the memory in @mem that can be
- * accessed according to @flags.
+ * Fill _info_ with the pointer and sizes of the memory in _mem_ that can be
+ * accessed according to _flags_.
  *
- * This function can return %FALSE for various reasons:
- * - the memory backed by @mem is not accessible with the given @flags.
+ * This function can return [FALSE]() for various reasons:
+ * - the memory backed by _mem_ is not accessible with the given _flags_.
  * - the memory was already mapped with a different mapping.
  *
- * @info and its contents remain valid for as long as @mem is valid and
- * until gst_memory_unmap() is called.
+ * _info_ and its contents remain valid for as long as _mem_ is valid and
+ * until [gst_memory_unmap]() is called.
  *
- * For each gst_memory_map() call, a corresponding gst_memory_unmap() call
+ * For each [gst_memory_map]() call, a corresponding [gst_memory_unmap]() call
  * should be done.
  *
- * Returns: %TRUE if the map operation was successful.
+ * Returns: [TRUE]() if the map operation was successful.
  */
 gboolean
 gst_memory_map (GstMemory * mem, GstMapInfo * info, GstMapFlags flags)
@@ -330,10 +329,10 @@ error:
 
 /**
  * gst_memory_unmap:
- * @mem: a #GstMemory
- * @info: a #GstMapInfo
+ * @mem: a [GstMemory]()
+ * @info: a [GstMapInfo]()
  *
- * Release the memory obtained with gst_memory_map()
+ * Release the memory obtained with [gst_memory_map]()
  */
 void
 gst_memory_unmap (GstMemory * mem, GstMapInfo * info)
@@ -351,15 +350,15 @@ gst_memory_unmap (GstMemory * mem, GstMapInfo * info)
 
 /**
  * gst_memory_copy:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @offset: offset to copy from
  * @size: size to copy, or -1 to copy to the end of the memory region
  *
- * Return a copy of @size bytes from @mem starting from @offset. This copy is
- * guaranteed to be writable. @size can be set to -1 to return a copy
- * from @offset to the end of the memory region.
+ * Return a copy of _size_ bytes from _mem_ starting from _offset_. This copy is
+ * guaranteed to be writable. _size_ can be set to -1 to return a copy
+ * from _offset_ to the end of the memory region.
  *
- * Returns: a new #GstMemory.
+ * Returns: a new [GstMemory]().
  */
 GstMemory *
 gst_memory_copy (GstMemory * mem, gssize offset, gssize size)
@@ -375,16 +374,16 @@ gst_memory_copy (GstMemory * mem, gssize offset, gssize size)
 
 /**
  * gst_memory_share:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @offset: offset to share from
  * @size: size to share, or -1 to share to the end of the memory region
  *
- * Return a shared copy of @size bytes from @mem starting from @offset. No
+ * Return a shared copy of _size_ bytes from _mem_ starting from _offset_. No
  * memory copy is performed and the memory region is simply shared. The result
- * is guaranteed to be non-writable. @size can be set to -1 to return a shared
- * copy from @offset to the end of the memory region.
+ * is guaranteed to be non-writable. _size_ can be set to -1 to return a shared
+ * copy from _offset_ to the end of the memory region.
  *
- * Returns: a new #GstMemory.
+ * Returns: a new [GstMemory]().
  */
 GstMemory *
 gst_memory_share (GstMemory * mem, gssize offset, gssize size)
@@ -422,18 +421,18 @@ gst_memory_share (GstMemory * mem, gssize offset, gssize size)
 
 /**
  * gst_memory_is_span:
- * @mem1: a #GstMemory
- * @mem2: a #GstMemory
+ * @mem1: a [GstMemory]()
+ * @mem2: a [GstMemory]()
  * @offset: a pointer to a result offset
  *
- * Check if @mem1 and mem2 share the memory with a common parent memory object
+ * Check if _mem1_ and mem2 share the memory with a common parent memory object
  * and that the memory is contiguous.
  *
- * If this is the case, the memory of @mem1 and @mem2 can be merged
- * efficiently by performing gst_memory_share() on the parent object from
- * the returned @offset.
+ * If this is the case, the memory of _mem1_ and _mem2_ can be merged
+ * efficiently by performing [gst_memory_share]() on the parent object from
+ * the returned _offset_.
  *
- * Returns: %TRUE if the memory is contiguous and of a common parent.
+ * Returns: [TRUE]() if the memory is contiguous and of a common parent.
  */
 gboolean
 gst_memory_is_span (GstMemory * mem1, GstMemory * mem2, gsize * offset)

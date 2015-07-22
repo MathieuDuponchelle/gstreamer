@@ -39,21 +39,21 @@ typedef struct _GstBufferList GstBufferList;
 /**
  * GstBufferListFunc:
  * @buffer: (out) (nullable): pointer the buffer
- * @idx: the index of @buffer
- * @user_data: user data passed to gst_buffer_list_foreach()
+ * @idx: the index of _buffer_
+ * @user_data: user data passed to [gst_buffer_list_foreach]()
  *
- * A function that will be called from gst_buffer_list_foreach(). The @buffer
- * field will point to a the reference of the buffer at @idx.
+ * A function that will be called from [gst_buffer_list_foreach](). The _buffer_
+ * field will point to a the reference of the buffer at _idx_.
  *
- * When this function returns %TRUE, the next buffer will be
- * returned. When %FALSE is returned, gst_buffer_list_foreach() will return.
+ * When this function returns [TRUE](), the next buffer will be
+ * returned. When [FALSE]() is returned, [gst_buffer_list_foreach]() will return.
  *
- * When @buffer is set to %NULL, the item will be removed from the bufferlist.
- * When @buffer has been made writable, the new buffer reference can be assigned
- * to @buffer. This function is responsible for unreffing the old buffer when
+ * When _buffer_ is set to [NULL](), the item will be removed from the bufferlist.
+ * When _buffer_ has been made writable, the new buffer reference can be assigned
+ * to _buffer_. This function is responsible for unreffing the old buffer when
  * removing or modifying.
  *
- * Returns: %FALSE when gst_buffer_list_foreach() should stop
+ * Returns: [FALSE]() when [gst_buffer_list_foreach]() should stop
  */
 typedef gboolean   (*GstBufferListFunc)   (GstBuffer **buffer, guint idx,
                                            gpointer user_data);
@@ -62,16 +62,16 @@ typedef gboolean   (*GstBufferListFunc)   (GstBuffer **buffer, guint idx,
 /* refcounting */
 /**
  * gst_buffer_list_ref:
- * @list: a #GstBufferList
+ * @list: a [GstBufferList]()
  *
  * Increases the refcount of the given buffer list by one.
  *
- * Note that the refcount affects the writability of @list and its data, see
- * gst_buffer_list_make_writable(). It is important to note that keeping
+ * Note that the refcount affects the writability of _list_ and its data, see
+ * [gst_buffer_list_make_writable](). It is important to note that keeping
  * additional references to GstBufferList instances can potentially increase
  * the number of memcpy operations in a pipeline.
  *
- * Returns: (transfer full): @list
+ * Returns: (transfer full): _list_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstBufferList * gst_buffer_list_ref (GstBufferList * list);
@@ -86,7 +86,7 @@ gst_buffer_list_ref (GstBufferList * list)
 
 /**
  * gst_buffer_list_unref:
- * @list: (transfer full): a #GstBufferList
+ * @list: (transfer full): a [GstBufferList]()
  *
  * Decreases the refcount of the buffer list. If the refcount reaches 0, the
  * buffer list will be freed.
@@ -104,13 +104,13 @@ gst_buffer_list_unref (GstBufferList * list)
 /* copy */
 /**
  * gst_buffer_list_copy:
- * @list: a #GstBufferList
+ * @list: a [GstBufferList]()
  *
  * Create a shallow copy of the given buffer list. This will make a newly
  * allocated copy of the source list with copies of buffer pointers. The
  * refcount of buffers pointed to will be increased by one.
  *
- * Returns: (transfer full): a new copy of @list.
+ * Returns: (transfer full): a new copy of _list_.
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstBufferList * gst_buffer_list_copy (const GstBufferList * list);
@@ -124,7 +124,7 @@ gst_buffer_list_copy (const GstBufferList * list)
 
 /**
  * gst_buffer_list_is_writable:
- * @list: a #GstBufferList
+ * @list: a [GstBufferList]()
  *
  * Tests if you can safely add buffers and groups into a buffer list.
  */
@@ -132,14 +132,14 @@ gst_buffer_list_copy (const GstBufferList * list)
 
 /**
  * gst_buffer_list_make_writable:
- * @list: (transfer full): a #GstBufferList
+ * @list: (transfer full): a [GstBufferList]()
  *
  * Makes a writable buffer list from the given buffer list. If the source buffer
  * list is already writable, this will simply return the same buffer list. A
- * copy will otherwise be made using gst_buffer_list_copy().
+ * copy will otherwise be made using [gst_buffer_list_copy]().
  *
  * Returns: (transfer full): a writable list, which may or may not be the
- *     same as @list
+ *     same as _list_
  */
 #define gst_buffer_list_make_writable(list) GST_BUFFER_LIST_CAST (gst_mini_object_make_writable (GST_MINI_OBJECT_CAST (list)))
 

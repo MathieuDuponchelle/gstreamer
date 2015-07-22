@@ -44,10 +44,10 @@ typedef struct _GstDeviceProviderPrivate GstDeviceProviderPrivate;
 
 /**
  * GstDeviceProvider:
- * @parent: The parent #GstObject
- * @devices: a #GList of the #GstDevice objects
+ * @parent: The parent [GstObject]()
+ * @devices: a [GList]() of the [GstDevice]() objects
  *
- * The structure of the base #GstDeviceProvider
+ * The structure of the base [GstDeviceProvider]()
  *
  * Since: 1.4
  */
@@ -66,17 +66,17 @@ struct _GstDeviceProvider {
 
 /**
  * GstDeviceProviderClass:
- * @parent_class: the parent #GstObjectClass structure
- * @factory: a pointer to the #GstDeviceProviderFactory that creates this
+ * @parent_class: the parent [GstObjectClass]() structure
+ * @factory: a pointer to the [GstDeviceProviderFactory]() that creates this
  *  provider
  * @probe: Returns a list of devices that are currently available.
  *  This should never block.
  * @start: Starts monitoring for new devices. Only subclasses that can know
  *  that devices have been added or remove need to implement this method.
  * @stop: Stops monitoring for new devices. Only subclasses that implement
- *  the start() method need to implement this method.
+ *  the [start]() method need to implement this method.
  *
- * The structure of the base #GstDeviceProviderClass
+ * The structure of the base [GstDeviceProviderClass]()
  *
  * Since: 1.4
  */

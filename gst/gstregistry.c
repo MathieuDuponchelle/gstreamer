@@ -24,14 +24,14 @@
 /**
  * SECTION:gstregistry
  * @short_description: Abstract base class for management of #GstPlugin objects
- * @see_also: #GstPlugin, #GstPluginFeature
+ * @see_also: [GstPlugin](), [GstPluginFeature]()
  *
  * One registry holds the metadata of a set of plugins.
  *
  * <emphasis role="bold">Design:</emphasis>
  *
- * The #GstRegistry object is a list of plugins and some functions for dealing
- * with them. Each #GstPlugin is matched 1-1 with a file on disk, and may or may
+ * The [GstRegistry]() object is a list of plugins and some functions for dealing
+ * with them. Each [GstPlugin]() is matched 1-1 with a file on disk, and may or may
  * not be loaded at a given time.
  *
  * The primary source, at all times, of plugin information is each plugin file
@@ -102,7 +102,7 @@
  * The "cache" and "registry" are different concepts and can represent
  * different sets of plugins. For various reasons, at init time, the cache is
  * stored in the default registry, and plugins not relevant to the current
- * process are marked with the %GST_PLUGIN_FLAG_CACHED bit. These plugins are
+ * process are marked with the [GST_PLUGIN_FLAG_CACHED]() bit. These plugins are
  * removed at the end of initialization.
  */
 
@@ -333,7 +333,7 @@ gst_registry_finalize (GObject * object)
  * reference on the registry, as it is alive as long as GStreamer is
  * initialized.
  *
- * Returns: (transfer none): the #GstRegistry.
+ * Returns: (transfer none): the [GstRegistry]().
  */
 GstRegistry *
 gst_registry_get (void)
@@ -400,7 +400,7 @@ was_added:
  *
  * Get the list of paths for the given registry.
  *
- * Returns: (transfer container) (element-type char*): A #GList of paths as
+ * Returns: (transfer container) (element-type char*): A [GList]() of paths as
  *     strings. g_list_free after use.
  *
  * MT safe.
@@ -428,9 +428,9 @@ gst_registry_get_path_list (GstRegistry * registry)
  * @plugin: (transfer full): the plugin to add
  *
  * Add the plugin to the registry. The plugin-added signal will be emitted.
- * This function will sink @plugin.
+ * This function will sink _plugin_.
  *
- * Returns: %TRUE on success.
+ * Returns: [TRUE]() on success.
  *
  * MT safe.
  */
@@ -554,9 +554,9 @@ gst_registry_remove_plugin (GstRegistry * registry, GstPlugin * plugin)
  * @feature: (transfer full): the feature to add
  *
  * Add the feature to the registry. The feature-added signal will be emitted.
- * This function sinks @feature.
+ * This function sinks _feature_.
  *
- * Returns: %TRUE on success.
+ * Returns: [TRUE]() on success.
  *
  * MT safe.
  */
@@ -642,14 +642,14 @@ gst_registry_remove_feature (GstRegistry * registry, GstPluginFeature * feature)
  * @first: only return first match
  * @user_data: (closure): user data passed to the filter function
  *
- * Runs a filter against all plugins in the registry and returns a #GList with
+ * Runs a filter against all plugins in the registry and returns a [GList]() with
  * the results. If the first flag is set, only the first match is
  * returned (as a list with a single object).
- * Every plugin is reffed; use gst_plugin_list_free() after use, which
+ * Every plugin is reffed; use [gst_plugin_list_free]() after use, which
  * will unref again.
  *
- * Returns: (transfer full) (element-type Gst.Plugin): a #GList of #GstPlugin.
- *     Use gst_plugin_list_free() after usage.
+ * Returns: (transfer full) (element-type Gst.Plugin): a [GList]() of [GstPlugin]().
+ *     Use [gst_plugin_list_free]() after usage.
  *
  * MT safe.
  */
@@ -821,8 +821,8 @@ gst_registry_get_device_provider_factory_list (GstRegistry * registry)
  * If the first flag is set, only the first match is
  * returned (as a list with a single object).
  *
- * Returns: (transfer full) (element-type Gst.PluginFeature): a #GList of
- *     #GstPluginFeature. Use gst_plugin_feature_list_free() after usage.
+ * Returns: (transfer full) (element-type Gst.PluginFeature): a [GList]() of
+ *     [GstPluginFeature](). Use [gst_plugin_feature_list_free]() after usage.
  *
  * MT safe.
  */
@@ -869,7 +869,7 @@ gst_registry_plugin_name_filter (GstPlugin * plugin, const gchar * name)
  * The plugin will be reffed; caller is responsible for unreffing.
  *
  * Returns: (transfer full) (nullable): the plugin with the given name
- *     or %NULL if the plugin was not found. gst_object_unref() after
+ *     or [NULL]() if the plugin was not found. [gst_object_unref]() after
  *     usage.
  *
  * MT safe.
@@ -904,8 +904,8 @@ gst_registry_find_plugin (GstRegistry * registry, const gchar * name)
  * Find the pluginfeature with the given name and type in the registry.
  *
  * Returns: (transfer full) (nullable): the pluginfeature with the
- *     given name and type or %NULL if the plugin was not
- *     found. gst_object_unref() after usage.
+ *     given name and type or [NULL]() if the plugin was not
+ *     found. [gst_object_unref]() after usage.
  *
  * MT safe.
  */
@@ -930,13 +930,13 @@ gst_registry_find_feature (GstRegistry * registry, const gchar * name,
 
 /**
  * gst_registry_get_feature_list:
- * @registry: a #GstRegistry
- * @type: a #GType.
+ * @registry: a [GstRegistry]()
+ * @type: a [GType]().
  *
- * Retrieves a #GList of #GstPluginFeature of @type.
+ * Retrieves a [GList]() of [GstPluginFeature]() of _type_.
  *
- * Returns: (transfer full) (element-type Gst.PluginFeature): a #GList of
- *     #GstPluginFeature of @type. Use gst_plugin_feature_list_free() after use
+ * Returns: (transfer full) (element-type Gst.PluginFeature): a [GList]() of
+ *     [GstPluginFeature]() of _type_. Use [gst_plugin_feature_list_free]() after use
  *
  * MT safe.
  */
@@ -971,8 +971,8 @@ gst_registry_get_feature_list (GstRegistry * registry, GType type)
  * Get a copy of all plugins registered in the given registry. The refcount
  * of each element in the list in incremented.
  *
- * Returns: (transfer full) (element-type Gst.Plugin): a #GList of #GstPlugin.
- *     Use gst_plugin_list_free() after usage.
+ * Returns: (transfer full) (element-type Gst.Plugin): a [GList]() of [GstPlugin]().
+ *     Use [gst_plugin_list_free]() after usage.
  *
  * MT safe.
  */
@@ -1002,13 +1002,13 @@ gst_registry_lookup_feature_locked (GstRegistry * registry, const char *name)
 
 /**
  * gst_registry_lookup_feature:
- * @registry: a #GstRegistry
- * @name: a #GstPluginFeature name
+ * @registry: a [GstRegistry]()
+ * @name: a [GstPluginFeature]() name
  *
- * Find a #GstPluginFeature with @name in @registry.
+ * Find a [GstPluginFeature]() with _name_ in _registry_.
  *
- * Returns: (transfer full): a #GstPluginFeature with its refcount incremented,
- *     use gst_object_unref() after usage.
+ * Returns: (transfer full): a [GstPluginFeature]() with its refcount incremented,
+ *     use [gst_object_unref]() after usage.
  *
  * MT safe.
  */
@@ -1057,8 +1057,8 @@ gst_registry_lookup_bn (GstRegistry * registry, const char *basename)
  * Look up a plugin in the given registry with the given filename.
  * If found, plugin is reffed.
  *
- * Returns: (transfer full) (nullable): the #GstPlugin if found, or
- *     %NULL if not.  gst_object_unref() after usage.
+ * Returns: (transfer full) (nullable): the [GstPlugin]() if found, or
+ *     [NULL]() if not.  [gst_object_unref]() after usage.
  */
 GstPlugin *
 gst_registry_lookup (GstRegistry * registry, const char *filename)
@@ -1376,7 +1376,7 @@ gst_registry_scan_path_internal (GstRegistryScanContext * context,
  * Scan the given path for plugins to add to the registry. The syntax of the
  * path is specific to the registry.
  *
- * Returns: %TRUE if registry changed
+ * Returns: [TRUE]() if registry changed
  */
 gboolean
 gst_registry_scan_path (GstRegistry * registry, const gchar * path)
@@ -1406,13 +1406,13 @@ _gst_plugin_feature_filter_plugin_name (GstPluginFeature * feature,
 
 /**
  * gst_registry_get_feature_list_by_plugin:
- * @registry: a #GstRegistry.
+ * @registry: a [GstRegistry]().
  * @name: a plugin name.
  *
- * Retrieves a #GList of features of the plugin with name @name.
+ * Retrieves a [GList]() of features of the plugin with name _name_.
  *
- * Returns: (transfer full) (element-type Gst.PluginFeature): a #GList of
- *     #GstPluginFeature. Use gst_plugin_feature_list_free() after usage.
+ * Returns: (transfer full) (element-type Gst.PluginFeature): a [GList]() of
+ *     [GstPluginFeature](). Use [gst_plugin_feature_list_free]() after usage.
  */
 GList *
 gst_registry_get_feature_list_by_plugin (GstRegistry * registry,
@@ -1444,18 +1444,18 @@ _priv_gst_registry_cleanup (void)
 
 /**
  * gst_registry_check_feature_version:
- * @registry: a #GstRegistry
+ * @registry: a [GstRegistry]()
  * @feature_name: the name of the feature (e.g. "oggdemux")
  * @min_major: the minimum major version number
  * @min_minor: the minimum minor version number
  * @min_micro: the minimum micro version number
  *
  * Checks whether a plugin feature by the given name exists in
- * @registry and whether its version is at least the
+ * _registry_ and whether its version is at least the
  * version required.
  *
- * Returns: %TRUE if the feature could be found and the version is
- * the same as the required version or newer, and %FALSE otherwise.
+ * Returns: [TRUE]() if the feature could be found and the version is
+ * the same as the required version or newer, and [FALSE]() otherwise.
  */
 gboolean
 gst_registry_check_feature_version (GstRegistry * registry,
@@ -1767,10 +1767,10 @@ ensure_current_registry (GError ** error)
  * registry file using a helper child process.
  *
  * Applications might want to disable this behaviour with the
- * gst_registry_fork_set_enabled() function, in which case new plugins
+ * [gst_registry_fork_set_enabled]() function, in which case new plugins
  * are scanned (and loaded) into the application process.
  *
- * Returns: %TRUE if GStreamer will use the child helper process when
+ * Returns: [TRUE]() if GStreamer will use the child helper process when
  * rebuilding the registry.
  */
 gboolean
@@ -1784,7 +1784,7 @@ gst_registry_fork_is_enabled (void)
  * @enabled: whether rebuilding the registry can use a temporary child helper process.
  *
  * Applications might want to disable/enable spawning of a child helper process
- * when rebuilding the registry. See gst_registry_fork_is_enabled() for more
+ * when rebuilding the registry. See [gst_registry_fork_is_enabled]() for more
  * information.
  */
 void
@@ -1802,7 +1802,7 @@ gst_registry_fork_set_enabled (gboolean enabled)
  * Applications will almost never need to call this function, it is only
  * useful if the application knows new plugins have been installed (or old
  * ones removed) since the start of the application (or, to be precise, the
- * first call to gst_init()) and the application wants to make use of any
+ * first call to [gst_init]()) and the application wants to make use of any
  * newly-installed plugins without restarting the application.
  *
  * Applications should assume that the registry update is neither atomic nor
@@ -1813,8 +1813,8 @@ gst_registry_fork_set_enabled (gboolean enabled)
  *
  * Note that this function may block for a significant amount of time.
  *
- * Returns: %TRUE if the registry has been updated successfully (does not
- *          imply that there were changes), otherwise %FALSE.
+ * Returns: [TRUE]() if the registry has been updated successfully (does not
+ *          imply that there were changes), otherwise [FALSE]().
  */
 gboolean
 gst_update_registry (void)

@@ -41,7 +41,7 @@ G_BEGIN_DECLS
 /**
  * GstPluginFeature:
  *
- * Opaque #GstPluginFeature structure.
+ * Opaque [GstPluginFeature]() structure.
  */
 typedef struct _GstPluginFeature GstPluginFeature;
 typedef struct _GstPluginFeatureClass GstPluginFeatureClass;
@@ -54,12 +54,12 @@ typedef struct _GstPluginFeatureClass GstPluginFeatureClass;
  * @GST_RANK_PRIMARY: will be chosen first
  *
  * Element priority ranks. Defines the order in which the autoplugger (or
- * similar rank-picking mechanisms, such as e.g. gst_element_make_from_uri())
+ * similar rank-picking mechanisms, such as e.g. [gst_element_make_from_uri]())
  * will choose this element over an alternative one with the same function.
  *
  * These constants serve as a rough guidance for defining the rank of a
- * #GstPluginFeature. Any value is valid, including values bigger than
- * @GST_RANK_PRIMARY.
+ * [GstPluginFeature](). Any value is valid, including values bigger than
+ * _GST_RANK_PRIMARY_.
  */
 typedef enum {
   GST_RANK_NONE                 = 0,
@@ -70,19 +70,18 @@ typedef enum {
 
 /**
  * gst_plugin_feature_get_name:
- * @feature: a #GstPluginFeature to get the name of @feature.
+ * @feature: a [GstPluginFeature]() to get the name of _feature_.
  *
- * Returns the name of @feature.
- * For a nameless plugin feature, this returns %NULL.
+ * Returns the name of _feature_.
+ * For a nameless plugin feature, this returns [NULL]().
  *
- * Returns: (transfer none) (nullable): the name of @feature. MT safe.
- *
+ * Returns: (transfer none) (nullable): the name of _feature_. MT safe.
  */
 #define                 gst_plugin_feature_get_name(feature)      GST_OBJECT_NAME(feature)
 
 /**
  * gst_plugin_feature_set_name:
- * @feature: a #GstPluginFeature to set the name of.
+ * @feature: a [GstPluginFeature]() to set the name of.
  * @name: the new name
  *
  * Sets the name of the plugin feature, getting rid of the old name if there was one.
@@ -93,12 +92,12 @@ typedef enum {
  * GstPluginFeatureFilter:
  * @feature: the pluginfeature to check
  * @user_data: the user_data that has been passed on e.g.
- *  gst_registry_feature_filter()
+ *  [gst_registry_feature_filter]()
  *
- * A function that can be used with e.g. gst_registry_feature_filter()
+ * A function that can be used with e.g. [gst_registry_feature_filter]()
  * to get a list of pluginfeature that match certain criteria.
  *
- * Returns: %TRUE for a positive match, %FALSE otherwise
+ * Returns: [TRUE]() for a positive match, [FALSE]() otherwise
  */
 typedef gboolean        (*GstPluginFeatureFilter)       (GstPluginFeature *feature,
                                                          gpointer user_data);
@@ -121,10 +120,10 @@ void            gst_plugin_feature_list_debug           (GList *list);
 
 /**
  * GST_PLUGIN_FEATURE_LIST_DEBUG:
- * @list: (transfer none) (element-type Gst.PluginFeature): a #GList of
+ * @list: (transfer none) (element-type Gst.PluginFeature): a [GList]() of
  *     plugin features
  *
- * Debug the plugin feature names in @list.
+ * Debug the plugin feature names in _list_.
  */
 #ifndef GST_DISABLE_GST_DEBUG
 #define GST_PLUGIN_FEATURE_LIST_DEBUG(list) gst_plugin_feature_list_debug(list)

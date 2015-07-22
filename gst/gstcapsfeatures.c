@@ -20,25 +20,25 @@
 
 /**
  * SECTION:gstcapsfeatures
- * @short_description: A set of features in caps 
- * @see_also: #GstCaps
+ * @short_description: A set of features in caps
+ * @see_also: [GstCaps]()
  *
- * #GstCapsFeatures can optionally be set on a #GstCaps to add requirements
- * for additional features for a specific #GstStructure. Caps structures with
+ * [GstCapsFeatures]() can optionally be set on a [GstCaps]() to add requirements
+ * for additional features for a specific [GstStructure](). Caps structures with
  * the same name but with a non-equal set of caps features are not compatible.
  * If a pad supports multiple sets of features it has to add multiple equal
  * structures with different feature sets to the caps.
  *
- * Empty #GstCapsFeatures are equivalent with the #GstCapsFeatures that only
- * contain #GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY. ANY #GstCapsFeatures as
- * created by gst_caps_features_new_any() are equal to any other #GstCapsFeatures
- * and can be used to specify that any #GstCapsFeatures would be supported, e.g.
- * for elements that don't touch buffer memory. #GstCaps with ANY #GstCapsFeatures
- * are considered non-fixed and during negotiation some #GstCapsFeatures have
+ * Empty [GstCapsFeatures]() are equivalent with the [GstCapsFeatures]() that only
+ * contain [GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY](). ANY [GstCapsFeatures]() as
+ * created by [gst_caps_features_new_any]() are equal to any other [GstCapsFeatures]()
+ * and can be used to specify that any [GstCapsFeatures]() would be supported, e.g.
+ * for elements that don't touch buffer memory. [GstCaps]() with ANY [GstCapsFeatures]()
+ * are considered non-fixed and during negotiation some [GstCapsFeatures]() have
  * to be selected.
  *
- * Examples for caps features would be the requirement of a specific #GstMemory
- * types or the requirement of having a specific #GstMeta on the buffer. Features
+ * Examples for caps features would be the requirement of a specific [GstMemory]()
+ * types or the requirement of having a specific [GstMeta]() on the buffer. Features
  * are given as a string of the format "memory:GstMemoryTypeName" or
  * "meta:GstMetaAPIName".
  *
@@ -149,12 +149,11 @@ gst_caps_feature_name_is_valid (const gchar * feature)
 /**
  * gst_caps_features_new_empty:
  *
- * Creates a new, empty #GstCapsFeatures.
+ * Creates a new, empty [GstCapsFeatures]().
  *
  * Free-function: gst_caps_features_free
  *
- * Returns: (transfer full): a new, empty #GstCapsFeatures
- *
+ * Returns: (transfer full): a new, empty [GstCapsFeatures]()
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -176,14 +175,13 @@ gst_caps_features_new_empty (void)
 /**
  * gst_caps_features_new_any:
  *
- * Creates a new, ANY #GstCapsFeatures. This will be equal
- * to any other #GstCapsFeatures but caps with these are
+ * Creates a new, ANY [GstCapsFeatures](). This will be equal
+ * to any other [GstCapsFeatures]() but caps with these are
  * unfixed.
  *
  * Free-function: gst_caps_features_free
  *
- * Returns: (transfer full): a new, ANY #GstCapsFeatures
- *
+ * Returns: (transfer full): a new, ANY [GstCapsFeatures]()
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -202,13 +200,12 @@ gst_caps_features_new_any (void)
  * @feature1: name of first feature to set
  * @...: additional features
  *
- * Creates a new #GstCapsFeatures with the given features.
- * The last argument must be %NULL.
+ * Creates a new [GstCapsFeatures]() with the given features.
+ * The last argument must be [NULL]().
  *
  * Free-function: gst_caps_features_free
  *
- * Returns: (transfer full): a new, empty #GstCapsFeatures
- *
+ * Returns: (transfer full): a new, empty [GstCapsFeatures]()
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -231,12 +228,11 @@ gst_caps_features_new (const gchar * feature1, ...)
  * @feature1: name of first feature to set
  * @varargs: variable argument list
  *
- * Creates a new #GstCapsFeatures with the given features.
+ * Creates a new [GstCapsFeatures]() with the given features.
  *
  * Free-function: gst_caps_features_free
  *
- * Returns: (transfer full): a new, empty #GstCapsFeatures
- *
+ * Returns: (transfer full): a new, empty [GstCapsFeatures]()
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -261,13 +257,12 @@ gst_caps_features_new_valist (const gchar * feature1, va_list varargs)
  * @feature1: name of first feature to set
  * @...: additional features
  *
- * Creates a new #GstCapsFeatures with the given features.
+ * Creates a new [GstCapsFeatures]() with the given features.
  * The last argument must be 0.
  *
  * Free-function: gst_caps_features_free
  *
- * Returns: (transfer full): a new, empty #GstCapsFeatures
- *
+ * Returns: (transfer full): a new, empty [GstCapsFeatures]()
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -290,12 +285,11 @@ gst_caps_features_new_id (GQuark feature1, ...)
  * @feature1: name of first feature to set
  * @varargs: variable argument list
  *
- * Creates a new #GstCapsFeatures with the given features.
+ * Creates a new [GstCapsFeatures]() with the given features.
  *
  * Free-function: gst_caps_features_free
  *
- * Returns: (transfer full): a new, empty #GstCapsFeatures
- *
+ * Returns: (transfer full): a new, empty [GstCapsFeatures]()
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -317,16 +311,15 @@ gst_caps_features_new_id_valist (GQuark feature1, va_list varargs)
 
 /**
  * gst_caps_features_set_parent_refcount:
- * @features: a #GstCapsFeatures
+ * @features: a [GstCapsFeatures]()
  * @refcount: (in): a pointer to the parent's refcount
  *
- * Sets the parent_refcount field of #GstCapsFeatures. This field is used to
+ * Sets the parent_refcount field of [GstCapsFeatures](). This field is used to
  * determine whether a caps features is mutable or not. This function should only be
- * called by code implementing parent objects of #GstCapsFeatures, as described in
+ * called by code implementing parent objects of [GstCapsFeatures](), as described in
  * the MT Refcounting section of the design documents.
  *
- * Returns: %TRUE if the parent refcount could be set.
- *
+ * Returns: [TRUE]() if the parent refcount could be set.
  * Since: 1.2
  */
 gboolean
@@ -356,14 +349,13 @@ gst_caps_features_set_parent_refcount (GstCapsFeatures * features,
 
 /**
  * gst_caps_features_copy:
- * @features: a #GstCapsFeatures to duplicate
+ * @features: a [GstCapsFeatures]() to duplicate
  *
- * Duplicates a #GstCapsFeatures and all its values.
+ * Duplicates a [GstCapsFeatures]() and all its values.
  *
  * Free-function: gst_caps_features_free
  *
- * Returns: (transfer full): a new #GstCapsFeatures.
- *
+ * Returns: (transfer full): a new [GstCapsFeatures]().
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -385,9 +377,9 @@ gst_caps_features_copy (const GstCapsFeatures * features)
 
 /**
  * gst_caps_features_free:
- * @features: (in) (transfer full): the #GstCapsFeatures to free
+ * @features: (in) (transfer full): the [GstCapsFeatures]() to free
  *
- * Frees a #GstCapsFeatures and all its values. The caps features must not
+ * Frees a [GstCapsFeatures]() and all its values. The caps features must not
  * have a parent when this function is called.
  *
  * Since: 1.2
@@ -409,21 +401,20 @@ gst_caps_features_free (GstCapsFeatures * features)
 
 /**
  * gst_caps_features_to_string:
- * @features: a #GstCapsFeatures
+ * @features: a [GstCapsFeatures]()
  *
- * Converts @features to a human-readable string representation.
+ * Converts _features_ to a human-readable string representation.
  *
  * For debugging purposes its easier to do something like this:
- * |[
+ * ```
  * GST_LOG ("features is %" GST_PTR_FORMAT, features);
- * ]|
+ * ```
  * This prints the features in human readable form.
  *
  * Free-function: g_free
  *
- * Returns: (transfer full): a pointer to string allocated by g_malloc().
- *     g_free() after usage.
- *
+ * Returns: (transfer full): a pointer to string allocated by [g_malloc]().
+ *     [g_free]() after usage.
  * Since: 1.2
  */
 gchar *
@@ -465,16 +456,15 @@ priv_gst_caps_features_append_to_gstring (const GstCapsFeatures * features,
 
 /**
  * gst_caps_features_from_string:
- * @features: a string representation of a #GstCapsFeatures.
+ * @features: a string representation of a [GstCapsFeatures]().
  *
- * Creates a #GstCapsFeatures from a string representation.
+ * Creates a [GstCapsFeatures]() from a string representation.
  *
  * Free-function: gst_caps_features_free
  *
- * Returns: (transfer full) (nullable): a new #GstCapsFeatures or
- *     %NULL when the string could not be parsed. Free with
- *     gst_caps_features_free() after use.
- *
+ * Returns: (transfer full) (nullable): a new [GstCapsFeatures]() or
+ *     [NULL]() when the string could not be parsed. Free with
+ *     [gst_caps_features_free]() after use.
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -557,12 +547,11 @@ gst_caps_features_from_string (const gchar * features)
 
 /**
  * gst_caps_features_get_size:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  *
- * Returns the number of features in @features.
+ * Returns the number of features in _features_.
  *
- * Returns: The number of features in @features.
- *
+ * Returns: The number of features in _features_.
  * Since: 1.2
  */
 guint
@@ -575,13 +564,12 @@ gst_caps_features_get_size (const GstCapsFeatures * features)
 
 /**
  * gst_caps_features_get_nth:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  * @i: index of the feature
  *
- * Returns the @i-th feature of @features.
+ * Returns the _i_-th feature of _features_.
  *
- * Returns: The @i-th feature of @features.
- *
+ * Returns: The _i_-th feature of _features_.
  * Since: 1.2
  */
 const gchar *
@@ -602,13 +590,12 @@ gst_caps_features_get_nth (const GstCapsFeatures * features, guint i)
 
 /**
  * gst_caps_features_get_nth_id:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  * @i: index of the feature
  *
- * Returns the @i-th feature of @features.
+ * Returns the _i_-th feature of _features_.
  *
- * Returns: The @i-th feature of @features.
- *
+ * Returns: The _i_-th feature of _features_.
  * Since: 1.2
  */
 GQuark
@@ -626,13 +613,12 @@ gst_caps_features_get_nth_id (const GstCapsFeatures * features, guint i)
 
 /**
  * gst_caps_features_contains:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  * @feature: a feature
  *
- * Check if @features contains @feature.
+ * Check if _features_ contains _feature_.
  *
- * Returns: %TRUE if @features contains @feature.
- *
+ * Returns: [TRUE]() if _features_ contains _feature_.
  * Since: 1.2
  */
 gboolean
@@ -648,13 +634,12 @@ gst_caps_features_contains (const GstCapsFeatures * features,
 
 /**
  * gst_caps_features_contains_id:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  * @feature: a feature
  *
- * Check if @features contains @feature.
+ * Check if _features_ contains _feature_.
  *
- * Returns: %TRUE if @features contains @feature.
- *
+ * Returns: [TRUE]() if _features_ contains _feature_.
  * Since: 1.2
  */
 gboolean
@@ -682,13 +667,12 @@ gst_caps_features_contains_id (const GstCapsFeatures * features, GQuark feature)
 
 /**
  * gst_caps_features_is_equal:
- * @features1: a #GstCapsFeatures.
- * @features2: a #GstCapsFeatures.
+ * @features1: a [GstCapsFeatures]().
+ * @features2: a [GstCapsFeatures]().
  *
- * Check if @features1 and @features2 are equal.
+ * Check if _features1_ and _features2_ are equal.
  *
- * Returns: %TRUE if @features1 and @features2 are equal.
- *
+ * Returns: [TRUE]() if _features1_ and _features2_ are equal.
  * Since: 1.2
  */
 gboolean
@@ -729,12 +713,11 @@ gst_caps_features_is_equal (const GstCapsFeatures * features1,
 
 /**
  * gst_caps_features_is_any:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  *
- * Check if @features is %GST_CAPS_FEATURES_ANY.
+ * Check if _features_ is [GST_CAPS_FEATURES_ANY]().
  *
- * Returns: %TRUE if @features is %GST_CAPS_FEATURES_ANY.
- *
+ * Returns: [TRUE]() if _features_ is [GST_CAPS_FEATURES_ANY]().
  * Since: 1.2
  */
 gboolean
@@ -747,10 +730,10 @@ gst_caps_features_is_any (const GstCapsFeatures * features)
 
 /**
  * gst_caps_features_add:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  * @feature: a feature.
  *
- * Adds @feature to @features.
+ * Adds _feature_ to _features_.
  *
  * Since: 1.2
  */
@@ -767,10 +750,10 @@ gst_caps_features_add (GstCapsFeatures * features, const gchar * feature)
 
 /**
  * gst_caps_features_add_id:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  * @feature: a feature.
  *
- * Adds @feature to @features.
+ * Adds _feature_ to _features_.
  *
  * Since: 1.2
  */
@@ -800,10 +783,10 @@ gst_caps_features_add_id (GstCapsFeatures * features, GQuark feature)
 
 /**
  * gst_caps_features_remove:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  * @feature: a feature.
  *
- * Removes @feature from @features.
+ * Removes _feature_ from _features_.
  *
  * Since: 1.2
  */
@@ -819,10 +802,10 @@ gst_caps_features_remove (GstCapsFeatures * features, const gchar * feature)
 
 /**
  * gst_caps_features_remove_id:
- * @features: a #GstCapsFeatures.
+ * @features: a [GstCapsFeatures]().
  * @feature: a feature.
  *
- * Removes @feature from @features.
+ * Removes _feature_ from _features_.
  *
  * Since: 1.2
  */

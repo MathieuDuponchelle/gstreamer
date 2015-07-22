@@ -29,17 +29,17 @@ typedef struct _GstEvent GstEvent;
 
 /**
  * GstEventTypeFlags:
- * @GST_EVENT_TYPE_UPSTREAM:     Set if the event can travel upstream.
- * @GST_EVENT_TYPE_DOWNSTREAM:   Set if the event can travel downstream.
- * @GST_EVENT_TYPE_SERIALIZED:   Set if the event should be serialized with data
+ * @GST_EVENT_TYPE_UPSTREAM: Set if the event can travel upstream.
+ * @GST_EVENT_TYPE_DOWNSTREAM: Set if the event can travel downstream.
+ * @GST_EVENT_TYPE_SERIALIZED: Set if the event should be serialized with data
  *                               flow.
- * @GST_EVENT_TYPE_STICKY:       Set if the event is sticky on the pads.
+ * @GST_EVENT_TYPE_STICKY: Set if the event is sticky on the pads.
  * @GST_EVENT_TYPE_STICKY_MULTI: Multiple sticky events can be on a pad, each
  *                               identified by the event name.
  *
- * #GstEventTypeFlags indicate the aspects of the different #GstEventType
- * values. You can get the type flags of a #GstEventType with the
- * gst_event_type_get_flags() function.
+ * [GstEventTypeFlags]() indicate the aspects of the different [GstEventType]()
+ * values. You can get the type flags of a [GstEventType]() with the
+ * [gst_event_type_get_flags]() function.
  */
 typedef enum {
   GST_EVENT_TYPE_UPSTREAM       = 1 << 0,
@@ -52,7 +52,7 @@ typedef enum {
 /**
  * GST_EVENT_TYPE_BOTH:
  *
- * The same thing as #GST_EVENT_TYPE_UPSTREAM | #GST_EVENT_TYPE_DOWNSTREAM.
+ * The same thing as [GST_EVENT_TYPE_UPSTREAM]() | [GST_EVENT_TYPE_DOWNSTREAM]().
  */
 #define GST_EVENT_TYPE_BOTH \
     (GST_EVENT_TYPE_UPSTREAM | GST_EVENT_TYPE_DOWNSTREAM)
@@ -82,7 +82,7 @@ typedef enum {
  * @GST_EVENT_STREAM_START: Event to mark the start of a new stream. Sent before any
  *                 other serialized event and only sent at the start of a new stream,
  *                 not after flushing seeks.
- * @GST_EVENT_CAPS: #GstCaps event. Notify the pad of a new media type.
+ * @GST_EVENT_CAPS: [GstCaps]() event. Notify the pad of a new media type.
  * @GST_EVENT_SEGMENT: A new media segment follows in the dataflow. The
  *                 segment events contains information for clipping buffers and
  *                 converting buffer timestamps to running-time and
@@ -124,12 +124,12 @@ typedef enum {
  *                         In-band when travelling downstream.
  * @GST_EVENT_CUSTOM_BOTH_OOB: Custom upstream or downstream out-of-band event.
  *
- * #GstEventType lists the standard event types that can be sent in a pipeline.
+ * [GstEventType]() lists the standard event types that can be sent in a pipeline.
  *
  * The custom event types can be used for private messages between elements
  * that can't be expressed using normal
  * GStreamer buffer passing semantics. Custom events carry an arbitrary
- * #GstStructure.
+ * [GstStructure]().
  * Specific custom events are distinguished by the name of the structure.
  */
 /* NOTE: keep in sync with quark registration in gstevent.c */
@@ -197,7 +197,7 @@ GST_EXPORT GType _gst_event_type;
  * GST_EVENT_TYPE:
  * @event: the event to query
  *
- * Get the #GstEventType of the event.
+ * Get the [GstEventType]() of the event.
  */
 #define GST_EVENT_TYPE(event)           (GST_EVENT_CAST(event)->type)
 
@@ -205,7 +205,7 @@ GST_EXPORT GType _gst_event_type;
  * GST_EVENT_TYPE_NAME:
  * @event: the event to query
  *
- * Get a constant string representation of the #GstEventType of the event.
+ * Get a constant string representation of the [GstEventType]() of the event.
  */
 #define GST_EVENT_TYPE_NAME(event)      (gst_event_type_get_name(GST_EVENT_TYPE(event)))
 
@@ -213,7 +213,7 @@ GST_EXPORT GType _gst_event_type;
  * GST_EVENT_TIMESTAMP:
  * @event: the event to query
  *
- * Get the #GstClockTime timestamp of the event. This is the time when the event
+ * Get the [GstClockTime]() timestamp of the event. This is the time when the event
  * was created.
  */
 #define GST_EVENT_TIMESTAMP(event)      (GST_EVENT_CAST(event)->timestamp)
@@ -222,7 +222,7 @@ GST_EXPORT GType _gst_event_type;
  * GST_EVENT_SEQNUM:
  * @event: the event to query
  *
- * The sequence number of @event.
+ * The sequence number of _event_.
  */
 #define GST_EVENT_SEQNUM(event)         (GST_EVENT_CAST(event)->seqnum)
 
@@ -257,7 +257,7 @@ GST_EXPORT GType _gst_event_type;
 
 /**
  * gst_event_is_writable:
- * @ev: a #GstEvent
+ * @ev: a [GstEvent]()
  *
  * Tests if you can safely write data into a event's structure or validly
  * modify the seqnum and timestamp field.
@@ -265,31 +265,31 @@ GST_EXPORT GType _gst_event_type;
 #define         gst_event_is_writable(ev)     gst_mini_object_is_writable (GST_MINI_OBJECT_CAST (ev))
 /**
  * gst_event_make_writable:
- * @ev: (transfer full): a #GstEvent
+ * @ev: (transfer full): a [GstEvent]()
  *
  * Makes a writable event from the given event. If the source event is
  * already writable, this will simply return the same event. A copy will
- * otherwise be made using gst_event_copy().
+ * otherwise be made using [gst_event_copy]().
  *
  * Returns: (transfer full): a writable event which may or may not be the
- *     same as @ev
+ *     same as _ev_
  */
 #define         gst_event_make_writable(ev)   GST_EVENT_CAST (gst_mini_object_make_writable (GST_MINI_OBJECT_CAST (ev)))
 /**
  * gst_event_replace:
  * @old_event: (inout) (transfer full) (nullable): pointer to a
- *     pointer to a #GstEvent to be replaced.
- * @new_event: (allow-none) (transfer none): pointer to a #GstEvent that will
- *     replace the event pointed to by @old_event.
+ *     pointer to a [GstEvent]() to be replaced.
+ * @new_event: (allow-none) (transfer none): pointer to a [GstEvent]() that will
+ *     replace the event pointed to by _old_event_.
  *
- * Modifies a pointer to a #GstEvent to point to a different #GstEvent. The
+ * Modifies a pointer to a [GstEvent]() to point to a different [GstEvent](). The
  * modification is done atomically (so this is useful for ensuring thread safety
  * in some cases), and the reference counts are updated appropriately (the old
  * event is unreffed, the new one is reffed).
  *
- * Either @new_event or the #GstEvent pointed to by @old_event may be %NULL.
+ * Either _new_event_ or the [GstEvent]() pointed to by _old_event_ may be [NULL]().
  *
- * Returns: %TRUE if @new_event was different from @old_event
+ * Returns: [TRUE]() if _new_event_ was different from _old_event_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gboolean gst_event_replace (GstEvent **old_event, GstEvent *new_event);
@@ -304,12 +304,12 @@ gst_event_replace (GstEvent **old_event, GstEvent *new_event)
 /**
  * gst_event_steal:
  * @old_event: (inout) (transfer full) (nullable): pointer to a
- *     pointer to a #GstEvent to be stolen.
+ *     pointer to a [GstEvent]() to be stolen.
  *
- * Atomically replace the #GstEvent pointed to by @old_event with %NULL and
+ * Atomically replace the [GstEvent]() pointed to by _old_event_ with [NULL]() and
  * return the original event.
  *
- * Returns: the #GstEvent that was in @old_event
+ * Returns: the [GstEvent]() that was in _old_event_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstEvent * gst_event_steal (GstEvent **old_event);
@@ -324,17 +324,17 @@ gst_event_steal (GstEvent **old_event)
 /**
  * gst_event_take:
  * @old_event: (inout) (transfer full) (nullable): pointer to a
- *     pointer to a #GstEvent to be stolen.
- * @new_event: (allow-none) (transfer full): pointer to a #GstEvent that will
- *     replace the event pointed to by @old_event.
+ *     pointer to a [GstEvent]() to be stolen.
+ * @new_event: (allow-none) (transfer full): pointer to a [GstEvent]() that will
+ *     replace the event pointed to by _old_event_.
  *
- * Modifies a pointer to a #GstEvent to point to a different #GstEvent. This
- * function is similar to gst_event_replace() except that it takes ownership of
- * @new_event.
+ * Modifies a pointer to a [GstEvent]() to point to a different [GstEvent](). This
+ * function is similar to [gst_event_replace]() except that it takes ownership of
+ * _new_event_.
  *
- * Either @new_event or the #GstEvent pointed to by @old_event may be %NULL.
+ * Either _new_event_ or the [GstEvent]() pointed to by _old_event_ may be [NULL]().
  *
- * Returns: %TRUE if @new_event was different from @old_event
+ * Returns: [TRUE]() if _new_event_ was different from _old_event_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gboolean gst_event_take (GstEvent **old_event, GstEvent *new_event);
@@ -359,7 +359,7 @@ gst_event_take (GstEvent **old_event, GstEvent *new_event)
  *    application enabled throttling to limit the data rate.
  *
  * The different types of QoS events that can be given to the
- * gst_event_new_qos() method.
+ * [gst_event_new_qos]() method.
  */
 typedef enum {
   GST_QOS_TYPE_OVERFLOW        = 0,
@@ -382,6 +382,8 @@ typedef enum {
  *    selected by the user (e.g. an audio track for the hard of hearing or
  *    a director's commentary track).
  *
+ *
+ *
  * Since: 1.2
  */
 typedef enum {
@@ -394,11 +396,11 @@ typedef enum {
 /**
  * GstEvent:
  * @mini_object: the parent structure
- * @type: the #GstEventType of the event
+ * @type: the [GstEventType]() of the event
  * @timestamp: the timestamp of the event
  * @seqnum: the sequence number of the event
  *
- * A #GstEvent.
+ * A [GstEvent]().
  */
 struct _GstEvent {
   GstMiniObject mini_object;
@@ -422,7 +424,7 @@ GstEventTypeFlags
  *
  * Increase the refcount of this event.
  *
- * Returns: (transfer full): @event (for convenience when doing assignments)
+ * Returns: (transfer full): _event_ (for convenience when doing assignments)
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstEvent * gst_event_ref (GstEvent * event);

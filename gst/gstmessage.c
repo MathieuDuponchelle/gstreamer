@@ -22,24 +22,24 @@
 /**
  * SECTION:gstmessage
  * @short_description: Lightweight objects to signal the application of
- *                     pipeline events
- * @see_also: #GstBus, #GstMiniObject, #GstElement
+ * @see_also: [GstBus](), [GstMiniObject](), [GstElement]()
  *
- * Messages are implemented as a subclass of #GstMiniObject with a generic
- * #GstStructure as the content. This allows for writing custom messages without
+ * pipeline events
+ * Messages are implemented as a subclass of [GstMiniObject]() with a generic
+ * [GstStructure]() as the content. This allows for writing custom messages without
  * requiring an API change while allowing a wide range of different types
  * of messages.
  *
  * Messages are posted by objects in the pipeline and are passed to the
- * application using the #GstBus.
+ * application using the [GstBus]().
  *
- * The basic use pattern of posting a message on a #GstBus is as follows:
- * |[
+ * The basic use pattern of posting a message on a [GstBus]() is as follows:
+ * ```
  *   gst_bus_post (bus, gst_message_new_eos());
- * ]|
+ * ```
  *
- * A #GstElement usually posts messages on the bus provided by the parent
- * container using gst_element_post_message().
+ * A [GstElement]() usually posts messages on the bus provided by the parent
+ * container using [gst_element_post_message]().
  */
 
 
@@ -266,14 +266,14 @@ gst_message_init (GstMessageImpl * message, GstMessageType type,
 
 /**
  * gst_message_new_custom:
- * @type: The #GstMessageType to distinguish messages
+ * @type: The [GstMessageType]() to distinguish messages
  * @src: (transfer none) (allow-none): The object originating the message.
  * @structure: (transfer full) (allow-none): the structure for the
  *     message. The message will take ownership of the structure.
  *
  * Create a new custom-typed message. This can be used for anything not
  * handled by other message-specific functions to pass a message to the
- * app. The structure field can be %NULL.
+ * app. The structure field can be [NULL]().
  *
  * Returns: (transfer full): The new message.
  *
@@ -314,12 +314,12 @@ had_parent:
 
 /**
  * gst_message_get_seqnum:
- * @message: A #GstMessage.
+ * @message: A [GstMessage]().
  *
  * Retrieve the sequence number of a message.
  *
  * Messages have ever-incrementing sequence numbers, which may also be set
- * explicitly via gst_message_set_seqnum(). Sequence numbers are typically used
+ * explicitly via [gst_message_set_seqnum](). Sequence numbers are typically used
  * to indicate that a message corresponds to some other set of messages or
  * events, for example a SEGMENT_DONE message corresponding to a SEEK event. It
  * is considered good practice to make this correspondence when possible, though
@@ -343,13 +343,13 @@ gst_message_get_seqnum (GstMessage * message)
 
 /**
  * gst_message_set_seqnum:
- * @message: A #GstMessage.
+ * @message: A [GstMessage]().
  * @seqnum: A sequence number.
  *
  * Set the sequence number of a message.
  *
  * This function might be called by the creator of a message to indicate that
- * the message relates to other messages or events. See gst_message_get_seqnum()
+ * the message relates to other messages or events. See [gst_message_get_seqnum]()
  * for more information.
  *
  * MT safe.
@@ -390,8 +390,8 @@ gst_message_new_eos (GstObject * src)
  * @error: (transfer none): The GError for this message.
  * @debug: A debugging string.
  *
- * Create a new error message. The message will copy @error and
- * @debug. This message is posted by element when a fatal event
+ * Create a new error message. The message will copy _error_ and
+ * _debug_. This message is posted by element when a fatal event
  * occurred. The pipeline will probably (partially) stop. The application
  * receiving this message should stop the pipeline.
  *
@@ -419,8 +419,8 @@ gst_message_new_error (GstObject * src, GError * error, const gchar * debug)
  * @error: (transfer none): The GError for this message.
  * @debug: A debugging string.
  *
- * Create a new warning message. The message will make copies of @error and
- * @debug.
+ * Create a new warning message. The message will make copies of _error_ and
+ * _debug_.
  *
  * Returns: (transfer full): The new warning message.
  *
@@ -446,8 +446,8 @@ gst_message_new_warning (GstObject * src, GError * error, const gchar * debug)
  * @error: (transfer none): The GError for this message.
  * @debug: A debugging string.
  *
- * Create a new info message. The message will make copies of @error and
- * @debug.
+ * Create a new info message. The message will make copies of _error_ and
+ * _debug_.
  *
  * MT safe.
  *
@@ -502,14 +502,14 @@ gst_message_new_tag (GstObject * src, GstTagList * tag_list)
  * @percent: The buffering percent
  *
  * Create a new buffering message. This message can be posted by an element that
- * needs to buffer data before it can continue processing. @percent should be a
+ * needs to buffer data before it can continue processing. _percent_ should be a
  * value between 0 and 100. A value of 100 means that the buffering completed.
  *
- * When @percent is < 100 the application should PAUSE a PLAYING pipeline. When
- * @percent is 100, the application can set the pipeline (back) to PLAYING.
+ * When _percent_ is < 100 the application should PAUSE a PLAYING pipeline. When
+ * _percent_ is 100, the application can set the pipeline (back) to PLAYING.
  * The application must be prepared to receive BUFFERING messages in the
  * PREROLLING state and may only set the pipeline to PLAYING after receiving a
- * message with @percent set to 100, which can happen after the pipeline
+ * message with _percent_ set to 100, which can happen after the pipeline
  * completed prerolling.
  *
  * MT safe.
@@ -594,7 +594,7 @@ gst_message_new_state_dirty (GstObject * src)
  * gst_message_new_clock_provide:
  * @src: (transfer none) (allow-none): The object originating the message.
  * @clock: (transfer none): the clock it provides
- * @ready: %TRUE if the sender can provide a clock
+ * @ready: [TRUE]() if the sender can provide a clock
  *
  * Create a clock provide message. This message is posted whenever an
  * element is ready to provide a clock or lost its ability to provide
@@ -680,14 +680,14 @@ gst_message_new_new_clock (GstObject * src, GstClock * clock)
  * gst_message_new_structure_change:
  * @src: (transfer none) (allow-none): The object originating the message.
  * @type: The change type.
- * @owner: (transfer none): The owner element of @src.
+ * @owner: (transfer none): The owner element of _src_.
  * @busy: Whether the structure change is busy.
  *
  * Create a new structure change message. This message is posted when the
  * structure of a pipeline is in the process of being changed, for example
  * when pads are linked or unlinked.
  *
- * @src should be the sinkpad that unlinked or linked.
+ * _src_ should be the sinkpad that unlinked or linked.
  *
  * Returns: (transfer full): the new structure change message.
  *
@@ -805,7 +805,7 @@ gst_message_new_application (GstObject * src, GstStructure * structure)
  * Create a new element-specific message. This is meant as a generic way of
  * allowing one-way communication from an element to an application, for example
  * "the firewire cable was unplugged". The format of the message should be
- * documented in the element's documentation. The structure field can be %NULL.
+ * documented in the element's documentation. The structure field can be [NULL]().
  *
  * Returns: (transfer full): The new element message.
  *
@@ -827,8 +827,8 @@ gst_message_new_element (GstObject * src, GstStructure * structure)
  * that know the duration of a stream when the duration changes. This message
  * is received by bins and is used to calculate the total duration of a
  * pipeline. Elements may post a duration message with a duration of
- * GST_CLOCK_TIME_NONE to indicate that the duration has changed and the 
- * cached duration should be discarded. The new duration can then be 
+ * GST_CLOCK_TIME_NONE to indicate that the duration has changed and the
+ * cached duration should be discarded. The new duration can then be
  * retrieved via a query.
  *
  * Returns: (transfer full): The new duration-changed message.
@@ -872,8 +872,8 @@ gst_message_new_async_start (GstObject * src)
  * @running_time: the desired running_time
  *
  * The message is posted when elements completed an ASYNC state change.
- * @running_time contains the time of the desired running_time when this
- * elements goes to PLAYING. A value of #GST_CLOCK_TIME_NONE for @running_time
+ * _running_time_ contains the time of the desired running_time when this
+ * elements goes to PLAYING. A value of [GST_CLOCK_TIME_NONE]() for _running_time_
  * means that the element has no clock interaction and thus doesn't care about
  * the running_time of the pipeline.
  *
@@ -943,7 +943,7 @@ gst_message_new_request_state (GstObject * src, GstState state)
 
 /**
  * gst_message_get_structure:
- * @message: The #GstMessage.
+ * @message: The [GstMessage]().
  *
  * Access the structure of the message.
  *
@@ -963,13 +963,13 @@ gst_message_get_structure (GstMessage * message)
 
 /**
  * gst_message_has_name:
- * @message: The #GstMessage.
+ * @message: The [GstMessage]().
  * @name: name to check
  *
- * Checks if @message has the given @name. This function is usually used to
+ * Checks if _message_ has the given _name_. This function is usually used to
  * check the name of a custom message.
  *
- * Returns: %TRUE if @name matches the name of the message structure.
+ * Returns: [TRUE]() if _name_ matches the name of the message structure.
  */
 gboolean
 gst_message_has_name (GstMessage * message, const gchar * name)
@@ -987,14 +987,14 @@ gst_message_has_name (GstMessage * message, const gchar * name)
 
 /**
  * gst_message_parse_tag:
- * @message: A valid #GstMessage of type GST_MESSAGE_TAG.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_TAG.
  * @tag_list: (out callee-allocates): return location for the tag-list.
  *
  * Extracts the tag list from the GstMessage. The tag list returned in the
  * output argument is a copy; the caller must free it when done.
  *
  * Typical usage of this function might be:
- * |[
+ * ```
  *   ...
  *   switch (GST_MESSAGE_TYPE (msg)) {
  *     case GST_MESSAGE_TAG: {
@@ -1009,7 +1009,7 @@ gst_message_has_name (GstMessage * message, const gchar * name)
  *     ...
  *   }
  *   ...
- * ]|
+ * ```
  *
  * MT safe.
  */
@@ -1026,11 +1026,11 @@ gst_message_parse_tag (GstMessage * message, GstTagList ** tag_list)
 
 /**
  * gst_message_parse_buffering:
- * @message: A valid #GstMessage of type GST_MESSAGE_BUFFERING.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_BUFFERING.
  * @percent: (out) (allow-none): Return location for the percent.
  *
  * Extracts the buffering percent from the GstMessage. see also
- * gst_message_new_buffering().
+ * [gst_message_new_buffering]().
  *
  * MT safe.
  */
@@ -1048,13 +1048,13 @@ gst_message_parse_buffering (GstMessage * message, gint * percent)
 
 /**
  * gst_message_set_buffering_stats:
- * @message: A valid #GstMessage of type GST_MESSAGE_BUFFERING.
- * @mode: a buffering mode 
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_BUFFERING.
+ * @mode: a buffering mode
  * @avg_in: the average input rate
  * @avg_out: the average output rate
  * @buffering_left: amount of buffering time left in milliseconds
  *
- * Configures the buffering stats values in @message.
+ * Configures the buffering stats values in _message_.
  */
 void
 gst_message_set_buffering_stats (GstMessage * message, GstBufferingMode mode,
@@ -1071,14 +1071,14 @@ gst_message_set_buffering_stats (GstMessage * message, GstBufferingMode mode,
 
 /**
  * gst_message_parse_buffering_stats:
- * @message: A valid #GstMessage of type GST_MESSAGE_BUFFERING.
- * @mode: (out) (allow-none): a buffering mode, or %NULL
- * @avg_in: (out) (allow-none): the average input rate, or %NULL
- * @avg_out: (out) (allow-none): the average output rate, or %NULL
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_BUFFERING.
+ * @mode: (out) (allow-none): a buffering mode, or [NULL]()
+ * @avg_in: (out) (allow-none): the average input rate, or [NULL]()
+ * @avg_out: (out) (allow-none): the average output rate, or [NULL]()
  * @buffering_left: (out) (allow-none): amount of buffering time left in
- *     milliseconds, or %NULL
+ *     milliseconds, or [NULL]()
  *
- * Extracts the buffering stats values from @message.
+ * Extracts the buffering stats values from _message_.
  */
 void
 gst_message_parse_buffering_stats (GstMessage * message,
@@ -1108,15 +1108,15 @@ gst_message_parse_buffering_stats (GstMessage * message,
 
 /**
  * gst_message_parse_state_changed:
- * @message: a valid #GstMessage of type GST_MESSAGE_STATE_CHANGED
- * @oldstate: (out) (allow-none): the previous state, or %NULL
- * @newstate: (out) (allow-none): the new (current) state, or %NULL
- * @pending: (out) (allow-none): the pending (target) state, or %NULL
+ * @message: a valid [GstMessage]() of type GST_MESSAGE_STATE_CHANGED
+ * @oldstate: (out) (allow-none): the previous state, or [NULL]()
+ * @newstate: (out) (allow-none): the new (current) state, or [NULL]()
+ * @pending: (out) (allow-none): the pending (target) state, or [NULL]()
  *
  * Extracts the old and new states from the GstMessage.
  *
  * Typical usage of this function might be:
- * |[
+ * ```
  *   ...
  *   switch (GST_MESSAGE_TYPE (msg)) {
  *     case GST_MESSAGE_STATE_CHANGED: {
@@ -1132,7 +1132,7 @@ gst_message_parse_buffering_stats (GstMessage * message,
  *     ...
  *   }
  *   ...
- * ]|
+ * ```
  *
  * MT safe.
  */
@@ -1162,10 +1162,10 @@ gst_message_parse_state_changed (GstMessage * message,
 
 /**
  * gst_message_parse_clock_provide:
- * @message: A valid #GstMessage of type GST_MESSAGE_CLOCK_PROVIDE.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_CLOCK_PROVIDE.
  * @clock: (out) (allow-none) (transfer none): a pointer to  hold a clock
- *     object, or %NULL
- * @ready: (out) (allow-none): a pointer to hold the ready flag, or %NULL
+ *     object, or [NULL]()
+ * @ready: (out) (allow-none): a pointer to hold the ready flag, or [NULL]()
  *
  * Extracts the clock and ready flag from the GstMessage.
  * The clock object returned remains valid until the message is freed.
@@ -1197,7 +1197,7 @@ gst_message_parse_clock_provide (GstMessage * message, GstClock ** clock,
 
 /**
  * gst_message_parse_clock_lost:
- * @message: A valid #GstMessage of type GST_MESSAGE_CLOCK_LOST.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_CLOCK_LOST.
  * @clock: (out) (allow-none) (transfer none): a pointer to hold the lost clock
  *
  * Extracts the lost clock from the GstMessage.
@@ -1225,7 +1225,7 @@ gst_message_parse_clock_lost (GstMessage * message, GstClock ** clock)
 
 /**
  * gst_message_parse_new_clock:
- * @message: A valid #GstMessage of type GST_MESSAGE_NEW_CLOCK.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_NEW_CLOCK.
  * @clock: (out) (allow-none) (transfer none): a pointer to hold the selected
  *     new clock
  *
@@ -1254,7 +1254,7 @@ gst_message_parse_new_clock (GstMessage * message, GstClock ** clock)
 
 /**
  * gst_message_parse_structure_change:
- * @message: A valid #GstMessage of type GST_MESSAGE_STRUCTURE_CHANGE.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_STRUCTURE_CHANGE.
  * @type: (out): A pointer to hold the change type
  * @owner: (out) (allow-none) (transfer none): The owner element of the
  *     message source
@@ -1294,16 +1294,16 @@ gst_message_parse_structure_change (GstMessage * message,
 
 /**
  * gst_message_parse_error:
- * @message: A valid #GstMessage of type GST_MESSAGE_ERROR.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_ERROR.
  * @gerror: (out) (allow-none) (transfer full): location for the GError
  * @debug: (out) (allow-none) (transfer full): location for the debug message,
- *     or %NULL
+ *     or [NULL]()
  *
  * Extracts the GError and debug string from the GstMessage. The values returned
  * in the output arguments are copies; the caller must free them when done.
  *
  * Typical usage of this function might be:
- * |[
+ * ```
  *   ...
  *   switch (GST_MESSAGE_TYPE (msg)) {
  *     case GST_MESSAGE_ERROR: {
@@ -1321,7 +1321,7 @@ gst_message_parse_structure_change (GstMessage * message,
  *     ...
  *   }
  *   ...
- * ]|
+ * ```
  *
  * MT safe.
  */
@@ -1338,10 +1338,10 @@ gst_message_parse_error (GstMessage * message, GError ** gerror, gchar ** debug)
 
 /**
  * gst_message_parse_warning:
- * @message: A valid #GstMessage of type GST_MESSAGE_WARNING.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_WARNING.
  * @gerror: (out) (allow-none) (transfer full): location for the GError
  * @debug: (out) (allow-none) (transfer full): location for the debug message,
- *     or %NULL
+ *     or [NULL]()
  *
  * Extracts the GError and debug string from the GstMessage. The values returned
  * in the output arguments are copies; the caller must free them when done.
@@ -1362,10 +1362,10 @@ gst_message_parse_warning (GstMessage * message, GError ** gerror,
 
 /**
  * gst_message_parse_info:
- * @message: A valid #GstMessage of type GST_MESSAGE_INFO.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_INFO.
  * @gerror: (out) (allow-none) (transfer full): location for the GError
  * @debug: (out) (allow-none) (transfer full): location for the debug message,
- *     or %NULL
+ *     or [NULL]()
  *
  * Extracts the GError and debug string from the GstMessage. The values returned
  * in the output arguments are copies; the caller must free them when done.
@@ -1385,9 +1385,9 @@ gst_message_parse_info (GstMessage * message, GError ** gerror, gchar ** debug)
 
 /**
  * gst_message_parse_segment_start:
- * @message: A valid #GstMessage of type GST_MESSAGE_SEGMENT_START.
- * @format: (out) (allow-none): Result location for the format, or %NULL
- * @position: (out) (allow-none): Result location for the position, or %NULL
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_SEGMENT_START.
+ * @format: (out) (allow-none): Result location for the format, or [NULL]()
+ * @position: (out) (allow-none): Result location for the position, or [NULL]()
  *
  * Extracts the position and format from the segment start message.
  *
@@ -1415,9 +1415,9 @@ gst_message_parse_segment_start (GstMessage * message, GstFormat * format,
 
 /**
  * gst_message_parse_segment_done:
- * @message: A valid #GstMessage of type GST_MESSAGE_SEGMENT_DONE.
- * @format: (out) (allow-none): Result location for the format, or %NULL
- * @position: (out) (allow-none): Result location for the position, or %NULL
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_SEGMENT_DONE.
+ * @format: (out) (allow-none): Result location for the format, or [NULL]()
+ * @position: (out) (allow-none): Result location for the position, or [NULL]()
  *
  * Extracts the position and format from the segment done message.
  *
@@ -1445,8 +1445,8 @@ gst_message_parse_segment_done (GstMessage * message, GstFormat * format,
 
 /**
  * gst_message_parse_async_done:
- * @message: A valid #GstMessage of type GST_MESSAGE_ASYNC_DONE.
- * @running_time: (out) (allow-none): Result location for the running_time or %NULL
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_ASYNC_DONE.
+ * @running_time: (out) (allow-none): Result location for the running_time or [NULL]()
  *
  * Extract the running_time from the async_done message.
  *
@@ -1469,8 +1469,8 @@ gst_message_parse_async_done (GstMessage * message, GstClockTime * running_time)
 
 /**
  * gst_message_parse_request_state:
- * @message: A valid #GstMessage of type GST_MESSAGE_REQUEST_STATE.
- * @state: (out) (allow-none): Result location for the requested state or %NULL
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_REQUEST_STATE.
+ * @state: (out) (allow-none): Result location for the requested state or [NULL]()
  *
  * Extract the requested state from the request_state message.
  *
@@ -1495,11 +1495,11 @@ gst_message_parse_request_state (GstMessage * message, GstState * state)
  * gst_message_new_stream_status:
  * @src: The object originating the message.
  * @type: The stream status type.
- * @owner: (transfer none): the owner element of @src.
+ * @owner: (transfer none): the owner element of _src_.
  *
  * Create a new stream status message. This message is posted when a streaming
  * thread is created/destroyed or when the state changed.
- * 
+ *
  * Returns: (transfer full): the new stream status message.
  *
  * MT safe.
@@ -1521,12 +1521,12 @@ gst_message_new_stream_status (GstObject * src, GstStreamStatusType type,
 
 /**
  * gst_message_parse_stream_status:
- * @message: A valid #GstMessage of type GST_MESSAGE_STREAM_STATUS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_STREAM_STATUS.
  * @type: (out): A pointer to hold the status type
  * @owner: (out) (transfer none): The owner element of the message source
  *
  * Extracts the stream status type and owner the GstMessage. The returned
- * owner remains valid for as long as the reference to @message is valid and
+ * owner remains valid for as long as the reference to _message_ is valid and
  * should thus not be unreffed.
  *
  * MT safe.
@@ -1555,7 +1555,7 @@ gst_message_parse_stream_status (GstMessage * message,
 
 /**
  * gst_message_set_stream_status_object:
- * @message: A valid #GstMessage of type GST_MESSAGE_STREAM_STATUS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_STREAM_STATUS.
  * @object: the object controlling the streaming
  *
  * Configures the object handling the streaming thread. This is usually a
@@ -1576,13 +1576,13 @@ gst_message_set_stream_status_object (GstMessage * message,
 
 /**
  * gst_message_get_stream_status_object:
- * @message: A valid #GstMessage of type GST_MESSAGE_STREAM_STATUS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_STREAM_STATUS.
  *
- * Extracts the object managing the streaming thread from @message.
+ * Extracts the object managing the streaming thread from _message_.
  *
  * Returns: a GValue containing the object that manages the streaming thread.
  * This object is usually of type GstTask but other types can be added in the
- * future. The object remains valid as long as @message is valid.
+ * future. The object remains valid as long as _message_ is valid.
  */
 const GValue *
 gst_message_get_stream_status_object (GstMessage * message)
@@ -1603,7 +1603,7 @@ gst_message_get_stream_status_object (GstMessage * message)
 /**
  * gst_message_new_step_done:
  * @src: The object originating the message.
- * @format: the format of @amount
+ * @format: the format of _amount_
  * @amount: the amount of stepped data
  * @rate: the rate of the stepped amount
  * @flush: is this an flushing step
@@ -1611,11 +1611,11 @@ gst_message_get_stream_status_object (GstMessage * message)
  * @duration: the duration of the data
  * @eos: the step caused EOS
  *
- * This message is posted by elements when they complete a part, when @intermediate set
- * to %TRUE, or a complete step operation.
+ * This message is posted by elements when they complete a part, when _intermediate_ set
+ * to [TRUE](), or a complete step operation.
  *
- * @duration will contain the amount of time (in GST_FORMAT_TIME) of the stepped
- * @amount of media in format @format.
+ * _duration_ will contain the amount of time (in GST_FORMAT_TIME) of the stepped
+ * _amount_ of media in format _format_.
  *
  * Returns: (transfer full): the new step_done message.
  *
@@ -1644,7 +1644,7 @@ gst_message_new_step_done (GstObject * src, GstFormat format, guint64 amount,
 
 /**
  * gst_message_parse_step_done:
- * @message: A valid #GstMessage of type GST_MESSAGE_STEP_DONE.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_STEP_DONE.
  * @format: (out) (allow-none): result location for the format
  * @amount: (out) (allow-none): result location for the amount
  * @rate: (out) (allow-none): result location for the rate
@@ -1682,24 +1682,24 @@ gst_message_parse_step_done (GstMessage * message, GstFormat * format,
  * gst_message_new_step_start:
  * @src: The object originating the message.
  * @active: if the step is active or queued
- * @format: the format of @amount
+ * @format: the format of _amount_
  * @amount: the amount of stepped data
  * @rate: the rate of the stepped amount
  * @flush: is this an flushing step
  * @intermediate: is this an intermediate step
  *
  * This message is posted by elements when they accept or activate a new step
- * event for @amount in @format. 
+ * event for _amount_ in _format_.
  *
- * @active is set to %FALSE when the element accepted the new step event and has
+ * _active_ is set to [FALSE]() when the element accepted the new step event and has
  * queued it for execution in the streaming threads.
  *
- * @active is set to %TRUE when the element has activated the step operation and
+ * _active_ is set to [TRUE]() when the element has activated the step operation and
  * is now ready to start executing the step in the streaming thread. After this
  * message is emitted, the application can queue a new step operation in the
  * element.
  *
- * Returns: (transfer full): The new step_start message. 
+ * Returns: (transfer full): The new step_start message.
  *
  * MT safe.
  */
@@ -1724,7 +1724,7 @@ gst_message_new_step_start (GstObject * src, gboolean active, GstFormat format,
 
 /**
  * gst_message_parse_step_start:
- * @message: A valid #GstMessage of type GST_MESSAGE_STEP_DONE.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_STEP_DONE.
  * @active: (out) (allow-none): result location for the active flag
  * @format: (out) (allow-none): result location for the format
  * @amount: (out) (allow-none): result location for the amount
@@ -1774,7 +1774,7 @@ gst_message_parse_step_start (GstMessage * message, gboolean * active,
  * clock (live) or it could be dropped by an element that performs QoS because of QOS
  * events received from a downstream element (!live).
  *
- * @running_time, @stream_time, @timestamp, @duration should be set to the
+ * _running_time_, _stream_time_, _timestamp_, _duration_ should be set to the
  * respective running-time, stream-time, timestamp and duration of the (dropped)
  * buffer that generated the QoS event. Values can be left to
  * GST_CLOCK_TIME_NONE when unknown.
@@ -1809,7 +1809,7 @@ gst_message_new_qos (GstObject * src, gboolean live, guint64 running_time,
 
 /**
  * gst_message_set_qos_values:
- * @message: A valid #GstMessage of type GST_MESSAGE_QOS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_QOS.
  * @jitter: The difference of the running-time against the deadline.
  * @proportion: Long term prediction of the ideal rate relative to normal rate
  * to get optimal quality.
@@ -1838,7 +1838,7 @@ gst_message_set_qos_values (GstMessage * message, gint64 jitter,
 
 /**
  * gst_message_set_qos_stats:
- * @message: A valid #GstMessage of type GST_MESSAGE_QOS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_QOS.
  * @format: Units of the 'processed' and 'dropped' fields. Video sinks and video
  * filters will use GST_FORMAT_BUFFERS (frames). Audio sinks and audio filters
  * will likely use GST_FORMAT_DEFAULT (samples).
@@ -1850,8 +1850,8 @@ gst_message_set_qos_values (GstMessage * message, gint64 jitter,
  * Set the QoS stats representing the history of the current continuous pipeline
  * playback period.
  *
- * When @format is @GST_FORMAT_UNDEFINED both @dropped and @processed are
- * invalid. Values of -1 for either @processed or @dropped mean unknown values.
+ * When _format_ is _GST_FORMAT_UNDEFINED_ both _dropped_ and _processed_ are
+ * invalid. Values of -1 for either _processed_ or _dropped_ mean unknown values.
  *
  * MT safe.
  */
@@ -1873,7 +1873,7 @@ gst_message_set_qos_stats (GstMessage * message, GstFormat format,
 
 /**
  * gst_message_parse_qos:
- * @message: A valid #GstMessage of type GST_MESSAGE_QOS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_QOS.
  * @live: (out) (allow-none): if the message was generated by a live element
  * @running_time: (out) (allow-none): the running time of the buffer that
  *     generated the message
@@ -1913,7 +1913,7 @@ gst_message_parse_qos (GstMessage * message, gboolean * live,
 
 /**
  * gst_message_parse_qos_values:
- * @message: A valid #GstMessage of type GST_MESSAGE_QOS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_QOS.
  * @jitter: (out) (allow-none): The difference of the running-time against
  *     the deadline.
  * @proportion: (out) (allow-none): Long term prediction of the ideal rate
@@ -1944,7 +1944,7 @@ gst_message_parse_qos_values (GstMessage * message, gint64 * jitter,
 
 /**
  * gst_message_parse_qos_stats:
- * @message: A valid #GstMessage of type GST_MESSAGE_QOS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_QOS.
  * @format: (out) (allow-none): Units of the 'processed' and 'dropped' fields.
  *     Video sinks and video filters will use GST_FORMAT_BUFFERS (frames).
  *     Audio sinks and audio filters will likely use GST_FORMAT_DEFAULT
@@ -1957,8 +1957,8 @@ gst_message_parse_qos_values (GstMessage * message, gint64 * jitter,
  * Extract the QoS stats representing the history of the current continuous
  * pipeline playback period.
  *
- * When @format is @GST_FORMAT_UNDEFINED both @dropped and @processed are
- * invalid. Values of -1 for either @processed or @dropped mean unknown values.
+ * When _format_ is _GST_FORMAT_UNDEFINED_ both _dropped_ and _processed_ are
+ * invalid. Values of -1 for either _processed_ or _dropped_ mean unknown values.
  *
  * MT safe.
  */
@@ -1981,15 +1981,15 @@ gst_message_parse_qos_stats (GstMessage * message, GstFormat * format,
 /**
  * gst_message_new_progress:
  * @src: The object originating the message.
- * @type: a #GstProgressType
+ * @type: a [GstProgressType]()
  * @code: a progress code
  * @text: free, user visible text describing the progress
  *
  * Progress messages are posted by elements when they use an asynchronous task
  * to perform actions triggered by a state change.
  *
- * @code contains a well defined string describing the action.
- * @test should contain a user visible string detailing the current action.
+ * _code_ contains a well defined string describing the action.
+ * _test_ should contain a user visible string detailing the current action.
  *
  * Returns: (transfer full): The new qos message.
  */
@@ -2020,12 +2020,12 @@ gst_message_new_progress (GstObject * src, GstProgressType type,
 
 /**
  * gst_message_parse_progress:
- * @message: A valid #GstMessage of type GST_MESSAGE_PROGRESS.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_PROGRESS.
  * @type: (out) (allow-none): location for the type
  * @code: (out) (allow-none) (transfer full): location for the code
  * @text: (out) (allow-none) (transfer full): location for the text
  *
- * Parses the progress @type, @code and @text.
+ * Parses the progress _type_, _code_ and _text_.
  */
 void
 gst_message_parse_progress (GstMessage * message, GstProgressType * type,
@@ -2046,7 +2046,7 @@ gst_message_parse_progress (GstMessage * message, GstProgressType * type,
 /**
  * gst_message_new_toc:
  * @src: the object originating the message.
- * @toc: (transfer none): #GstToc structure for the message.
+ * @toc: (transfer none): [GstToc]() structure for the message.
  * @updated: whether TOC was updated or not.
  *
  * Create a new TOC message. The message is posted by elements
@@ -2072,13 +2072,13 @@ gst_message_new_toc (GstObject * src, GstToc * toc, gboolean updated)
 
 /**
  * gst_message_parse_toc:
- * @message: a valid #GstMessage of type GST_MESSAGE_TOC.
+ * @message: a valid [GstMessage]() of type GST_MESSAGE_TOC.
  * @toc: (out) (transfer full): return location for the TOC.
  * @updated: (out): return location for the updated flag.
  *
- * Extract the TOC from the #GstMessage. The TOC returned in the
+ * Extract the TOC from the [GstMessage](). The TOC returned in the
  * output argument is a copy; the caller must free it with
- * gst_toc_unref() when done.
+ * [gst_toc_unref]() when done.
  *
  * MT safe.
  */
@@ -2100,7 +2100,7 @@ gst_message_parse_toc (GstMessage * message, GstToc ** toc, gboolean * updated)
  * @running_time: the requested running-time
  *
  * This message is posted when the pipeline running-time should be reset to
- * @running_time, like after a flushing seek.
+ * _running_time_, like after a flushing seek.
  *
  * Returns: (transfer full): The new reset_time message.
  *
@@ -2121,9 +2121,9 @@ gst_message_new_reset_time (GstObject * src, GstClockTime running_time)
 
 /**
  * gst_message_parse_reset_time:
- * @message: A valid #GstMessage of type GST_MESSAGE_RESET_TIME.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_RESET_TIME.
  * @running_time: (out) (allow-none): Result location for the running_time or
- *      %NULL
+ *      [NULL]()
  *
  * Extract the running-time from the RESET_TIME message.
  *
@@ -2202,16 +2202,15 @@ gst_message_set_group_id (GstMessage * message, guint group_id)
 
 /**
  * gst_message_parse_group_id:
- * @message: A valid #GstMessage of type GST_MESSAGE_STREAM_START.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_STREAM_START.
  * @group_id: (out) (allow-none): Result location for the group id or
- *      %NULL
+ *      [NULL]()
  *
  * Extract the group from the STREAM_START message.
  *
- * Returns: %TRUE if the message had a group id set, %FALSE otherwise
+ * Returns: [TRUE]() if the message had a group id set, [FALSE]() otherwise
  *
  * MT safe.
- *
  * Since: 1.2
  */
 gboolean
@@ -2242,12 +2241,11 @@ gst_message_parse_group_id (GstMessage * message, guint * group_id)
  * @src: (transfer none) (allow-none): The object originating the message.
  * @context_type: The context type that is needed
  *
- * This message is posted when an element needs a specific #GstContext.
+ * This message is posted when an element needs a specific [GstContext]().
  *
  * Returns: (transfer full): The new need-context message.
  *
  * MT safe.
- *
  * Since: 1.2
  */
 GstMessage *
@@ -2268,12 +2266,11 @@ gst_message_new_need_context (GstObject * src, const gchar * context_type)
 /**
  * gst_message_parse_context_type:
  * @message: a GST_MESSAGE_NEED_CONTEXT type message
- * @context_type: (out) (allow-none): the context type, or %NULL
+ * @context_type: (out) (allow-none): the context type, or [NULL]()
  *
  * Parse a context type from an existing GST_MESSAGE_NEED_CONTEXT message.
  *
- * Returns: a #gboolean indicating if the parsing succeeded.
- *
+ * Returns: a [gboolean]() indicating if the parsing succeeded.
  * Since: 1.2
  */
 gboolean
@@ -2301,12 +2298,11 @@ gst_message_parse_context_type (GstMessage * message,
  * @src: (transfer none) (allow-none): The object originating the message.
  * @context: (transfer full): the context
  *
- * This message is posted when an element has a new local #GstContext.
+ * This message is posted when an element has a new local [GstContext]().
  *
  * Returns: (transfer full): The new have-context message.
  *
  * MT safe.
- *
  * Since: 1.2
  */
 GstMessage *
@@ -2325,9 +2321,9 @@ gst_message_new_have_context (GstObject * src, GstContext * context)
 
 /**
  * gst_message_parse_have_context:
- * @message: A valid #GstMessage of type GST_MESSAGE_HAVE_CONTEXT.
+ * @message: A valid [GstMessage]() of type GST_MESSAGE_HAVE_CONTEXT.
  * @context: (out) (transfer full) (allow-none): Result location for the
- *      context or %NULL
+ *      context or [NULL]()
  *
  * Extract the context from the HAVE_CONTEXT message.
  *
@@ -2348,15 +2344,14 @@ gst_message_parse_have_context (GstMessage * message, GstContext ** context)
 
 /**
  * gst_message_new_device_added:
- * @src: The #GstObject that created the message
- * @device: (transfer none): The new #GstDevice
+ * @src: The [GstObject]() that created the message
+ * @device: (transfer none): The new [GstDevice]()
  *
  * Creates a new device-added message. The device-added message is produced by
- * #GstDeviceProvider or a #GstDeviceMonitor. They announce the appearance
+ * [GstDeviceProvider]() or a [GstDeviceMonitor](). They announce the appearance
  * of monitored devices.
  *
- * Returns: a newly allocated #GstMessage
- *
+ * Returns: a newly allocated [GstMessage]()
  * Since: 1.4
  */
 GstMessage *
@@ -2377,12 +2372,12 @@ gst_message_new_device_added (GstObject * src, GstDevice * device)
 
 /**
  * gst_message_parse_device_added:
- * @message: a #GstMessage of type %GST_MESSAGE_DEVICE_ADDED
+ * @message: a [GstMessage]() of type [GST_MESSAGE_DEVICE_ADDED]()
  * @device: (out) (allow-none) (transfer none): A location where to store a
- *  pointer to the new #GstDevice, or %NULL
- * 
+ *  pointer to the new [GstDevice](), or [NULL]()
+ *
  * Parses a device-added message. The device-added message is produced by
- * #GstDeviceProvider or a #GstDeviceMonitor. It announces the appearance
+ * [GstDeviceProvider]() or a [GstDeviceMonitor](). It announces the appearance
  * of monitored devices.
  *
  * Since: 1.4
@@ -2400,15 +2395,14 @@ gst_message_parse_device_added (GstMessage * message, GstDevice ** device)
 
 /**
  * gst_message_new_device_removed:
- * @src: The #GstObject that created the message
- * @device: (transfer none): The removed #GstDevice
+ * @src: The [GstObject]() that created the message
+ * @device: (transfer none): The removed [GstDevice]()
  *
  * Creates a new device-removed message. The device-removed message is produced
- * by #GstDeviceProvider or a #GstDeviceMonitor. They announce the
+ * by [GstDeviceProvider]() or a [GstDeviceMonitor](). They announce the
  * disappearance of monitored devices.
  *
- * Returns: a newly allocated #GstMessage
- *
+ * Returns: a newly allocated [GstMessage]()
  * Since: 1.4
  */
 GstMessage *
@@ -2429,12 +2423,12 @@ gst_message_new_device_removed (GstObject * src, GstDevice * device)
 
 /**
  * gst_message_parse_device_removed:
- * @message: a #GstMessage of type %GST_MESSAGE_DEVICE_REMOVED
+ * @message: a [GstMessage]() of type [GST_MESSAGE_DEVICE_REMOVED]()
  * @device: (out) (allow-none) (transfer none): A location where to store a
- *  pointer to the removed #GstDevice, or %NULL
+ *  pointer to the removed [GstDevice](), or [NULL]()
  *
  * Parses a device-removed message. The device-removed message is produced by
- * #GstDeviceProvider or a #GstDeviceMonitor. It announces the
+ * [GstDeviceProvider]() or a [GstDeviceMonitor](). It announces the
  * disappearance of monitored devices.
  *
  * Since: 1.4

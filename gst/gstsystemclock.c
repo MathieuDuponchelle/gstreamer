@@ -23,7 +23,7 @@
 /**
  * SECTION:gstsystemclock
  * @short_description: Default clock that uses the current system time
- * @see_also: #GstClock
+ * @see_also: [GstClock]()
  *
  * The GStreamer core provides a GstSystemClock based on the system time.
  * Asynchronous callbacks are scheduled from an internal thread.
@@ -281,10 +281,10 @@ gst_system_clock_get_property (GObject * object, guint prop_id, GValue * value,
 
 /**
  * gst_system_clock_set_default:
- * @new_clock: a #GstClock
+ * @new_clock: a [GstClock]()
  *
  * Sets the default system clock that can be obtained with
- * gst_system_clock_obtain().
+ * [gst_system_clock_obtain]().
  *
  * This is mostly used for testing and debugging purposes when you
  * want to have control over the time reported by the default system

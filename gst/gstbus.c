@@ -22,10 +22,10 @@
 /**
  * SECTION:gstbus
  * @short_description: Asynchronous message bus subsystem
- * @see_also: #GstMessage, #GstElement
+ * @see_also: [GstMessage](), [GstElement]()
  *
- * The #GstBus is an object responsible for delivering #GstMessage packets in
- * a first-in first-out way from the streaming threads (see #GstTask) to the
+ * The [GstBus]() is an object responsible for delivering [GstMessage]() packets in
+ * a first-in first-out way from the streaming threads (see [GstTask]()) to the
  * application.
  *
  * Since the application typically only wants to deal with delivery of these
@@ -33,35 +33,35 @@
  * different threads. This is important since the actual streaming of media
  * is done in another thread than the application.
  *
- * The GstBus provides support for #GSource based notifications. This makes it
+ * The GstBus provides support for [GSource]() based notifications. This makes it
  * possible to handle the delivery in the glib mainloop.
  *
- * The #GSource callback function gst_bus_async_signal_func() can be used to
+ * The [GSource]() callback function [gst_bus_async_signal_func]() can be used to
  * convert all bus messages into signal emissions.
  *
- * A message is posted on the bus with the gst_bus_post() method. With the
- * gst_bus_peek() and gst_bus_pop() methods one can look at or retrieve a
+ * A message is posted on the bus with the [gst_bus_post]() method. With the
+ * [gst_bus_peek]() and [gst_bus_pop]() methods one can look at or retrieve a
  * previously posted message.
  *
- * The bus can be polled with the gst_bus_poll() method. This methods blocks
+ * The bus can be polled with the [gst_bus_poll]() method. This methods blocks
  * up to the specified timeout value until one of the specified messages types
- * is posted on the bus. The application can then gst_bus_pop() the messages
+ * is posted on the bus. The application can then [gst_bus_pop]() the messages
  * from the bus to handle them.
  * Alternatively the application can register an asynchronous bus function
- * using gst_bus_add_watch_full() or gst_bus_add_watch(). This function will
- * install a #GSource in the default glib main loop and will deliver messages
+ * using [gst_bus_add_watch_full]() or [gst_bus_add_watch](). This function will
+ * install a [GSource]() in the default glib main loop and will deliver messages
  * a short while after they have been posted. Note that the main loop should
  * be running for the asynchronous callbacks.
  *
  * It is also possible to get messages from the bus without any thread
- * marshalling with the gst_bus_set_sync_handler() method. This makes it
+ * marshalling with the [gst_bus_set_sync_handler]() method. This makes it
  * possible to react to a message in the same thread that posted the
  * message on the bus. This should only be used if the application is able
  * to deal with messages from different threads.
  *
- * Every #GstPipeline has one bus.
+ * Every [GstPipeline]() has one bus.
  *
- * Note that a #GstPipeline will set its bus into flushing state when changing
+ * Note that a [GstPipeline]() will set its bus into flushing state when changing
  * from READY to NULL state.
  */
 
@@ -165,11 +165,11 @@ gst_bus_class_init (GstBusClass * klass)
    * GstBus::enable-async:
    *
    * Enable async message delivery support for bus watches,
-   * gst_bus_pop() and similar API. Without this only the
+   * [gst_bus_pop]() and similar API. Without this only the
    * synchronous message handlers are called.
    *
    * This property is used to create the child element buses
-   * in #GstBin.
+   * in [GstBin]().
    */
   g_object_class_install_property (gobject_class, PROP_ENABLE_ASYNC,
       g_param_spec_boolean ("enable-async", "Enable Async",
@@ -186,7 +186,7 @@ gst_bus_class_init (GstBusClass * klass)
    * thread that posted the message so one has to be careful with locking.
    *
    * This signal will not be emitted by default, you have to call
-   * gst_bus_enable_sync_message_emission() before.
+   * [gst_bus_enable_sync_message_emission]() before.
    */
   gst_bus_signals[SYNC_MESSAGE] =
       g_signal_new ("sync-message", G_TYPE_FROM_CLASS (klass),
@@ -267,9 +267,9 @@ gst_bus_finalize (GObject * object)
 /**
  * gst_bus_new:
  *
- * Creates a new #GstBus instance.
+ * Creates a new [GstBus]() instance.
  *
- * Returns: (transfer full): a new #GstBus instance
+ * Returns: (transfer full): a new [GstBus]() instance
  */
 GstBus *
 gst_bus_new (void)
@@ -284,13 +284,13 @@ gst_bus_new (void)
 
 /**
  * gst_bus_post:
- * @bus: a #GstBus to post on
- * @message: (transfer full): the #GstMessage to post
+ * @bus: a [GstBus]() to post on
+ * @message: (transfer full): the [GstMessage]() to post
  *
  * Post a message on the given bus. Ownership of the message
  * is taken by the bus.
  *
- * Returns: %TRUE if the message could be posted, %FALSE if the bus is flushing.
+ * Returns: [TRUE]() if the message could be posted, [FALSE]() if the bus is flushing.
  *
  * MT safe.
  */
@@ -408,12 +408,12 @@ is_flushing:
 
 /**
  * gst_bus_have_pending:
- * @bus: a #GstBus to check
+ * @bus: a [GstBus]() to check
  *
  * Check if there are pending messages on the bus that
  * should be handled.
  *
- * Returns: %TRUE if there are messages on the bus to be handled, %FALSE
+ * Returns: [TRUE]() if there are messages on the bus to be handled, [FALSE]()
  * otherwise.
  *
  * MT safe.
@@ -433,12 +433,12 @@ gst_bus_have_pending (GstBus * bus)
 
 /**
  * gst_bus_set_flushing:
- * @bus: a #GstBus
+ * @bus: a [GstBus]()
  * @flushing: whether or not to flush the bus
  *
- * If @flushing, flush out and unref any messages queued in the bus. Releases
+ * If _flushing_, flush out and unref any messages queued in the bus. Releases
  * references to the message origin objects. Will flush future messages until
- * gst_bus_set_flushing() sets @flushing to %FALSE.
+ * [gst_bus_set_flushing]() sets _flushing_ to [FALSE]().
  *
  * MT safe.
  */
@@ -471,22 +471,22 @@ gst_bus_set_flushing (GstBus * bus, gboolean flushing)
 
 /**
  * gst_bus_timed_pop_filtered:
- * @bus: a #GstBus to pop from
+ * @bus: a [GstBus]() to pop from
  * @timeout: a timeout in nanoseconds, or GST_CLOCK_TIME_NONE to wait forever
  * @types: message types to take into account, GST_MESSAGE_ANY for any type
  *
- * Get a message from the bus whose type matches the message type mask @types,
+ * Get a message from the bus whose type matches the message type mask _types_,
  * waiting up to the specified timeout (and discarding any messages that do not
  * match the mask provided).
  *
- * If @timeout is 0, this function behaves like gst_bus_pop_filtered(). If
- * @timeout is #GST_CLOCK_TIME_NONE, this function will block forever until a
+ * If _timeout_ is 0, this function behaves like [gst_bus_pop_filtered](). If
+ * _timeout_ is [GST_CLOCK_TIME_NONE](), this function will block forever until a
  * matching message was posted on the bus.
  *
- * Returns: (transfer full) (nullable): a #GstMessage matching the
- *     filter in @types, or %NULL if no matching message was found on
+ * Returns: (transfer full) (nullable): a [GstMessage]() matching the
+ *     filter in _types_, or [NULL]() if no matching message was found on
  *     the bus until the timeout expired. The message is taken from
- *     the bus and needs to be unreffed with gst_message_unref() after
+ *     the bus and needs to be unreffed with [gst_message_unref]() after
  *     usage.
  *
  * MT safe.
@@ -576,19 +576,19 @@ beach:
 
 /**
  * gst_bus_timed_pop:
- * @bus: a #GstBus to pop
+ * @bus: a [GstBus]() to pop
  * @timeout: a timeout
  *
  * Get a message from the bus, waiting up to the specified timeout.
  *
- * If @timeout is 0, this function behaves like gst_bus_pop(). If @timeout is
- * #GST_CLOCK_TIME_NONE, this function will block forever until a message was
+ * If _timeout_ is 0, this function behaves like [gst_bus_pop](). If _timeout_ is
+ * [GST_CLOCK_TIME_NONE](), this function will block forever until a message was
  * posted on the bus.
  *
- * Returns: (transfer full) (nullable): the #GstMessage that is on the
- *     bus after the specified timeout or %NULL if the bus is empty
+ * Returns: (transfer full) (nullable): the [GstMessage]() that is on the
+ *     bus after the specified timeout or [NULL]() if the bus is empty
  *     after the timeout expired.  The message is taken from the bus
- *     and needs to be unreffed with gst_message_unref() after usage.
+ *     and needs to be unreffed with [gst_message_unref]() after usage.
  *
  * MT safe.
  */
@@ -602,19 +602,19 @@ gst_bus_timed_pop (GstBus * bus, GstClockTime timeout)
 
 /**
  * gst_bus_pop_filtered:
- * @bus: a #GstBus to pop
+ * @bus: a [GstBus]() to pop
  * @types: message types to take into account
  *
- * Get a message matching @type from the bus.  Will discard all messages on
- * the bus that do not match @type and that have been posted before the first
- * message that does match @type.  If there is no message matching @type on
+ * Get a message matching _type_ from the bus.  Will discard all messages on
+ * the bus that do not match _type_ and that have been posted before the first
+ * message that does match _type_.  If there is no message matching _type_ on
  * the bus, all messages will be discarded. It is not possible to use message
- * enums beyond #GST_MESSAGE_EXTENDED in the @events mask.
+ * enums beyond [GST_MESSAGE_EXTENDED]() in the _events_ mask.
  *
- * Returns: (transfer full) (nullable): the next #GstMessage matching
- *     @type that is on the bus, or %NULL if the bus is empty or there
- *     is no message matching @type. The message is taken from the bus
- *     and needs to be unreffed with gst_message_unref() after usage.
+ * Returns: (transfer full) (nullable): the next [GstMessage]() matching
+ *     _type_ that is on the bus, or [NULL]() if the bus is empty or there
+ *     is no message matching _type_. The message is taken from the bus
+ *     and needs to be unreffed with [gst_message_unref]() after usage.
  *
  * MT safe.
  */
@@ -629,13 +629,13 @@ gst_bus_pop_filtered (GstBus * bus, GstMessageType types)
 
 /**
  * gst_bus_pop:
- * @bus: a #GstBus to pop
+ * @bus: a [GstBus]() to pop
  *
  * Get a message from the bus.
  *
- * Returns: (transfer full) (nullable): the #GstMessage that is on the
- *     bus, or %NULL if the bus is empty. The message is taken from
- *     the bus and needs to be unreffed with gst_message_unref() after
+ * Returns: (transfer full) (nullable): the [GstMessage]() that is on the
+ *     bus, or [NULL]() if the bus is empty. The message is taken from
+ *     the bus and needs to be unreffed with [gst_message_unref]() after
  *     usage.
  *
  * MT safe.
@@ -650,14 +650,14 @@ gst_bus_pop (GstBus * bus)
 
 /**
  * gst_bus_peek:
- * @bus: a #GstBus
+ * @bus: a [GstBus]()
  *
  * Peek the message on the top of the bus' queue. The message will remain
  * on the bus' message queue. A reference is returned, and needs to be unreffed
  * by the caller.
  *
- * Returns: (transfer full) (nullable): the #GstMessage that is on the
- *     bus, or %NULL if the bus is empty.
+ * Returns: (transfer full) (nullable): the [GstMessage]() that is on the
+ *     bus, or [NULL]() if the bus is empty.
  *
  * MT safe.
  */
@@ -681,10 +681,10 @@ gst_bus_peek (GstBus * bus)
 
 /**
  * gst_bus_set_sync_handler:
- * @bus: a #GstBus to install the handler on
+ * @bus: a [GstBus]() to install the handler on
  * @func: (allow-none): The handler function to install
  * @user_data: User data that will be sent to the handler function.
- * @notify: called when @user_data becomes unused
+ * @notify: called when _user_data_ becomes unused
  *
  * Sets the synchronous handler on the bus. The function will be called
  * every time a new message is posted on the bus. Note that the function
@@ -693,7 +693,7 @@ gst_bus_peek (GstBus * bus)
  * should handle messages asynchronously using the gst_bus watch and poll
  * functions.
  *
- * You cannot replace an existing sync_handler. You can pass %NULL to this
+ * You cannot replace an existing sync_handler. You can pass [NULL]() to this
  * function, which will clear the existing handler.
  */
 void
@@ -832,13 +832,13 @@ static GSourceFuncs gst_bus_source_funcs = {
 
 /**
  * gst_bus_create_watch:
- * @bus: a #GstBus to create the watch for
+ * @bus: a [GstBus]() to create the watch for
  *
  * Create watch for this bus. The GSource will be dispatched whenever
  * a message is on the bus. After the GSource is dispatched, the
  * message is popped off the bus and unreffed.
  *
- * Returns: (transfer full): a #GSource that can be added to a mainloop.
+ * Returns: (transfer full): a [GSource]() that can be added to a mainloop.
  */
 GSource *
 gst_bus_create_watch (GstBus * bus)
@@ -894,16 +894,16 @@ gst_bus_add_watch_full_unlocked (GstBus * bus, gint priority,
 }
 
 /**
- * gst_bus_add_watch_full: (rename-to gst_bus_add_watch)
- * @bus: a #GstBus to create the watch for.
+ * gst_bus_add_watch_full: (rename-to gst_bus_add_watch):
+ * @bus: a [GstBus]() to create the watch for.
  * @priority: The priority of the watch.
  * @func: A function to call when a message is received.
- * @user_data: user data passed to @func.
+ * @user_data: user data passed to _func_.
  * @notify: the function to call when the source is removed.
  *
- * Adds a bus watch to the default main context with the given @priority (e.g.
- * %G_PRIORITY_DEFAULT). It is also possible to use a non-default  main
- * context set up using g_main_context_push_thread_default() (before
+ * Adds a bus watch to the default main context with the given _priority_ (e.g.
+ * [G_PRIORITY_DEFAULT]()). It is also possible to use a non-default  main
+ * context set up using [g_main_context_push_thread_default]() (before
  * one had to create a bus watch source and attach it to the desired main
  * context 'manually').
  *
@@ -913,16 +913,16 @@ gst_bus_add_watch_full_unlocked (GstBus * bus, gint priority,
  *
  * The bus watch will only work if a GLib main loop is being run.
  *
- * When @func is called, the message belongs to the caller; if you want to
- * keep a copy of it, call gst_message_ref() before leaving @func.
+ * When _func_ is called, the message belongs to the caller; if you want to
+ * keep a copy of it, call [gst_message_ref]() before leaving _func_.
  *
- * The watch can be removed using gst_bus_remove_watch() or by returning %FALSE
- * from @func. If the watch was added to the default main context it is also
- * possible to remove the watch using g_source_remove().
+ * The watch can be removed using [gst_bus_remove_watch]() or by returning [FALSE]()
+ * from _func_. If the watch was added to the default main context it is also
+ * possible to remove the watch using [g_source_remove]().
  *
  * MT safe.
  *
- * Returns: The event source id or 0 if @bus already got an event source.
+ * Returns: The event source id or 0 if _bus_ already got an event source.
  */
 guint
 gst_bus_add_watch_full (GstBus * bus, gint priority,
@@ -940,14 +940,14 @@ gst_bus_add_watch_full (GstBus * bus, gint priority,
 }
 
 /**
- * gst_bus_add_watch: (skip)
- * @bus: a #GstBus to create the watch for
+ * gst_bus_add_watch: (skip):
+ * @bus: a [GstBus]() to create the watch for
  * @func: A function to call when a message is received.
- * @user_data: user data passed to @func.
+ * @user_data: user data passed to _func_.
  *
  * Adds a bus watch to the default main context with the default priority
- * (%G_PRIORITY_DEFAULT). It is also possible to use a non-default main
- * context set up using g_main_context_push_thread_default() (before
+ * ([G_PRIORITY_DEFAULT]()). It is also possible to use a non-default main
+ * context set up using [g_main_context_push_thread_default]() (before
  * one had to create a bus watch source and attach it to the desired main
  * context 'manually').
  *
@@ -957,11 +957,11 @@ gst_bus_add_watch_full (GstBus * bus, gint priority,
  *
  * The bus watch will only work if a GLib main loop is being run.
  *
- * The watch can be removed using gst_bus_remove_watch() or by returning %FALSE
- * from @func. If the watch was added to the default main context it is also
- * possible to remove the watch using g_source_remove().
+ * The watch can be removed using [gst_bus_remove_watch]() or by returning [FALSE]()
+ * from _func_. If the watch was added to the default main context it is also
+ * possible to remove the watch using [g_source_remove]().
  *
- * Returns: The event source id or 0 if @bus already got an event source.
+ * Returns: The event source id or 0 if _bus_ already got an event source.
  *
  * MT safe.
  */
@@ -974,14 +974,12 @@ gst_bus_add_watch (GstBus * bus, GstBusFunc func, gpointer user_data)
 
 /**
  * gst_bus_remove_watch:
- * @bus: a #GstBus to remove the watch from.
+ * @bus: a [GstBus]() to remove the watch from.
  *
- * Removes an installed bus watch from @bus.
+ * Removes an installed bus watch from _bus_.
  *
- * Returns: %TRUE on success or %FALSE if @bus has no event source.
- *
+ * Returns: [TRUE]() on success or [FALSE]() if _bus_ has no event source.
  * Since: 1.6
- *
  */
 gboolean
 gst_bus_remove_watch (GstBus * bus)
@@ -1076,22 +1074,22 @@ poll_destroy_timeout (GstBusPollData * poll_data)
 
 /**
  * gst_bus_poll:
- * @bus: a #GstBus
- * @events: a mask of #GstMessageType, representing the set of message types to
+ * @bus: a [GstBus]()
+ * @events: a mask of [GstMessageType](), representing the set of message types to
  * poll for (note special handling of extended message types below)
- * @timeout: the poll timeout, as a #GstClockTime, or #GST_CLOCK_TIME_NONE to poll
+ * @timeout: the poll timeout, as a [GstClockTime](), or [GST_CLOCK_TIME_NONE]() to poll
  * indefinitely.
  *
  * Poll the bus for messages. Will block while waiting for messages to come.
- * You can specify a maximum time to poll with the @timeout parameter. If
- * @timeout is negative, this function will block indefinitely.
+ * You can specify a maximum time to poll with the _timeout_ parameter. If
+ * _timeout_ is negative, this function will block indefinitely.
  *
- * All messages not in @events will be popped off the bus and will be ignored.
- * It is not possible to use message enums beyond #GST_MESSAGE_EXTENDED in the
- * @events mask
+ * All messages not in _events_ will be popped off the bus and will be ignored.
+ * It is not possible to use message enums beyond [GST_MESSAGE_EXTENDED]() in the
+ * _events_ mask
  *
  * Because poll is implemented using the "message" signal enabled by
- * gst_bus_add_signal_watch(), calling gst_bus_poll() will cause the "message"
+ * [gst_bus_add_signal_watch](), calling [gst_bus_poll]() will cause the "message"
  * signal to be emitted for every message that poll sees. Thus a "message"
  * signal handler will see the same messages that this function sees -- neither
  * will steal messages from the other.
@@ -1104,21 +1102,21 @@ poll_destroy_timeout (GstBusPollData * poll_data)
  * other non-trivial application that uses the GLib main loop. As this function
  * runs a GLib main loop, any callback attached to the default GLib main
  * context may be invoked. This could be timeouts, GUI events, I/O events etc.;
- * even if gst_bus_poll() is called with a 0 timeout. Any of these callbacks
+ * even if [gst_bus_poll]() is called with a 0 timeout. Any of these callbacks
  * may do things you do not expect, e.g. destroy the main application window or
  * some other resource; change other application state; display a dialog and
  * run another main loop until the user clicks it away. In short, using this
  * function may add a lot of complexity to your code through unexpected
  * re-entrancy and unexpected changes to your application's state.
  *
- * For 0 timeouts use gst_bus_pop_filtered() instead of this function; for
- * other short timeouts use gst_bus_timed_pop_filtered(); everything else is
+ * For 0 timeouts use [gst_bus_pop_filtered]() instead of this function; for
+ * other short timeouts use [gst_bus_timed_pop_filtered](); everything else is
  * better handled by setting up an asynchronous bus watch and doing things
  * from there.
  *
  * Returns: (transfer full) (nullable): the message that was received,
- *     or %NULL if the poll timed out. The message is taken from the
- *     bus and needs to be unreffed with gst_message_unref() after
+ *     or [NULL]() if the poll timed out. The message is taken from the
+ *     bus and needs to be unreffed with [gst_message_unref]() after
  *     usage.
  */
 GstMessage *
@@ -1171,14 +1169,14 @@ gst_bus_poll (GstBus * bus, GstMessageType events, GstClockTime timeout)
 
 /**
  * gst_bus_async_signal_func:
- * @bus: a #GstBus
- * @message: the #GstMessage received
+ * @bus: a [GstBus]()
+ * @message: the [GstMessage]() received
  * @data: user data
  *
- * A helper #GstBusFunc that can be used to convert all asynchronous messages
+ * A helper [GstBusFunc]() that can be used to convert all asynchronous messages
  * into signals.
  *
- * Returns: %TRUE
+ * Returns: [TRUE]()
  */
 gboolean
 gst_bus_async_signal_func (GstBus * bus, GstMessage * message, gpointer data)
@@ -1198,8 +1196,8 @@ gst_bus_async_signal_func (GstBus * bus, GstMessage * message, gpointer data)
 
 /**
  * gst_bus_sync_signal_handler:
- * @bus: a #GstBus
- * @message: the #GstMessage received
+ * @bus: a [GstBus]()
+ * @message: the [GstMessage]() received
  * @data: user data
  *
  * A helper GstBusSyncHandler that can be used to convert all synchronous
@@ -1224,7 +1222,7 @@ gst_bus_sync_signal_handler (GstBus * bus, GstMessage * message, gpointer data)
 
 /**
  * gst_bus_enable_sync_message_emission:
- * @bus: a #GstBus on which you want to receive the "sync-message" signal
+ * @bus: a [GstBus]() on which you want to receive the "sync-message" signal
  *
  * Instructs GStreamer to emit the "sync-message" signal after running the bus's
  * sync handler. This function is here so that code can ensure that they can
@@ -1232,12 +1230,12 @@ gst_bus_sync_signal_handler (GstBus * bus, GstMessage * message, gpointer data)
  * handler is.
  *
  * This function may be called multiple times. To clean up, the caller is
- * responsible for calling gst_bus_disable_sync_message_emission() as many times
+ * responsible for calling [gst_bus_disable_sync_message_emission]() as many times
  * as this function is called.
  *
- * While this function looks similar to gst_bus_add_signal_watch(), it is not
+ * While this function looks similar to [gst_bus_add_signal_watch](), it is not
  * exactly the same -- this function enables <emphasis>synchronous</emphasis> emission of
- * signals when messages arrive; gst_bus_add_signal_watch() adds an idle callback
+ * signals when messages arrive; [gst_bus_add_signal_watch]() adds an idle callback
  * to pop messages off the bus <emphasis>asynchronously</emphasis>. The sync-message signal
  * comes from the thread of whatever object posted the message; the "message"
  * signal is marshalled to the main thread via the main loop.
@@ -1256,17 +1254,17 @@ gst_bus_enable_sync_message_emission (GstBus * bus)
 
 /**
  * gst_bus_disable_sync_message_emission:
- * @bus: a #GstBus on which you previously called
- * gst_bus_enable_sync_message_emission()
+ * @bus: a [GstBus]() on which you previously called
+ * [gst_bus_enable_sync_message_emission]()
  *
  * Instructs GStreamer to stop emitting the "sync-message" signal for this bus.
- * See gst_bus_enable_sync_message_emission() for more information.
+ * See [gst_bus_enable_sync_message_emission]() for more information.
  *
  * In the event that multiple pieces of code have called
- * gst_bus_enable_sync_message_emission(), the sync-message emissions will only
- * be stopped after all calls to gst_bus_enable_sync_message_emission() were
+ * [gst_bus_enable_sync_message_emission](), the sync-message emissions will only
+ * be stopped after all calls to [gst_bus_enable_sync_message_emission]() were
  * "cancelled" by calling this function. In this way the semantics are exactly
- * the same as gst_object_ref() that which calls enable should also call
+ * the same as [gst_object_ref]() that which calls enable should also call
  * disable.
  *
  * MT safe.
@@ -1284,12 +1282,12 @@ gst_bus_disable_sync_message_emission (GstBus * bus)
 
 /**
  * gst_bus_add_signal_watch_full:
- * @bus: a #GstBus on which you want to receive the "message" signal
+ * @bus: a [GstBus]() on which you want to receive the "message" signal
  * @priority: The priority of the watch.
  *
- * Adds a bus signal watch to the default main context with the given @priority
- * (e.g. %G_PRIORITY_DEFAULT). It is also possible to use a non-default main
- * context set up using g_main_context_push_thread_default()
+ * Adds a bus signal watch to the default main context with the given _priority_
+ * (e.g. [G_PRIORITY_DEFAULT]()). It is also possible to use a non-default main
+ * context set up using [g_main_context_push_thread_default]()
  * (before one had to create a bus watch source and attach it to the desired
  * main context 'manually').
  *
@@ -1297,7 +1295,7 @@ gst_bus_disable_sync_message_emission (GstBus * bus)
  * message posted on the bus when the main loop is running.
  *
  * This function may be called multiple times. To clean up, the caller is
- * responsible for calling gst_bus_remove_signal_watch() as many times as this
+ * responsible for calling [gst_bus_remove_signal_watch]() as many times as this
  * function is called.
  *
  * There can only be a single bus watch per bus, you must remove any signal
@@ -1343,11 +1341,11 @@ add_failed:
 
 /**
  * gst_bus_add_signal_watch:
- * @bus: a #GstBus on which you want to receive the "message" signal
+ * @bus: a [GstBus]() on which you want to receive the "message" signal
  *
  * Adds a bus signal watch to the default main context with the default priority
- * (%G_PRIORITY_DEFAULT). It is also possible to use a non-default
- * main context set up using g_main_context_push_thread_default() (before
+ * ([G_PRIORITY_DEFAULT]()). It is also possible to use a non-default
+ * main context set up using [g_main_context_push_thread_default]() (before
  * one had to create a bus watch source and attach it to the desired main
  * context 'manually').
  *
@@ -1355,7 +1353,7 @@ add_failed:
  * message posted on the bus.
  *
  * This function may be called multiple times. To clean up, the caller is
- * responsible for calling gst_bus_remove_signal_watch() as many times as this
+ * responsible for calling [gst_bus_remove_signal_watch]() as many times as this
  * function is called.
  *
  * MT safe.
@@ -1368,9 +1366,9 @@ gst_bus_add_signal_watch (GstBus * bus)
 
 /**
  * gst_bus_remove_signal_watch:
- * @bus: a #GstBus you previously added a signal watch to
+ * @bus: a [GstBus]() you previously added a signal watch to
  *
- * Removes a signal watch previously added with gst_bus_add_signal_watch().
+ * Removes a signal watch previously added with [gst_bus_add_signal_watch]().
  *
  * MT safe.
  */

@@ -19,8 +19,8 @@
 /**
  * SECTION:gstparamspec
  * @short_description: GParamSpec implementations specific
- * to GStreamer
  *
+ * to GStreamer
  * GParamSpec implementations specific to GStreamer.
  */
 
@@ -157,7 +157,7 @@ gst_param_spec_fraction_get_type (void)
  *
  * This function creates a fraction GParamSpec for use by objects/elements
  * that want to expose properties of fraction type. This function is typically
- * used in connection with g_object_class_install_property() in a GObjects's
+ * used in connection with [g_object_class_install_property]() in a GObjects's
  * instance_init function.
  *
  * Returns: (transfer full): a newly created parameter specification

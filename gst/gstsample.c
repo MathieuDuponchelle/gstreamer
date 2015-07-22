@@ -22,9 +22,9 @@
 /**
  * SECTION:gstsample
  * @short_description: A media sample
- * @see_also: #GstBuffer, #GstCaps, #GstSegment
+ * @see_also: [GstBuffer](), [GstCaps](), [GstSegment]()
  *
- * A #GstSample is a small object containing data, a type, timing and
+ * A [GstSample]() is a small object containing data, a type, timing and
  * extra arbitrary information.
  */
 #include "gst_private.h"
@@ -93,16 +93,16 @@ _gst_sample_free (GstSample * sample)
 
 /**
  * gst_sample_new:
- * @buffer: (transfer none) (allow-none): a #GstBuffer, or %NULL
- * @caps: (transfer none) (allow-none): a #GstCaps, or %NULL
- * @segment: (transfer none) (allow-none): a #GstSegment, or %NULL
- * @info: (transfer full) (allow-none): a #GstStructure, or %NULL
+ * @buffer: (transfer none) (allow-none): a [GstBuffer](), or [NULL]()
+ * @caps: (transfer none) (allow-none): a [GstCaps](), or [NULL]()
+ * @segment: (transfer none) (allow-none): a [GstSegment](), or [NULL]()
+ * @info: (transfer full) (allow-none): a [GstStructure](), or [NULL]()
  *
- * Create a new #GstSample with the provided details.
+ * Create a new [GstSample]() with the provided details.
  *
  * Free-function: gst_sample_unref
  *
- * Returns: (transfer full): the new #GstSample. gst_sample_unref()
+ * Returns: (transfer full): the new [GstSample](). [gst_sample_unref]()
  *     after usage.
  */
 GstSample *
@@ -147,14 +147,14 @@ had_parent:
 
 /**
  * gst_sample_get_buffer:
- * @sample: a #GstSample
+ * @sample: a [GstSample]()
  *
- * Get the buffer associated with @sample
+ * Get the buffer associated with _sample_
  *
- * Returns: (transfer none) (nullable): the buffer of @sample or %NULL
+ * Returns: (transfer none) (nullable): the buffer of _sample_ or [NULL]()
  *  when there is no buffer. The buffer remains valid as long as
- *  @sample is valid.  If you need to hold on to it for longer than
- *  that, take a ref to the buffer with gst_buffer_ref().
+ *  _sample_ is valid.  If you need to hold on to it for longer than
+ *  that, take a ref to the buffer with [gst_buffer_ref]().
  */
 GstBuffer *
 gst_sample_get_buffer (GstSample * sample)
@@ -166,14 +166,14 @@ gst_sample_get_buffer (GstSample * sample)
 
 /**
  * gst_sample_get_caps:
- * @sample: a #GstSample
+ * @sample: a [GstSample]()
  *
- * Get the caps associated with @sample
+ * Get the caps associated with _sample_
  *
- * Returns: (transfer none) (nullable): the caps of @sample or %NULL
- *  when there is no caps. The caps remain valid as long as @sample is
+ * Returns: (transfer none) (nullable): the caps of _sample_ or [NULL]()
+ *  when there is no caps. The caps remain valid as long as _sample_ is
  *  valid.  If you need to hold on to the caps for longer than that,
- *  take a ref to the caps with gst_caps_ref().
+ *  take a ref to the caps with [gst_caps_ref]().
  */
 GstCaps *
 gst_sample_get_caps (GstSample * sample)
@@ -185,12 +185,12 @@ gst_sample_get_caps (GstSample * sample)
 
 /**
  * gst_sample_get_segment:
- * @sample: a #GstSample
+ * @sample: a [GstSample]()
  *
- * Get the segment associated with @sample
+ * Get the segment associated with _sample_
  *
- * Returns: (transfer none): the segment of @sample.
- *  The segment remains valid as long as @sample is valid.
+ * Returns: (transfer none): the segment of _sample_.
+ *  The segment remains valid as long as _sample_ is valid.
  */
 GstSegment *
 gst_sample_get_segment (GstSample * sample)
@@ -202,12 +202,12 @@ gst_sample_get_segment (GstSample * sample)
 
 /**
  * gst_sample_get_info:
- * @sample: a #GstSample
+ * @sample: a [GstSample]()
  *
- * Get extra information associated with @sample.
+ * Get extra information associated with _sample_.
  *
- * Returns: (transfer none): the extra info of @sample.
- *  The info remains valid as long as @sample is valid.
+ * Returns: (transfer none): the extra info of _sample_.
+ *  The info remains valid as long as _sample_ is valid.
  */
 const GstStructure *
 gst_sample_get_info (GstSample * sample)
@@ -219,15 +219,14 @@ gst_sample_get_info (GstSample * sample)
 
 /**
  * gst_sample_get_buffer_list:
- * @sample: a #GstSample
+ * @sample: a [GstSample]()
  *
- * Get the buffer list associated with @sample
+ * Get the buffer list associated with _sample_
  *
- * Returns: (transfer none) (nullable): the buffer list of @sample or %NULL
+ * Returns: (transfer none) (nullable): the buffer list of _sample_ or [NULL]()
  *  when there is no buffer list. The buffer list remains valid as long as
- *  @sample is valid.  If you need to hold on to it for longer than
- *  that, take a ref to the buffer list with gst_mini_object_ref ().
- *
+ *  _sample_ is valid.  If you need to hold on to it for longer than
+ *  that, take a ref to the buffer list with [gst_mini_object_ref]().
  * Since: 1.6
  */
 GstBufferList *
@@ -240,10 +239,10 @@ gst_sample_get_buffer_list (GstSample * sample)
 
 /**
  * gst_sample_set_buffer_list:
- * @sample: a #GstSample
- * @buffer_list: a #GstBufferList
+ * @sample: a [GstSample]()
+ * @buffer_list: a [GstBufferList]()
  *
- * Set the buffer list associated with @sample
+ * Set the buffer list associated with _sample_
  *
  * Since: 1.6
  */

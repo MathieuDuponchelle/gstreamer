@@ -52,7 +52,7 @@ G_BEGIN_DECLS
  * @GST_PAD_ALWAYS: the pad is always available
  * @GST_PAD_SOMETIMES: the pad will become available depending on the media stream
  * @GST_PAD_REQUEST: the pad is only available on request with
- *  gst_element_request_pad().
+ *  [gst_element_request_pad]().
  *
  * Indicates when this pad will become available.
  */
@@ -74,7 +74,7 @@ typedef enum {
  * GST_PAD_TEMPLATE_DIRECTION:
  * @templ: the template to query
  *
- * Get the #GstPadDirection of the padtemplate.
+ * Get the [GstPadDirection]() of the padtemplate.
  */
 #define GST_PAD_TEMPLATE_DIRECTION(templ)	(((GstPadTemplate *)(templ))->direction)
 
@@ -82,7 +82,7 @@ typedef enum {
  * GST_PAD_TEMPLATE_PRESENCE:
  * @templ: the template to query
  *
- * Get the #GstPadPresence of the padtemplate.
+ * Get the [GstPadPresence]() of the padtemplate.
  */
 #define GST_PAD_TEMPLATE_PRESENCE(templ)	(((GstPadTemplate *)(templ))->presence)
 
@@ -90,7 +90,7 @@ typedef enum {
  * GST_PAD_TEMPLATE_CAPS:
  * @templ: the template to query
  *
- * Get a handle to the padtemplate #GstCaps
+ * Get a handle to the padtemplate [GstCaps]()
  */
 #define GST_PAD_TEMPLATE_CAPS(templ)		(((GstPadTemplate *)(templ))->caps)
 
@@ -147,7 +147,7 @@ struct _GstPadTemplateClass {
  * @presence: the presence of the template
  * @static_caps: the caps of the template.
  *
- * Structure describing the #GstStaticPadTemplate.
+ * Structure describing the [GstStaticPadTemplate]().
  */
 struct _GstStaticPadTemplate {
   const gchar     *name_template;

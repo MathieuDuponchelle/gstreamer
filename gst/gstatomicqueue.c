@@ -30,10 +30,10 @@
 
 /**
  * SECTION:gstatomicqueue
- * @title: GstAtomicQueue
  * @short_description: An atomic queue implementation
+ * @title: GstAtomicQueue
  *
- * The #GstAtomicQueue object implements a queue that can be used from multiple
+ * The [GstAtomicQueue]() object implements a queue that can be used from multiple
  * threads without performing any blocking operations.
  */
 
@@ -147,10 +147,10 @@ clear_free_list (GstAtomicQueue * queue)
  * gst_atomic_queue_new:
  * @initial_size: initial queue size
  *
- * Create a new atomic queue instance. @initial_size will be rounded up to the
+ * Create a new atomic queue instance. _initial_size_ will be rounded up to the
  * nearest power of 2 and used as the initial size of the queue.
  *
- * Returns: a new #GstAtomicQueue
+ * Returns: a new [GstAtomicQueue]()
  */
 GstAtomicQueue *
 gst_atomic_queue_new (guint initial_size)
@@ -171,9 +171,9 @@ gst_atomic_queue_new (guint initial_size)
 
 /**
  * gst_atomic_queue_ref:
- * @queue: a #GstAtomicQueue
+ * @queue: a [GstAtomicQueue]()
  *
- * Increase the refcount of @queue.
+ * Increase the refcount of _queue_.
  */
 void
 gst_atomic_queue_ref (GstAtomicQueue * queue)
@@ -195,9 +195,9 @@ gst_atomic_queue_free (GstAtomicQueue * queue)
 
 /**
  * gst_atomic_queue_unref:
- * @queue: a #GstAtomicQueue
+ * @queue: a [GstAtomicQueue]()
  *
- * Unref @queue and free the memory when the refcount reaches 0.
+ * Unref _queue_ and free the memory when the refcount reaches 0.
  */
 void
 gst_atomic_queue_unref (GstAtomicQueue * queue)
@@ -210,12 +210,12 @@ gst_atomic_queue_unref (GstAtomicQueue * queue)
 
 /**
  * gst_atomic_queue_peek:
- * @queue: a #GstAtomicQueue
+ * @queue: a [GstAtomicQueue]()
  *
  * Peek the head element of the queue without removing it from the queue.
  *
- * Returns: (transfer none) (nullable): the head element of @queue or
- * %NULL when the queue is empty.
+ * Returns: (transfer none) (nullable): the head element of _queue_ or
+ * [NULL]() when the queue is empty.
  */
 gpointer
 gst_atomic_queue_peek (GstAtomicQueue * queue)
@@ -260,11 +260,11 @@ gst_atomic_queue_peek (GstAtomicQueue * queue)
 
 /**
  * gst_atomic_queue_pop:
- * @queue: a #GstAtomicQueue
+ * @queue: a [GstAtomicQueue]()
  *
  * Get the head element of the queue.
  *
- * Returns: (transfer full): the head element of @queue or %NULL when
+ * Returns: (transfer full): the head element of _queue_ or [NULL]() when
  * the queue is empty.
  */
 gpointer
@@ -329,10 +329,10 @@ gst_atomic_queue_pop (GstAtomicQueue * queue)
 
 /**
  * gst_atomic_queue_push:
- * @queue: a #GstAtomicQueue
+ * @queue: a [GstAtomicQueue]()
  * @data: the data
  *
- * Append @data to the tail of the queue.
+ * Append _data_ to the tail of the queue.
  */
 void
 gst_atomic_queue_push (GstAtomicQueue * queue, gpointer data)
@@ -390,7 +390,7 @@ gst_atomic_queue_push (GstAtomicQueue * queue, gpointer data)
 
 /**
  * gst_atomic_queue_length:
- * @queue: a #GstAtomicQueue
+ * @queue: a [GstAtomicQueue]()
  *
  * Get the amount of items in the queue.
  *

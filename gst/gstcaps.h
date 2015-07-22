@@ -50,25 +50,25 @@ typedef enum {
 
 /**
  * GstCapsIntersectMode:
- * @GST_CAPS_INTERSECT_ZIG_ZAG  : Zig-zags over both caps.
- * @GST_CAPS_INTERSECT_FIRST    : Keeps the first caps order.
+ * @GST_CAPS_INTERSECT_ZIG_ZAG: Zig-zags over both caps.
+ * @GST_CAPS_INTERSECT_FIRST: Keeps the first caps order.
  *
  * Modes of caps intersection
  *
- * @GST_CAPS_INTERSECT_ZIG_ZAG tries to preserve overall order of both caps
+ * _GST_CAPS_INTERSECT_ZIG_ZAG_ tries to preserve overall order of both caps
  * by iterating on the caps' structures as the following matrix shows:
- * |[
+ * ```
  *          caps1
  *       +-------------
  *       | 1  2  4  7
  * caps2 | 3  5  8 10
  *       | 6  9 11 12
- * ]|
+ * ```
  * Used when there is no explicit precedence of one caps over the other. e.g.
  * tee's sink pad getcaps function, it will probe its src pad peers' for their
  * caps and intersect them with this mode.
  *
- * @GST_CAPS_INTERSECT_FIRST is useful when an element wants to preserve
+ * _GST_CAPS_INTERSECT_FIRST_ is useful when an element wants to preserve
  * another element's caps priority order when intersecting with its own caps.
  * Example: If caps1 is [A, B, C] and caps2 is [E, B, D, A], the result
  * would be [A, B], maintaining the first caps priority on the intersection.
@@ -89,7 +89,7 @@ typedef enum {
 /**
  * GST_CAPS_NONE:
  *
- * The opposite of %GST_CAPS_ANY: it means that the pad/element outputs an
+ * The opposite of [GST_CAPS_ANY](): it means that the pad/element outputs an
  * undefined media type that can not be detected. This macro returns a singleton
  * and should not be unreffed.
  */
@@ -98,21 +98,21 @@ typedef enum {
 /**
  * GST_STATIC_CAPS_ANY:
  *
- * Creates a new #GstCaps static caps that matches anything.
+ * Creates a new [GstCaps]() static caps that matches anything.
  * This can be used in pad templates.
  */
 #define GST_STATIC_CAPS_ANY       GST_STATIC_CAPS("ANY")
 /**
  * GST_STATIC_CAPS_NONE:
  *
- * Creates a new #GstCaps static caps that matches nothing.
+ * Creates a new [GstCaps]() static caps that matches nothing.
  * This can be used in pad templates.
  */
 #define GST_STATIC_CAPS_NONE      GST_STATIC_CAPS("NONE")
 
 /**
  * GST_CAPS_IS_SIMPLE:
- * @caps: the #GstCaps instance to check
+ * @caps: the [GstCaps]() instance to check
  *
  * Convenience macro that checks if the number of structures in the given caps
  * is exactly one.
@@ -123,7 +123,7 @@ typedef enum {
  * GST_STATIC_CAPS:
  * @string: the string describing the caps
  *
- * Creates a new #GstCaps static caps from an input string.
+ * Creates a new [GstCaps]() static caps from an input string.
  * This can be used in pad templates.
  */
 #define GST_STATIC_CAPS(string) \
@@ -140,23 +140,23 @@ GST_EXPORT GstCaps * _gst_caps_any;
 GST_EXPORT GstCaps * _gst_caps_none;
 /**
  * GST_CAPS_FLAGS:
- * @caps: a #GstCaps.
+ * @caps: a [GstCaps]().
  *
- * A flags word containing #GstCapsFlags flags set on this caps.
+ * A flags word containing [GstCapsFlags]() flags set on this caps.
  */
 #define GST_CAPS_FLAGS(caps)                    GST_MINI_OBJECT_FLAGS(caps)
 
 /* refcount */
 /**
  * GST_CAPS_REFCOUNT:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  *
  * Get access to the reference count field of the caps
  */
 #define GST_CAPS_REFCOUNT(caps)                 GST_MINI_OBJECT_REFCOUNT(caps)
 /**
  * GST_CAPS_REFCOUNT_VALUE:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  *
  * Get the reference count value of the caps.
  */
@@ -164,24 +164,24 @@ GST_EXPORT GstCaps * _gst_caps_none;
 
 /**
  * GST_CAPS_FLAG_IS_SET:
- * @caps: a #GstCaps.
- * @flag: the #GstCapsFlags to check.
+ * @caps: a [GstCaps]().
+ * @flag: the [GstCapsFlags]() to check.
  *
  * Gives the status of a specific flag on a caps.
  */
 #define GST_CAPS_FLAG_IS_SET(caps,flag)        GST_MINI_OBJECT_FLAG_IS_SET (caps, flag)
 /**
  * GST_CAPS_FLAG_SET:
- * @caps: a #GstCaps.
- * @flag: the #GstCapsFlags to set.
+ * @caps: a [GstCaps]().
+ * @flag: the [GstCapsFlags]() to set.
  *
  * Sets a caps flag on a caps.
  */
 #define GST_CAPS_FLAG_SET(caps,flag)           GST_MINI_OBJECT_FLAG_SET (caps, flag)
 /**
  * GST_CAPS_FLAG_UNSET:
- * @caps: a #GstCaps.
- * @flag: the #GstCapsFlags to clear.
+ * @caps: a [GstCaps]().
+ * @flag: the [GstCapsFlags]() to clear.
  *
  * Clears a caps flag.
  */
@@ -190,18 +190,18 @@ GST_EXPORT GstCaps * _gst_caps_none;
 /* refcounting */
 /**
  * gst_caps_ref:
- * @caps: the #GstCaps to reference
+ * @caps: the [GstCaps]() to reference
  *
- * Add a reference to a #GstCaps object.
+ * Add a reference to a [GstCaps]() object.
  *
- * From this point on, until the caller calls gst_caps_unref() or
- * gst_caps_make_writable(), it is guaranteed that the caps object will not
- * change. This means its structures won't change, etc. To use a #GstCaps
+ * From this point on, until the caller calls [gst_caps_unref]() or
+ * [gst_caps_make_writable](), it is guaranteed that the caps object will not
+ * change. This means its structures won't change, etc. To use a [GstCaps]()
  * object, you must always have a refcount on it -- either the one made
- * implicitly by e.g. gst_caps_new_simple(), or via taking one explicitly with
+ * implicitly by e.g. [gst_caps_new_simple](), or via taking one explicitly with
  * this function.
  *
- * Returns: the same #GstCaps object.
+ * Returns: the same [GstCaps]() object.
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstCaps * gst_caps_ref (GstCaps * caps);
@@ -215,9 +215,9 @@ gst_caps_ref (GstCaps * caps)
 
 /**
  * gst_caps_unref:
- * @caps: a #GstCaps.
+ * @caps: a [GstCaps]().
  *
- * Unref a #GstCaps and and free all its structures and the
+ * Unref a [GstCaps]() and and free all its structures and the
  * structures' values when the refcount reaches 0.
  */
 #ifdef _FOOL_GTK_DOC_
@@ -233,18 +233,18 @@ gst_caps_unref (GstCaps * caps)
 /* copy caps */
 /**
  * gst_caps_copy:
- * @caps: a #GstCaps.
+ * @caps: a [GstCaps]().
  *
- * Creates a new #GstCaps as a copy of the old @caps. The new caps will have a
+ * Creates a new [GstCaps]() as a copy of the old _caps_. The new caps will have a
  * refcount of 1, owned by the caller. The structures are copied as well.
  *
- * Note that this function is the semantic equivalent of a gst_caps_ref()
- * followed by a gst_caps_make_writable(). If you only want to hold on to a
- * reference to the data, you should use gst_caps_ref().
+ * Note that this function is the semantic equivalent of a [gst_caps_ref]()
+ * followed by a [gst_caps_make_writable](). If you only want to hold on to a
+ * reference to the data, you should use [gst_caps_ref]().
  *
- * When you are finished with the caps, call gst_caps_unref() on it.
+ * When you are finished with the caps, call [gst_caps_unref]() on it.
  *
- * Returns: the new #GstCaps
+ * Returns: the new [GstCaps]()
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstCaps * gst_caps_copy (const GstCaps * caps);
@@ -258,49 +258,49 @@ gst_caps_copy (const GstCaps * caps)
 
 /**
  * gst_caps_is_writable:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  *
- * Tests if you can safely modify @caps. It is only safe to modify caps when
+ * Tests if you can safely modify _caps_. It is only safe to modify caps when
  * there is only one owner of the caps - ie, the object is writable.
  */
 #define         gst_caps_is_writable(caps)     gst_mini_object_is_writable (GST_MINI_OBJECT_CAST (caps))
 
 /**
  * gst_caps_make_writable:
- * @caps: (transfer full): a #GstCaps
+ * @caps: (transfer full): a [GstCaps]()
  *
- * Returns a writable copy of @caps.
+ * Returns a writable copy of _caps_.
  *
- * If there is only one reference count on @caps, the caller must be the owner,
+ * If there is only one reference count on _caps_, the caller must be the owner,
  * and so this function will return the caps object unchanged. If on the other
  * hand there is more than one reference on the object, a new caps object will
- * be returned. The caller's reference on @caps will be removed, and instead the
+ * be returned. The caller's reference on _caps_ will be removed, and instead the
  * caller will own a reference to the returned object.
  *
  * In short, this function unrefs the caps in the argument and refs the caps
  * that it returns. Don't access the argument after calling this function. See
- * also: gst_caps_ref().
+ * also: [gst_caps_ref]().
  *
  * Returns: (transfer full): a writable caps which may or may not be the
- *     same as @caps
+ *     same as _caps_
  */
 #define         gst_caps_make_writable(caps)   GST_CAPS_CAST (gst_mini_object_make_writable (GST_MINI_OBJECT_CAST (caps)))
 
 /**
  * gst_caps_replace:
  * @old_caps: (inout) (transfer full) (nullable): pointer to a pointer
- *     to a #GstCaps to be replaced.
- * @new_caps: (transfer none) (allow-none): pointer to a #GstCaps that will
- *     replace the caps pointed to by @old_caps.
+ *     to a [GstCaps]() to be replaced.
+ * @new_caps: (transfer none) (allow-none): pointer to a [GstCaps]() that will
+ *     replace the caps pointed to by _old_caps_.
  *
- * Modifies a pointer to a #GstCaps to point to a different #GstCaps. The
+ * Modifies a pointer to a [GstCaps]() to point to a different [GstCaps](). The
  * modification is done atomically (so this is useful for ensuring thread safety
  * in some cases), and the reference counts are updated appropriately (the old
  * caps is unreffed, the new is reffed).
  *
- * Either @new_caps or the #GstCaps pointed to by @old_caps may be %NULL.
+ * Either _new_caps_ or the [GstCaps]() pointed to by _old_caps_ may be [NULL]().
  *
- * Returns: %TRUE if @new_caps was different from @old_caps
+ * Returns: [TRUE]() if _new_caps_ was different from _old_caps_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gboolean gst_caps_replace (GstCaps **old_caps, GstCaps *new_caps);
@@ -314,16 +314,16 @@ gst_caps_replace (GstCaps **old_caps, GstCaps *new_caps)
 
 /**
  * gst_caps_take:
- * @old_caps: (inout) (transfer full): pointer to a pointer to a #GstCaps to be
+ * @old_caps: (inout) (transfer full): pointer to a pointer to a [GstCaps]() to be
  *     replaced.
- * @new_caps: (transfer full) (allow-none): pointer to a #GstCaps that will
- *     replace the caps pointed to by @old_caps.
+ * @new_caps: (transfer full) (allow-none): pointer to a [GstCaps]() that will
+ *     replace the caps pointed to by _old_caps_.
  *
- * Modifies a pointer to a #GstCaps to point to a different #GstCaps. This
- * function is similar to gst_caps_replace() except that it takes ownership
- * of @new_caps.
+ * Modifies a pointer to a [GstCaps]() to point to a different [GstCaps](). This
+ * function is similar to [gst_caps_replace]() except that it takes ownership
+ * of _new_caps_.
  *
- * Returns: %TRUE if @new_caps was different from @old_caps
+ * Returns: [TRUE]() if _new_caps_ was different from _old_caps_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gboolean gst_caps_take (GstCaps **old_caps, GstCaps *new_caps);
@@ -347,12 +347,12 @@ struct _GstCaps {
 
 /**
  * GstStaticCaps:
- * @caps: the cached #GstCaps
+ * @caps: the cached [GstCaps]()
  * @string: a string describing a caps
  *
- * Datastructure to initialize #GstCaps from a string description usually
- * used in conjunction with GST_STATIC_CAPS() and gst_static_caps_get() to
- * instantiate a #GstCaps.
+ * Datastructure to initialize [GstCaps]() from a string description usually
+ * used in conjunction with [GST_STATIC_CAPS]() and [gst_static_caps_get]() to
+ * instantiate a [GstCaps]().
  */
 struct _GstStaticCaps {
   /*< public >*/
@@ -365,16 +365,15 @@ struct _GstStaticCaps {
 
 /**
  * GstCapsForeachFunc:
- * @features: the #GstCapsFeatures
- * @structure: the #GstStructure
+ * @features: the [GstCapsFeatures]()
+ * @structure: the [GstStructure]()
  * @user_data: user data
  *
- * A function that will be called in gst_caps_foreach(). The function may
- * not modify @features or @structure.
+ * A function that will be called in [gst_caps_foreach](). The function may
+ * not modify _features_ or _structure_.
  *
- * Returns: %TRUE if the foreach operation should continue, %FALSE if
- * the foreach operation should stop with %FALSE.
- *
+ * Returns: [TRUE]() if the foreach operation should continue, [FALSE]() if
+ * the foreach operation should stop with [FALSE]().
  * Since: 1.6
  */
 typedef gboolean (*GstCapsForeachFunc) (GstCapsFeatures *features,
@@ -383,15 +382,15 @@ typedef gboolean (*GstCapsForeachFunc) (GstCapsFeatures *features,
 
 /**
  * GstCapsMapFunc:
- * @features: the #GstCapsFeatures
- * @structure: the #GstStructure
+ * @features: the [GstCapsFeatures]()
+ * @structure: the [GstStructure]()
  * @user_data: user data
  *
- * A function that will be called in gst_caps_map_in_place(). The function
- * may modify @features and @structure.
+ * A function that will be called in [gst_caps_map_in_place](). The function
+ * may modify _features_ and _structure_.
  *
- * Returns: %TRUE if the map operation should continue, %FALSE if
- * the map operation should stop with %FALSE.
+ * Returns: [TRUE]() if the map operation should continue, [FALSE]() if
+ * the map operation should stop with [FALSE]().
  */
 typedef gboolean (*GstCapsMapFunc)     (GstCapsFeatures *features,
                                         GstStructure    *structure,
@@ -399,16 +398,16 @@ typedef gboolean (*GstCapsMapFunc)     (GstCapsFeatures *features,
 
 /**
  * GstCapsFilterMapFunc:
- * @features: the #GstCapsFeatures
- * @structure: the #GstStructure
+ * @features: the [GstCapsFeatures]()
+ * @structure: the [GstStructure]()
  * @user_data: user data
  *
- * A function that will be called in gst_caps_filter_and_map_in_place().
- * The function may modify @features and @structure, and both will be
- * removed from the caps if %FALSE is returned.
+ * A function that will be called in [gst_caps_filter_and_map_in_place]().
+ * The function may modify _features_ and _structure_, and both will be
+ * removed from the caps if [FALSE]() is returned.
  *
- * Returns: %TRUE if the features and structure should be preserved,
- * %FALSE if it should be removed.
+ * Returns: [TRUE]() if the features and structure should be preserved,
+ * [FALSE]() if it should be removed.
  */
 typedef gboolean (*GstCapsFilterMapFunc) (GstCapsFeatures *features,
                                           GstStructure    *structure,

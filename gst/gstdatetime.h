@@ -44,9 +44,9 @@ GST_EXPORT GType _gst_date_time_type;
 /**
  * GST_TYPE_DATE_TIME:
  *
- * a boxed #GValue type for #GstDateTime that represents a date and time.
+ * a boxed [GValue]() type for [GstDateTime]() that represents a date and time.
  *
- * Returns: the #GType of GstDateTime
+ * Returns: the [GType]() of GstDateTime
  */
 
 #define GST_TYPE_DATE_TIME (_gst_date_time_type)

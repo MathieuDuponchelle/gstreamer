@@ -67,7 +67,7 @@ typedef enum {
  * @GST_TOC_ENTRY_TYPE_TRACK: entry is a track (i.e. a part of a sequence)
  * @GST_TOC_ENTRY_TYPE_CHAPTER: entry is a chapter (i.e. a part of a sequence)
  *
- * The different types of TOC entries (see #GstTocEntry).
+ * The different types of TOC entries (see [GstTocEntry]()).
  *
  * There are two types of TOC entries: alternatives or parts in a sequence.
  */
@@ -83,17 +83,17 @@ typedef enum {
 
 /**
  * GST_TOC_ENTRY_TYPE_IS_ALTERNATIVE:
- * @entry_type: The #GstTocEntryType from a #GstTocEntry
+ * @entry_type: The [GstTocEntryType]() from a [GstTocEntry]()
  *
- * Checks if @entry_type indicates that its #GstTocEntry is an alternative.
+ * Checks if _entry_type_ indicates that its [GstTocEntry]() is an alternative.
  */
 #define GST_TOC_ENTRY_TYPE_IS_ALTERNATIVE(entry_type)  (entry_type < 0)
 
 /**
  * GST_TOC_ENTRY_TYPE_IS_SEQUENCE:
- * @entry_type: The #GstTocEntryType from a #GstTocEntry
+ * @entry_type: The [GstTocEntryType]() from a [GstTocEntry]()
  *
- * Checks if @entry_type indicates that its #GstTocEntry is a sequence.
+ * Checks if _entry_type_ indicates that its [GstTocEntry]() is a sequence.
  */
 #define GST_TOC_ENTRY_TYPE_IS_SEQUENCE(entry_type)     (entry_type > 0)
 
@@ -104,7 +104,7 @@ typedef enum {
  * @GST_TOC_LOOP_REVERSE: repeat backward
  * @GST_TOC_LOOP_PING_PONG: repeat forward and backward
  *
- * How a #GstTocEntry should be repeated. By default, entries are played a
+ * How a [GstTocEntry]() should be repeated. By default, entries are played a
  * single time.
  *
  * Since: 1.4
@@ -119,8 +119,8 @@ typedef enum {
 /**
  * GST_TOC_REPEAT_COUNT_INFINITE:
  *
- * Special value for the repeat_count set in gst_toc_entry_set_loop() or
- * returned by gst_toc_entry_set_loop() to indicate infinite looping.
+ * Special value for the repeat_count set in [gst_toc_entry_set_loop]() or
+ * returned by [gst_toc_entry_set_loop]() to indicate infinite looping.
  *
  * Since: 1.4
  */

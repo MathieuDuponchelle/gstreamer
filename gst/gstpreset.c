@@ -32,18 +32,17 @@
  * The interface comes with a default implementation that serves most plugins.
  * Wrapper plugins will override most methods to implement support for the
  * native preset format of those wrapped plugins.
- * One method that is useful to be overridden is gst_preset_get_property_names().
+ * One method that is useful to be overridden is [gst_preset_get_property_names]().
  * With that one can control which properties are saved and in which order.
  * When implementing support for read-only presets, one should set the vmethods
- * for gst_preset_save_preset() and gst_preset_delete_preset() to %NULL.
- * Applications can use gst_preset_is_editable() to check for that.
+ * for [gst_preset_save_preset]() and [gst_preset_delete_preset]() to [NULL]().
+ * Applications can use [gst_preset_is_editable]() to check for that.
  *
- * The default implementation supports presets located in a system directory, 
+ * The default implementation supports presets located in a system directory,
  * application specific directory and in the users home directory. When getting
- * a list of presets individual presets are read and overlaid in 1) system, 
+ * a list of presets individual presets are read and overlaid in 1) system,
  * 2) application and 3) user order. Whenever an earlier entry is newer, the
- * later entries will be updated. 
- * 
+ * later entries will be updated.
  */
 /* FIXME:
  * - non racyness
@@ -967,12 +966,12 @@ no_presets:
 
 /**
  * gst_preset_get_preset_names:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  *
- * Get a copy of preset names as a %NULL terminated string array.
+ * Get a copy of preset names as a [NULL]() terminated string array.
  *
- * Returns: (transfer full) (array zero-terminated=1) (element-type gchar*):
- *     list with names, use g_strfreev() after usage.
+ * Returns: (transfer full) (array zero-terminated=1) (element-type gchar*): 
+ *     list with names, use [g_strfreev]() after usage.
  */
 gchar **
 gst_preset_get_preset_names (GstPreset * preset)
@@ -984,12 +983,12 @@ gst_preset_get_preset_names (GstPreset * preset)
 
 /**
  * gst_preset_get_property_names:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  *
  * Get a the names of the GObject properties that can be used for presets.
  *
  * Returns: (transfer full) (array zero-terminated=1) (element-type gchar*): an
- *   array of property names which should be freed with g_strfreev() after use.
+ *   array of property names which should be freed with [g_strfreev]() after use.
  */
 gchar **
 gst_preset_get_property_names (GstPreset * preset)
@@ -1001,12 +1000,12 @@ gst_preset_get_property_names (GstPreset * preset)
 
 /**
  * gst_preset_load_preset:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  * @name: preset name to load
  *
  * Load the given preset.
  *
- * Returns: %TRUE for success, %FALSE if e.g. there is no preset with that @name
+ * Returns: [TRUE]() for success, [FALSE]() if e.g. there is no preset with that _name_
  */
 gboolean
 gst_preset_load_preset (GstPreset * preset, const gchar * name)
@@ -1019,13 +1018,13 @@ gst_preset_load_preset (GstPreset * preset, const gchar * name)
 
 /**
  * gst_preset_save_preset:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  * @name: preset name to save
  *
  * Save the current object settings as a preset under the given name. If there
- * is already a preset by this @name it will be overwritten.
+ * is already a preset by this _name_ it will be overwritten.
  *
- * Returns: %TRUE for success, %FALSE
+ * Returns: [TRUE]() for success, [FALSE]()
  */
 gboolean
 gst_preset_save_preset (GstPreset * preset, const gchar * name)
@@ -1038,14 +1037,14 @@ gst_preset_save_preset (GstPreset * preset, const gchar * name)
 
 /**
  * gst_preset_rename_preset:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  * @old_name: current preset name
  * @new_name: new preset name
  *
- * Renames a preset. If there is already a preset by the @new_name it will be
+ * Renames a preset. If there is already a preset by the _new_name_ it will be
  * overwritten.
  *
- * Returns: %TRUE for success, %FALSE if e.g. there is no preset with @old_name
+ * Returns: [TRUE]() for success, [FALSE]() if e.g. there is no preset with _old_name_
  */
 gboolean
 gst_preset_rename_preset (GstPreset * preset, const gchar * old_name,
@@ -1061,12 +1060,12 @@ gst_preset_rename_preset (GstPreset * preset, const gchar * old_name,
 
 /**
  * gst_preset_delete_preset:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  * @name: preset name to remove
  *
  * Delete the given preset.
  *
- * Returns: %TRUE for success, %FALSE if e.g. there is no preset with that @name
+ * Returns: [TRUE]() for success, [FALSE]() if e.g. there is no preset with that _name_
  */
 gboolean
 gst_preset_delete_preset (GstPreset * preset, const gchar * name)
@@ -1079,16 +1078,16 @@ gst_preset_delete_preset (GstPreset * preset, const gchar * name)
 
 /**
  * gst_preset_set_meta:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  * @name: preset name
  * @tag: meta data item name
  * @value: (allow-none): new value
  *
- * Sets a new @value for an existing meta data item or adds a new item. Meta
- * data @tag names can be something like e.g. "comment". Supplying %NULL for the
- * @value will unset an existing value.
+ * Sets a new _value_ for an existing meta data item or adds a new item. Meta
+ * data _tag_ names can be something like e.g. "comment". Supplying [NULL]() for the
+ * _value_ will unset an existing value.
  *
- * Returns: %TRUE for success, %FALSE if e.g. there is no preset with that @name
+ * Returns: [TRUE]() for success, [FALSE]() if e.g. there is no preset with that _name_
  */
 gboolean
 gst_preset_set_meta (GstPreset * preset, const gchar * name, const gchar * tag,
@@ -1103,16 +1102,16 @@ gst_preset_set_meta (GstPreset * preset, const gchar * name, const gchar * tag,
 
 /**
  * gst_preset_get_meta:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  * @name: preset name
  * @tag: meta data item name
  * @value: (out callee-allocates): value
  *
- * Gets the @value for an existing meta data @tag. Meta data @tag names can be
+ * Gets the _value_ for an existing meta data _tag_. Meta data _tag_ names can be
  * something like e.g. "comment". Returned values need to be released when done.
  *
- * Returns: %TRUE for success, %FALSE if e.g. there is no preset with that @name
- * or no value for the given @tag
+ * Returns: [TRUE]() for success, [FALSE]() if e.g. there is no preset with that _name_
+ * or no value for the given _tag_
  */
 gboolean
 gst_preset_get_meta (GstPreset * preset, const gchar * name, const gchar * tag,
@@ -1131,10 +1130,10 @@ gst_preset_get_meta (GstPreset * preset, const gchar * name, const gchar * tag,
  * @app_dir: the application specific preset dir
  *
  * Sets an extra directory as an absolute path that should be considered when
- * looking for presets. Any presets in the application dir will shadow the 
+ * looking for presets. Any presets in the application dir will shadow the
  * system presets.
  *
- * Returns: %TRUE for success, %FALSE if the dir already has been set
+ * Returns: [TRUE]() for success, [FALSE]() if the dir already has been set
  */
 gboolean
 gst_preset_set_app_dir (const gchar * app_dir)
@@ -1154,7 +1153,7 @@ gst_preset_set_app_dir (const gchar * app_dir)
  * Gets the directory for application specific presets if set by the
  * application.
  *
- * Returns: (nullable): the directory or %NULL, don't free or modify
+ * Returns: (nullable): the directory or [NULL](), don't free or modify
  * the string
  */
 const gchar *
@@ -1165,12 +1164,11 @@ gst_preset_get_app_dir (void)
 
 /**
  * gst_preset_is_editable:
- * @preset: a #GObject that implements #GstPreset
+ * @preset: a [GObject]() that implements [GstPreset]()
  *
  * Check if one can add new presets, change existing ones and remove presets.
  *
- * Returns: %TRUE if presets are editable or %FALSE if they are static
- *
+ * Returns: [TRUE]() if presets are editable or [FALSE]() if they are static
  * Since: 1.6
  */
 gboolean

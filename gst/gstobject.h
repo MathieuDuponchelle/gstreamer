@@ -53,14 +53,14 @@ typedef enum
 
 /**
  * GST_OBJECT_REFCOUNT:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  *
  * Get access to the reference count field of the object.
  */
 #define GST_OBJECT_REFCOUNT(obj)                (((GObject*)(obj))->ref_count)
 /**
  * GST_OBJECT_REFCOUNT_VALUE:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  *
  * Get the reference count value of the object.
  */
@@ -71,14 +71,14 @@ typedef enum
 
 /**
  * GST_OBJECT_GET_LOCK:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  *
  * Acquire a reference to the mutex of this object.
  */
 #define GST_OBJECT_GET_LOCK(obj)               (&GST_OBJECT_CAST(obj)->lock)
 /**
  * GST_OBJECT_LOCK:
- * @obj: a #GstObject to lock
+ * @obj: a [GstObject]() to lock
  *
  * This macro will obtain a lock on the object, making serialization possible.
  * It blocks until the lock can be obtained.
@@ -86,15 +86,15 @@ typedef enum
 #define GST_OBJECT_LOCK(obj)                   g_mutex_lock(GST_OBJECT_GET_LOCK(obj))
 /**
  * GST_OBJECT_TRYLOCK:
- * @obj: a #GstObject.
+ * @obj: a [GstObject]().
  *
  * This macro will try to obtain a lock on the object, but will return with
- * %FALSE if it can't get it immediately.
+ * [FALSE]() if it can't get it immediately.
  */
 #define GST_OBJECT_TRYLOCK(obj)                g_mutex_trylock(GST_OBJECT_GET_LOCK(obj))
 /**
  * GST_OBJECT_UNLOCK:
- * @obj: a #GstObject to unlock.
+ * @obj: a [GstObject]() to unlock.
  *
  * This macro releases a lock on the object.
  */
@@ -103,14 +103,14 @@ typedef enum
 
 /**
  * GST_OBJECT_NAME:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  *
  * Get the name of this object
  */
 #define GST_OBJECT_NAME(obj)            (GST_OBJECT_CAST(obj)->name)
 /**
  * GST_OBJECT_PARENT:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  *
  * Get the parent of this object
  */
@@ -119,14 +119,14 @@ typedef enum
 
 /**
  * GST_OBJECT_FLAGS:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  *
  * This macro returns the entire set of flags for the object.
  */
 #define GST_OBJECT_FLAGS(obj)                  (GST_OBJECT_CAST (obj)->flags)
 /**
  * GST_OBJECT_FLAG_IS_SET:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  * @flag: Flag to check for
  *
  * This macro checks to see if the given flag is set.
@@ -134,7 +134,7 @@ typedef enum
 #define GST_OBJECT_FLAG_IS_SET(obj,flag)       ((GST_OBJECT_FLAGS (obj) & (flag)) == (flag))
 /**
  * GST_OBJECT_FLAG_SET:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  * @flag: Flag to set
  *
  * This macro sets the given bits.
@@ -142,7 +142,7 @@ typedef enum
 #define GST_OBJECT_FLAG_SET(obj,flag)          (GST_OBJECT_FLAGS (obj) |= (flag))
 /**
  * GST_OBJECT_FLAG_UNSET:
- * @obj: a #GstObject
+ * @obj: a [GstObject]()
  * @flag: Flag to set
  *
  * This macro unsets the given bits.
@@ -181,7 +181,7 @@ struct _GstObject {
 /**
  * GstObjectClass:
  * @parent_class: parent
- * @path_string_separator: separator used by gst_object_get_path_string()
+ * @path_string_separator: separator used by [gst_object_get_path_string]()
  * @deep_notify: default signal handler
  *
  * GStreamer base object class.

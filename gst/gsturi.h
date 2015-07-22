@@ -80,7 +80,7 @@ typedef enum {
 
 /**
  * GST_URI_TYPE_IS_VALID:
- * @type: A #GstURIType
+ * @type: A [GstURIType]()
  *
  * Tests if the type direction is valid.
  */
@@ -95,7 +95,7 @@ typedef enum {
 /**
  * GstURIHandler:
  *
- * Opaque #GstURIHandler structure.
+ * Opaque [GstURIHandler]() structure.
  */
 typedef struct _GstURIHandler GstURIHandler;
 typedef struct _GstURIHandlerInterface GstURIHandlerInterface;
@@ -108,7 +108,7 @@ typedef struct _GstURIHandlerInterface GstURIHandlerInterface;
  * @get_uri: Method to return the URI currently handled by the element.
  * @set_uri: Method to set a new URI.
  *
- * Any #GstElement using this interface should implement these methods.
+ * Any [GstElement]() using this interface should implement these methods.
  */
 struct _GstURIHandlerInterface {
   GTypeInterface parent;
@@ -177,7 +177,7 @@ typedef struct _GstUri GstUri;
 /**
  * GST_URI_NO_PORT:
  *
- * Value for #GstUri<!-- -->.port to indicate no port number.
+ * Value for [GstUri]()<!-- -->.port to indicate no port number.
  */
 #define GST_URI_NO_PORT 0
 
@@ -253,13 +253,13 @@ gboolean gst_uri_set_fragment          (GstUri * uri, const gchar * fragment);
 
 /**
  * gst_uri_copy:
- * @uri: This #GstUri object.
+ * @uri: This [GstUri]() object.
  *
- * Create a new #GstUri object with the same data as this #GstUri object.
- * If @uri is %NULL then returns %NULL.
+ * Create a new [GstUri]() object with the same data as this [GstUri]() object.
+ * If _uri_ is [NULL]() then returns [NULL]().
  *
- * Returns: (transfer full): A new #GstUri object which is a copy of this
- *          #GstUri or %NULL.
+ * Returns: (transfer full): A new [GstUri]() object which is a copy of this
+ *          [GstUri]() or [NULL]().
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstUri * gst_uri_copy (const GstUri * uri);
@@ -273,9 +273,9 @@ gst_uri_copy (const GstUri * uri)
 
 /**
  * gst_uri_ref:
- * @uri: (transfer none): This #GstUri object.
+ * @uri: (transfer none): This [GstUri]() object.
  *
- * Add a reference to this #GstUri object. See gst_mini_object_ref() for further
+ * Add a reference to this [GstUri]() object. See [gst_mini_object_ref]() for further
  * info.
  *
  * Returns: This object with the reference count incremented.
@@ -292,13 +292,13 @@ gst_uri_ref (GstUri * uri)
 
 /**
  * gst_uri_unref:
- * @uri: (transfer full): This #GstUri object.
+ * @uri: (transfer full): This [GstUri]() object.
  *
- * Decrement the reference count to this #GstUri object.
+ * Decrement the reference count to this [GstUri]() object.
  *
  * If the reference count drops to 0 then finalize this object.
  *
- * See gst_mini_object_unref() for further info.
+ * See [gst_mini_object_unref]() for further info.
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC void gst_uri_unref (GstUri * uri);

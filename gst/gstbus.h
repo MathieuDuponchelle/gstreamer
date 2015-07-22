@@ -70,8 +70,8 @@ typedef enum
 
 /**
  * GstBusSyncHandler:
- * @bus: the #GstBus that sent the message
- * @message: the #GstMessage
+ * @bus: the [GstBus]() that sent the message
+ * @message: the [GstMessage]()
  * @user_data: user data that has been given, when registering the handler
  *
  * Handler will be invoked synchronously, when a new message has been injected
@@ -81,34 +81,34 @@ typedef enum
  * If the handler returns GST_BUS_DROP, it should unref the message, else the
  * message should not be unreffed by the sync handler.
  *
- * Returns: #GstBusSyncReply stating what to do with the message
+ * Returns: [GstBusSyncReply]() stating what to do with the message
  */
 typedef GstBusSyncReply (*GstBusSyncHandler)    (GstBus * bus, GstMessage * message, gpointer user_data);
 
 /**
  * GstBusFunc:
- * @bus: the #GstBus that sent the message
- * @message: the #GstMessage
+ * @bus: the [GstBus]() that sent the message
+ * @message: the [GstMessage]()
  * @user_data: user data that has been given, when registering the handler
  *
- * Specifies the type of function passed to gst_bus_add_watch() or
- * gst_bus_add_watch_full(), which is called from the mainloop when a message
+ * Specifies the type of function passed to [gst_bus_add_watch]() or
+ * [gst_bus_add_watch_full](), which is called from the mainloop when a message
  * is available on the bus.
  *
  * The message passed to the function will be unreffed after execution of this
  * function so it should not be freed in the function.
  *
  * Note that this function is used as a GSourceFunc which means that returning
- * %FALSE will remove the GSource from the mainloop.
+ * [FALSE]() will remove the GSource from the mainloop.
  *
- * Returns: %FALSE if the event source should be removed.
+ * Returns: [FALSE]() if the event source should be removed.
  */
 typedef gboolean        (*GstBusFunc)           (GstBus * bus, GstMessage * message, gpointer user_data);
 
 /**
  * GstBus:
  *
- * The opaque #GstBus data structure.
+ * The opaque [GstBus]() data structure.
  */
 struct _GstBus
 {

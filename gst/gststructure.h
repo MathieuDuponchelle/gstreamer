@@ -40,15 +40,15 @@ typedef struct _GstStructure GstStructure;
 
 /**
  * GstStructureForeachFunc:
- * @field_id: the #GQuark of the field name
- * @value: the #GValue of the field
+ * @field_id: the [GQuark]() of the field name
+ * @value: the [GValue]() of the field
  * @user_data: user data
  *
- * A function that will be called in gst_structure_foreach(). The function may
- * not modify @value.
+ * A function that will be called in [gst_structure_foreach](). The function may
+ * not modify _value_.
  *
- * Returns: %TRUE if the foreach operation should continue, %FALSE if
- * the foreach operation should stop with %FALSE.
+ * Returns: [TRUE]() if the foreach operation should continue, [FALSE]() if
+ * the foreach operation should stop with [FALSE]().
  */
 typedef gboolean (*GstStructureForeachFunc) (GQuark   field_id,
                                              const GValue * value,
@@ -56,15 +56,15 @@ typedef gboolean (*GstStructureForeachFunc) (GQuark   field_id,
 
 /**
  * GstStructureMapFunc:
- * @field_id: the #GQuark of the field name
- * @value: the #GValue of the field
+ * @field_id: the [GQuark]() of the field name
+ * @value: the [GValue]() of the field
  * @user_data: user data
  *
- * A function that will be called in gst_structure_map_in_place(). The function
- * may modify @value.
+ * A function that will be called in [gst_structure_map_in_place](). The function
+ * may modify _value_.
  *
- * Returns: %TRUE if the map operation should continue, %FALSE if
- * the map operation should stop with %FALSE.
+ * Returns: [TRUE]() if the map operation should continue, [FALSE]() if
+ * the map operation should stop with [FALSE]().
  */
 typedef gboolean (*GstStructureMapFunc)     (GQuark   field_id,
                                              GValue * value,
@@ -72,15 +72,15 @@ typedef gboolean (*GstStructureMapFunc)     (GQuark   field_id,
 
 /**
  * GstStructureFilterMapFunc:
- * @field_id: the #GQuark of the field name
- * @value: the #GValue of the field
+ * @field_id: the [GQuark]() of the field name
+ * @value: the [GValue]() of the field
  * @user_data: user data
  *
- * A function that will be called in gst_structure_filter_and_map_in_place().
- * The function may modify @value, and the value will be removed from
- * the structure if %FALSE is returned.
+ * A function that will be called in [gst_structure_filter_and_map_in_place]().
+ * The function may modify _value_, and the value will be removed from
+ * the structure if [FALSE]() is returned.
  *
- * Returns: %TRUE if the field should be preserved, %FALSE if it
+ * Returns: [TRUE]() if the field should be preserved, [FALSE]() if it
  * should be removed.
  */
 typedef gboolean (*GstStructureFilterMapFunc) (GQuark   field_id,

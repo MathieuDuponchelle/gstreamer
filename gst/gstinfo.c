@@ -25,7 +25,7 @@
 /**
  * SECTION:gstinfo
  * @short_description: Debugging and logging facilities
- * @see_also: #gst-running for command line parameters
+ * @see_also: [gst]()-running for command line parameters
  * and environment variables that affect the debugging output.
  *
  * GStreamer's debugging subsystem is an easy way to get information about what
@@ -33,32 +33,32 @@
  * methods (g_warning and friends) for that.
  *
  * The debugging subsystem works only after GStreamer has been initialized
- * - for example by calling gst_init().
+ * - for example by calling [gst_init]().
  *
  * The debugging subsystem is used to log informational messages while the
  * application runs.  Each messages has some properties attached to it. Among
  * these properties are the debugging category, the severity (called "level"
- * here) and an optional #GObject it belongs to. Each of these messages is sent
+ * here) and an optional [GObject]() it belongs to. Each of these messages is sent
  * to all registered debugging handlers, which then handle the messages.
  * GStreamer attaches a default handler on startup, which outputs requested
  * messages to stderr.
  *
- * Messages are output by using shortcut macros like #GST_DEBUG,
- * #GST_CAT_ERROR_OBJECT or similar. These all expand to calling gst_debug_log()
+ * Messages are output by using shortcut macros like [GST_DEBUG](),
+ * [GST_CAT_ERROR_OBJECT]() or similar. These all expand to calling [gst_debug_log]()
  * with the right parameters.
  * The only thing a developer will probably want to do is define his own
  * categories. This is easily done with 3 lines. At the top of your code,
  * declare
  * the variables and set the default category.
- * |[
+ * ```
  *   GST_DEBUG_CATEGORY_STATIC (my_category);  // define category (statically)
  *   #define GST_CAT_DEFAULT my_category       // set as default
- * ]|
+ * ```
  * After that you only need to initialize the category.
- * |[
+ * ```
  *   GST_DEBUG_CATEGORY_INIT (my_category, "my category",
  *                            0, "This is my very own");
- * ]|
+ * ```
  * Initialization must be done before the category is used first.
  * Plugins do this
  * in their plugin_init function, libraries and applications should do that
@@ -71,7 +71,7 @@
  * So don't take addresses of these functions or use other tricks.
  * If you must do that for some reason, there is still an option.
  * If the debugging
- * subsystem was compiled out, #GST_DISABLE_GST_DEBUG is defined in
+ * subsystem was compiled out, [GST_DISABLE_GST_DEBUG]() is defined in
  * &lt;gst/gst.h&gt;,
  * so you can check that before doing your trick.
  * Disabling the debugging subsystem will give you a slight (read: unnoticeable)
@@ -79,7 +79,7 @@
  * library itself becomes around 10% smaller.
  *
  * Please note that there are naming conventions for the names of debugging
- * categories. These are explained at GST_DEBUG_CATEGORY_INIT().
+ * categories. These are explained at [GST_DEBUG_CATEGORY_INIT]().
  */
 
 #define GST_INFO_C
@@ -428,7 +428,7 @@ _priv_gst_debug_init (void)
  * @function: the function that emitted the message
  * @line: the line from that the message was emitted, usually __LINE__
  * @object: (transfer none) (allow-none): the object this message relates to,
- *     or %NULL if none
+ *     or [NULL]() if none
  * @format: a printf style format string
  * @...: optional arguments for the format
  *
@@ -478,7 +478,7 @@ gst_path_basename (const gchar * file_name)
  * @function: the function that emitted the message
  * @line: the line from that the message was emitted, usually __LINE__
  * @object: (transfer none) (allow-none): the object this message relates to,
- *     or %NULL if none
+ *     or [NULL]() if none
  * @format: a printf style format string
  * @args: optional arguments for the format
  *
@@ -521,10 +521,10 @@ gst_debug_log_valist (GstDebugCategory * category, GstDebugLevel level,
  * gst_debug_message_get:
  * @message: a debug message
  *
- * Gets the string representation of a #GstDebugMessage. This function is used
+ * Gets the string representation of a [GstDebugMessage](). This function is used
  * in debug handlers to extract the message.
  *
- * Returns: the string representation of a #GstDebugMessage.
+ * Returns: the string representation of a [GstDebugMessage]().
  */
 const gchar *
 gst_debug_message_get (GstDebugMessage * message)
@@ -970,16 +970,16 @@ static const gchar *levelcolormap[GST_LEVEL_COUNT] = {
  * @line: the line from that the message was emitted, usually __LINE__
  * @message: the actual message
  * @object: (transfer none) (allow-none): the object this message relates to,
- *     or %NULL if none
+ *     or [NULL]() if none
  * @user_data: the FILE* to log to
  *
  * The default logging handler used by GStreamer. Logging functions get called
  * whenever a macro like GST_DEBUG or similar is used. By default this function
  * is setup to output the message and additional info to stderr (or the log file
  * specified via the GST_DEBUG_FILE environment variable) as received via
- * @user_data.
+ * _user_data_.
  *
- * You can add other handlers by using gst_debug_add_log_function().
+ * You can add other handlers by using [gst_debug_add_log_function]().
  * And you can remove this handler by calling
  * gst_debug_remove_log_function(gst_debug_log_default);
  */
@@ -1137,10 +1137,10 @@ gst_debug_level_get_name (GstDebugLevel level)
  * gst_debug_add_log_function:
  * @func: the function to use
  * @user_data: user data
- * @notify: called when @user_data is not used anymore
+ * @notify: called when _user_data_ is not used anymore
  *
  * Adds the logging function to the list of logging functions.
- * Be sure to use #G_GNUC_NO_INSTRUMENT on that function, it is needed.
+ * Be sure to use [G_GNUC_NO_INSTRUMENT]() on that function, it is needed.
  */
 void
 gst_debug_add_log_function (GstLogFunction func, gpointer user_data,
@@ -1281,10 +1281,10 @@ gst_debug_remove_log_function_by_data (gpointer data)
  * @colored: Whether to use colored output or not
  *
  * Sets or unsets the use of coloured debugging output.
- * Same as gst_debug_set_color_mode () with the argument being
+ * Same as [gst_debug_set_color_mode]() with the argument being
  * being GST_DEBUG_COLOR_MODE_ON or GST_DEBUG_COLOR_MODE_OFF.
  *
- * This function may be called before gst_init().
+ * This function may be called before [gst_init]().
  */
 void
 gst_debug_set_colored (gboolean colored)
@@ -1296,11 +1296,11 @@ gst_debug_set_colored (gboolean colored)
 
 /**
  * gst_debug_set_color_mode:
- * @mode: The coloring mode for debug output. See @GstDebugColorMode.
+ * @mode: The coloring mode for debug output. See _GstDebugColorMode_.
  *
  * Changes the coloring mode for debug output.
  *
- * This function may be called before gst_init().
+ * This function may be called before [gst_init]().
  *
  * Since: 1.2
  */
@@ -1317,7 +1317,7 @@ gst_debug_set_color_mode (GstDebugColorMode mode)
  *
  * Changes the coloring mode for debug output.
  *
- * This function may be called before gst_init().
+ * This function may be called before [gst_init]().
  *
  * Since: 1.2
  */
@@ -1337,7 +1337,7 @@ gst_debug_set_color_mode_from_string (const gchar * mode)
  *
  * Checks if the debugging output should be colored.
  *
- * Returns: %TRUE, if the debug output should be colored.
+ * Returns: [TRUE](), if the debug output should be colored.
  */
 gboolean
 gst_debug_is_colored (void)
@@ -1351,8 +1351,7 @@ gst_debug_is_colored (void)
  *
  * Changes the coloring mode for debug output.
  *
- * Returns: see @GstDebugColorMode for possible values.
- *
+ * Returns: see _GstDebugColorMode_ for possible values.
  * Since: 1.2
  */
 GstDebugColorMode
@@ -1386,7 +1385,7 @@ gst_debug_set_active (gboolean active)
  *
  * Checks if debugging output is activated.
  *
- * Returns: %TRUE, if debugging is activated
+ * Returns: [TRUE](), if debugging is activated
  */
 gboolean
 gst_debug_is_active (void)
@@ -1401,7 +1400,7 @@ gst_debug_is_active (void)
  * Sets the default threshold to the given level and updates all categories to
  * use this threshold.
  *
- * This function may be called before gst_init().
+ * This function may be called before [gst_init]().
  */
 void
 gst_debug_set_default_threshold (GstDebugLevel level)
@@ -1572,7 +1571,7 @@ _gst_debug_category_new (const gchar * name, guint color,
 
 /**
  * gst_debug_category_free:
- * @category: #GstDebugCategory to free.
+ * @category: [GstDebugCategory]() to free.
  *
  * Removes and frees the category and all associated resources.
  */
@@ -1594,8 +1593,8 @@ gst_debug_category_free (GstDebugCategory * category)
 
 /**
  * gst_debug_category_set_threshold:
- * @category: a #GstDebugCategory to set threshold of.
- * @level: the #GstDebugLevel threshold to set.
+ * @category: a [GstDebugCategory]() to set threshold of.
+ * @level: the [GstDebugLevel]() threshold to set.
  *
  * Sets the threshold of the category to the given level. Debug information will
  * only be output if the threshold is lower or equal to the level of the
@@ -1622,13 +1621,13 @@ gst_debug_category_set_threshold (GstDebugCategory * category,
 
 /**
  * gst_debug_category_reset_threshold:
- * @category: a #GstDebugCategory to reset threshold of.
+ * @category: a [GstDebugCategory]() to reset threshold of.
  *
  * Resets the threshold of the category to the default level. Debug information
  * will only be output if the threshold is lower or equal to the level of the
  * debugging message.
  * Use this function to set the threshold back to where it was after using
- * gst_debug_category_set_threshold().
+ * [gst_debug_category_set_threshold]().
  */
 void
 gst_debug_category_reset_threshold (GstDebugCategory * category)
@@ -1638,11 +1637,11 @@ gst_debug_category_reset_threshold (GstDebugCategory * category)
 
 /**
  * gst_debug_category_get_threshold:
- * @category: a #GstDebugCategory to get threshold of.
+ * @category: a [GstDebugCategory]() to get threshold of.
  *
- * Returns the threshold of a #GstDebugCategory.
+ * Returns the threshold of a [GstDebugCategory]().
  *
- * Returns: the #GstDebugLevel that is used as threshold.
+ * Returns: the [GstDebugLevel]() that is used as threshold.
  */
 GstDebugLevel
 gst_debug_category_get_threshold (GstDebugCategory * category)
@@ -1652,7 +1651,7 @@ gst_debug_category_get_threshold (GstDebugCategory * category)
 
 /**
  * gst_debug_category_get_name:
- * @category: a #GstDebugCategory to get name of.
+ * @category: a [GstDebugCategory]() to get name of.
  *
  * Returns the name of a debug category.
  *
@@ -1666,7 +1665,7 @@ gst_debug_category_get_name (GstDebugCategory * category)
 
 /**
  * gst_debug_category_get_color:
- * @category: a #GstDebugCategory to get the color of.
+ * @category: a [GstDebugCategory]() to get the color of.
  *
  * Returns the color of a debug category used when printing output in this
  * category.
@@ -1681,7 +1680,7 @@ gst_debug_category_get_color (GstDebugCategory * category)
 
 /**
  * gst_debug_category_get_description:
- * @category: a #GstDebugCategory to get the description of.
+ * @category: a [GstDebugCategory]() to get the description of.
  *
  * Returns the description of a debug category.
  *
@@ -1803,9 +1802,9 @@ parse_debug_level (gchar * str, GstDebugLevel * level)
  * gst_debug_set_threshold_from_string:
  * @list: comma-separated list of "category:level" pairs to be used
  *     as debug logging levels
- * @reset: %TRUE to clear all previously-set debug levels before setting
+ * @reset: [TRUE]() to clear all previously-set debug levels before setting
  *     new thresholds
- * %FALSE if adding the threshold described by @list to the one already set.
+ * [FALSE]() if adding the threshold described by _list_ to the one already set.
  *
  * Sets the debug logging wanted in the same form as with the GST_DEBUG
  * environment variable. You can use wildcards such as '*', but note that

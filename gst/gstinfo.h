@@ -92,10 +92,10 @@ typedef enum {
  * GST_LEVEL_DEFAULT:
  *
  * Defines the default debugging level to be used with GStreamer. It is normally
- * set to #GST_LEVEL_NONE so nothing get printed.
+ * set to [GST_LEVEL_NONE]() so nothing get printed.
  * As it can be configured at compile time, developer builds may chose to
  * override that though.
- * You can use this as an argument to gst_debug_set_default_threshold() to
+ * You can use this as an argument to [gst_debug_set_default_threshold]() to
  * reset the debugging output to default behaviour.
  */
 #ifndef GST_LEVEL_DEFAULT
@@ -198,7 +198,7 @@ typedef struct _GstDebugCategory GstDebugCategory;
  * GstDebugCategory:
  *
  * This is the struct that describes the categories. Once initialized with
- * #GST_DEBUG_CATEGORY_INIT, its values can't be changed anymore.
+ * [GST_DEBUG_CATEGORY_INIT](), its values can't be changed anymore.
  */
 struct _GstDebugCategory {
   /*< private >*/
@@ -215,9 +215,9 @@ struct _GstDebugCategory {
  * GST_STR_NULL:
  * @str: (allow-none): The string to check.
  *
- * Macro to use when a string must not be %NULL, but may be %NULL. If the string
- * is %NULL, "(NULL)" is printed instead.
- * In GStreamer printf string arguments may not be %NULL, because on some
+ * Macro to use when a string must not be [NULL](), but may be [NULL](). If the string
+ * is [NULL](), "(NULL)" is printed instead.
+ * In GStreamer printf string arguments may not be [NULL](), because on some
  * platforms (ie Solaris) the libc crashes in that case. This includes debugging
  * strings.
  */
@@ -279,17 +279,17 @@ typedef struct _GstDebugMessage GstDebugMessage;
 
 /**
  * GstLogFunction:
- * @category: a #GstDebugCategory
- * @level: a #GstDebugLevel
+ * @category: a [GstDebugCategory]()
+ * @level: a [GstDebugLevel]()
  * @file: file name
  * @function: function name
  * @line: line number
- * @object: a #GObject
+ * @object: a [GObject]()
  * @message: the message
  * @user_data: user data for the log function
  *
  * Function prototype for a logging function that can be registered with
- * gst_debug_add_log_function().
+ * [gst_debug_add_log_function]().
  * Use G_GNUC_NO_INSTRUMENT on that function.
  */
 typedef void (*GstLogFunction)  (GstDebugCategory * category,
@@ -446,7 +446,7 @@ G_STMT_START{                                        \
  * @color: the colors to use for a color representation or 0 for no color.
  * @description: optional description of the category.
  *
- * Initializes a new #GstDebugCategory with the given properties and set to
+ * Initializes a new [GstDebugCategory]() with the given properties and set to
  * the default threshold.
  *
  * <note>
@@ -484,18 +484,18 @@ G_STMT_START{                                        \
  * @cat: the category to initialize.
  * @name: log category name
  *
- * Looks up an existing #GstDebugCategory by its @name and sets @cat. If the
+ * Looks up an existing [GstDebugCategory]() by its _name_ and sets _cat_. If the
  * category is not found, but GST_CAT_DEFAULT is defined, that is assigned to
- * @cat. Otherwise @cat will be %NULL.
+ * _cat_. Otherwise _cat_ will be [NULL]().
  *
- * |[
+ * ```
  * GST_DEBUG_CATEGORY_STATIC (gst_myplugin_debug);
  * #define GST_CAT_DEFAULT gst_myplugin_debug
  * GST_DEBUG_CATEGORY_STATIC (GST_CAT_PERFORMANCE);
  * ...
  * GST_DEBUG_CATEGORY_INIT (gst_myplugin_debug, "myplugin", 0, "nice element");
  * GST_DEBUG_CATEGORY_GET (GST_CAT_PERFORMANCE, "GST_PERFORMANCE");
- * ]|
+ * ```
  */
 #ifdef GST_CAT_DEFAULT
 #define GST_DEBUG_CATEGORY_GET(cat,name)  G_STMT_START{\
@@ -527,7 +527,7 @@ GST_EXPORT GstDebugLevel            _gst_debug_min;
  * GST_CAT_LEVEL_LOG:
  * @cat: category to use
  * @level: the severity of the message
- * @object: (allow-none): the #GObject the message belongs to or %NULL if none
+ * @object: (allow-none): the [GObject]() the message belongs to or [NULL]() if none
  * @...: A printf-style message to output
  *
  * Outputs a debugging message. This is the most general macro for outputting
@@ -596,7 +596,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
 /**
  * GST_CAT_ERROR_OBJECT:
  * @cat: category to use
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output an error message belonging to the given object in the given category.
@@ -604,7 +604,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
 /**
  * GST_CAT_WARNING_OBJECT:
  * @cat: category to use
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output a warning message belonging to the given object in the given category.
@@ -612,7 +612,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
 /**
  * GST_CAT_INFO_OBJECT:
  * @cat: category to use
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output an informational message belonging to the given object in the given
@@ -621,7 +621,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
 /**
  * GST_CAT_DEBUG_OBJECT:
  * @cat: category to use
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output an debugging message belonging to the given object in the given category.
@@ -629,7 +629,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
 /**
  * GST_CAT_LOG_OBJECT:
  * @cat: category to use
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output an logging message belonging to the given object in the given category.
@@ -637,7 +637,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
 /**
  * GST_CAT_FIXME_OBJECT:
  * @cat: category to use
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output a fixme message belonging to the given object in the given category.
@@ -645,7 +645,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
 /**
  * GST_CAT_TRACE_OBJECT:
  * @cat: category to use
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output a tracing message belonging to the given object in the given
@@ -654,12 +654,12 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
 /**
  * GST_CAT_MEMDUMP_OBJECT:
  * @cat: category to use
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @msg: message string to log with the data
  * @data: pointer to the data to output
  * @length: length of the data to output
  *
- * Output a hexdump of @data relating to the given object in the given
+ * Output a hexdump of _data_ relating to the given object in the given
  * category.
  */
 
@@ -720,27 +720,27 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
  * @data: pointer to the data to output
  * @length: length of the data to output
  *
- * Output a hexdump of @data in the given category.
+ * Output a hexdump of _data_ in the given category.
  */
 
 
 /**
  * GST_ERROR_OBJECT:
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output an error message belonging to the given object in the default category.
  */
 /**
  * GST_WARNING_OBJECT:
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output a warning message belonging to the given object in the default category.
  */
 /**
  * GST_INFO_OBJECT:
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output an informational message belonging to the given object in the default
@@ -748,7 +748,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
  */
 /**
  * GST_DEBUG_OBJECT:
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output a debugging message belonging to the given object in the default
@@ -756,28 +756,28 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
  */
 /**
  * GST_LOG_OBJECT:
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output a logging message belonging to the given object in the default category.
  */
 /**
  * GST_FIXME_OBJECT:
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output a fixme message belonging to the given object in the default category.
  */
 /**
  * GST_TRACE_OBJECT:
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @...: printf-style message to output
  *
  * Output a tracing message belonging to the given object in the default category.
  */
 /**
  * GST_MEMDUMP_OBJECT:
- * @obj: the #GObject the message belongs to
+ * @obj: the [GObject]() the message belongs to
  * @msg: message string to log with the data
  * @data: pointer to the data to output
  * @length: length of the data to output
@@ -834,7 +834,7 @@ GST_CAT_LEVEL_LOG (GstDebugCategory * cat, GstDebugLevel level,
  * @data: pointer to the data to output
  * @length: length of the data to output
  *
- * Output a hexdump of @data.
+ * Output a hexdump of _data_.
  */
 
 #ifdef G_HAVE_ISO_VARARGS
@@ -1219,9 +1219,9 @@ GST_TRACE (const char *format, ...)
  * @ptr: pointer to the function to register
  *
  * Register a pointer to a function with its name, so it can later be used by
- * GST_DEBUG_FUNCPTR_NAME().
+ * [GST_DEBUG_FUNCPTR_NAME]().
  *
- * Use this variant of #GST_DEBUG_FUNCPTR if you do not need to use @ptr.
+ * Use this variant of [GST_DEBUG_FUNCPTR]() if you do not need to use _ptr_.
  */
 #define GST_DEBUG_REGISTER_FUNCPTR(ptr) \
   _gst_debug_register_funcptr((GstDebugFuncPtr)(ptr), #ptr)
@@ -1230,9 +1230,9 @@ GST_TRACE (const char *format, ...)
  * @ptr: pointer to the function to register
  *
  * Register a pointer to a function with its name, so it can later be used by
- * GST_DEBUG_FUNCPTR_NAME().
+ * [GST_DEBUG_FUNCPTR_NAME]().
  *
- * Returns: the value passed to @ptr.
+ * Returns: the value passed to _ptr_.
  */
 #define GST_DEBUG_FUNCPTR(ptr) \
   (_gst_debug_register_funcptr((GstDebugFuncPtr)(ptr), #ptr) , ptr)
@@ -1242,7 +1242,7 @@ GST_TRACE (const char *format, ...)
  * @ptr: address of the function of which to look up the name
  *
  * Retrieves the name of the function, if it was previously registered with
- * GST_DEBUG_FUNCPTR(). If not, it returns a description of the pointer.
+ * [GST_DEBUG_FUNCPTR](). If not, it returns a description of the pointer.
  *
  * This macro returns a constant string which must not be modified or
  * freed by the caller.

@@ -23,24 +23,24 @@
  * SECTION:gstmeta
  * @short_description: Buffer metadata
  *
- * The #GstMeta structure should be included as the first member of a #GstBuffer
+ * The [GstMeta]() structure should be included as the first member of a [GstBuffer]()
  * metadata structure. The structure defines the API of the metadata and should
  * be accessible to all elements using the metadata.
  *
- * A metadata API is registered with gst_meta_api_type_register() which takes a
+ * A metadata API is registered with [gst_meta_api_type_register]() which takes a
  * name for the metadata API and some tags associated with the metadata.
- * With gst_meta_api_type_has_tag() one can check if a certain metadata API
+ * With [gst_meta_api_type_has_tag]() one can check if a certain metadata API
  * contains a given tag.
  *
  * Multiple implementations of a metadata API can be registered.
- * To implement a metadata API, gst_meta_register() should be used. This
+ * To implement a metadata API, [gst_meta_register]() should be used. This
  * function takes all parameters needed to create, free and transform metadata
- * along with the size of the metadata. The function returns a #GstMetaInfo
+ * along with the size of the metadata. The function returns a [GstMetaInfo]()
  * structure that contains the information for the implementation of the API.
  *
- * A specific implementation can be retrieved by name with gst_meta_get_info().
+ * A specific implementation can be retrieved by name with [gst_meta_get_info]().
  *
- * See #GstBuffer for how the metadata can be added, retrieved and removed from
+ * See [GstBuffer]() for how the metadata can be added, retrieved and removed from
  * buffers.
  */
 #include "gst_private.h"
@@ -69,12 +69,12 @@ _priv_gst_meta_initialize (void)
 /**
  * gst_meta_api_type_register:
  * @api: an API to register
- * @tags: tags for @api
+ * @tags: tags for _api_
  *
- * Register and return a GType for the @api and associate it with
- * @tags.
+ * Register and return a GType for the _api_ and associate it with
+ * _tags_.
  *
- * Returns: a unique GType for @api.
+ * Returns: a unique GType for _api_.
  */
 GType
 gst_meta_api_type_register (const gchar * api, const gchar ** tags)
@@ -108,9 +108,9 @@ gst_meta_api_type_register (const gchar * api, const gchar ** tags)
  * @api: an API
  * @tag: the tag to check
  *
- * Check if @api was registered with @tag.
+ * Check if _api_ was registered with _tag_.
  *
- * Returns: %TRUE if @api was registered with @tag.
+ * Returns: [TRUE]() if _api_ was registered with _tag_.
  */
 gboolean
 gst_meta_api_type_has_tag (GType api, GQuark tag)
@@ -125,8 +125,9 @@ gst_meta_api_type_has_tag (GType api, GQuark tag)
  * gst_meta_api_type_get_tags:
  * @api: an API
  *
- * Returns: (transfer none) (array zero-terminated=1) (element-type utf8): an array of tags as strings.
  *
+ *
+ * Returns: (transfer none) (array zero-terminated=1) (element-type utf8): an array of tags as strings.
  * Since: 1.2
  */
 const gchar *const *
@@ -145,19 +146,19 @@ gst_meta_api_type_get_tags (GType api)
 
 /**
  * gst_meta_register:
- * @api: the type of the #GstMeta API
- * @impl: the name of the #GstMeta implementation
- * @size: the size of the #GstMeta structure
- * @init_func: (scope async): a #GstMetaInitFunction
- * @free_func: (scope async): a #GstMetaFreeFunction
- * @transform_func: (scope async): a #GstMetaTransformFunction
+ * @api: the type of the [GstMeta]() API
+ * @impl: the name of the [GstMeta]() implementation
+ * @size: the size of the [GstMeta]() structure
+ * @init_func: (scope async): a [GstMetaInitFunction]()
+ * @free_func: (scope async): a [GstMetaFreeFunction]()
+ * @transform_func: (scope async): a [GstMetaTransformFunction]()
  *
- * Register a new #GstMeta implementation.
+ * Register a new [GstMeta]() implementation.
  *
- * The same @info can be retrieved later with gst_meta_get_info() by using
- * @impl as the key.
+ * The same _info_ can be retrieved later with [gst_meta_get_info]() by using
+ * _impl_ as the key.
  *
- * Returns: (transfer none): a #GstMetaInfo that can be used to access metadata.
+ * Returns: (transfer none): a [GstMetaInfo]() that can be used to access metadata.
  */
 
 const GstMetaInfo *
@@ -203,10 +204,10 @@ gst_meta_register (GType api, const gchar * impl, gsize size,
  * @impl: the name
  *
  * Lookup a previously registered meta info structure by its implementation name
- * @impl.
+ * _impl_.
  *
- * Returns: (transfer none) (nullable): a #GstMetaInfo with @impl, or
- * %NULL when no such metainfo exists.
+ * Returns: (transfer none) (nullable): a [GstMetaInfo]() with _impl_, or
+ * [NULL]() when no such metainfo exists.
  */
 const GstMetaInfo *
 gst_meta_get_info (const gchar * impl)

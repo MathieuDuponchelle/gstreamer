@@ -35,7 +35,7 @@ G_BEGIN_DECLS
 /**
  * GstPreset:
  *
- * Opaque #GstPreset data structure.
+ * Opaque [GstPreset]() data structure.
  */
 typedef struct _GstPreset GstPreset; /* dummy object */
 typedef struct _GstPresetInterface GstPresetInterface;
@@ -52,7 +52,7 @@ typedef struct _GstPresetInterface GstPresetInterface;
  * @set_meta: virtual methods to set textual meta data to a preset
  * @get_meta: virtual methods to get textual meta data from a preset
  *
- * #GstPreset interface.
+ * [GstPreset]() interface.
  */
 struct _GstPresetInterface
 {

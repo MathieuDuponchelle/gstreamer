@@ -70,14 +70,14 @@ typedef struct _GstMessage GstMessage;
  * message is used internally and never forwarded to the application.
  * @GST_MESSAGE_SEGMENT_DONE: pipeline completed playback of a segment. This
  * message is forwarded to the application after all elements that posted
- * @GST_MESSAGE_SEGMENT_START posted a GST_MESSAGE_SEGMENT_DONE message.
+ * _GST_MESSAGE_SEGMENT_START_ posted a GST_MESSAGE_SEGMENT_DONE message.
  * @GST_MESSAGE_DURATION_CHANGED: The duration of a pipeline changed. The
  * application can get the new duration with a duration query.
  * @GST_MESSAGE_ASYNC_START: Posted by elements when they start an ASYNC
- * #GstStateChange. This message is not forwarded to the application but is used
+ * [GstStateChange](). This message is not forwarded to the application but is used
  * internally.
  * @GST_MESSAGE_ASYNC_DONE: Posted by elements when they complete an ASYNC
- * #GstStateChange. The application will only receive this message from the toplevel
+ * [GstStateChange](). The application will only receive this message from the toplevel
  * pipeline.
  * @GST_MESSAGE_LATENCY: Posted by elements when their latency changes. The
  * application should recalculate and distribute a new latency.
@@ -101,13 +101,13 @@ typedef struct _GstMessage GstMessage;
  * @GST_MESSAGE_HAVE_CONTEXT: Message indicating that an element created a context (Since 1.2)
  * @GST_MESSAGE_EXTENDED: Message is an extended message type (see below).
  *     These extended message IDs can't be used directly with mask-based API
- *     like gst_bus_poll() or gst_bus_timed_pop_filtered(), but you can still
+ *     like [gst_bus_poll]() or [gst_bus_timed_pop_filtered](), but you can still
  *     filter for GST_MESSAGE_EXTENDED and then check the result for the
  *     specific type. (Since 1.4)
- * @GST_MESSAGE_DEVICE_ADDED: Message indicating a #GstDevice was added to
- *     a #GstDeviceProvider (Since 1.4)
- * @GST_MESSAGE_DEVICE_REMOVED: Message indicating a #GstDevice was removed
- *     from a #GstDeviceProvider (Since 1.4)
+ * @GST_MESSAGE_DEVICE_ADDED: Message indicating a [GstDevice]() was added to
+ *     a [GstDeviceProvider]() (Since 1.4)
+ * @GST_MESSAGE_DEVICE_REMOVED: Message indicating a [GstDevice]() was removed
+ *     from a [GstDeviceProvider]() (Since 1.4)
  * @GST_MESSAGE_ANY: mask for all of the above messages.
  *
  * The different message types that are available.
@@ -187,56 +187,57 @@ GST_EXPORT GType _gst_message_type;
 
 /**
  * GST_MESSAGE_TYPE:
- * @message: a #GstMessage
+ * @message: a [GstMessage]()
  *
- * Get the #GstMessageType of @message.
+ * Get the [GstMessageType]() of _message_.
  */
 #define GST_MESSAGE_TYPE(message)       (GST_MESSAGE_CAST(message)->type)
 /**
  * GST_MESSAGE_TYPE_IS_EXTENDED:
- * @message: a #GstMessage
+ * @message: a [GstMessage]()
  *
  * Check if the message is in the extended message group
+ *
  * Since: 1.4
  */
 #define GST_MESSAGE_TYPE_IS_EXTENDED(message)       (!!(GST_MESSAGE_CAST(message)->type & GST_MESSAGE_EXTENDED))
 
 /**
  * GST_MESSAGE_TYPE_NAME:
- * @message: a #GstMessage
+ * @message: a [GstMessage]()
  *
- * Get a constant string representation of the #GstMessageType of @message.
+ * Get a constant string representation of the [GstMessageType]() of _message_.
  */
 #define GST_MESSAGE_TYPE_NAME(message)  gst_message_type_get_name(GST_MESSAGE_TYPE(message))
 /**
  * GST_MESSAGE_TIMESTAMP:
- * @message: a #GstMessage
+ * @message: a [GstMessage]()
  *
- * Get the timestamp of @message. This is the timestamp when the message
+ * Get the timestamp of _message_. This is the timestamp when the message
  * was created.
  */
 #define GST_MESSAGE_TIMESTAMP(message)  (GST_MESSAGE_CAST(message)->timestamp)
 /**
  * GST_MESSAGE_SRC:
- * @message: a #GstMessage
+ * @message: a [GstMessage]()
  *
- * Get the object that posted @message.
+ * Get the object that posted _message_.
  */
 #define GST_MESSAGE_SRC(message)        (GST_MESSAGE_CAST(message)->src)
 
 /**
  * GST_MESSAGE_SEQNUM:
- * @message: a #GstMessage
+ * @message: a [GstMessage]()
  *
- * Get the sequence number of @message.
+ * Get the sequence number of _message_.
  */
 #define GST_MESSAGE_SEQNUM(message)     (GST_MESSAGE_CAST(message)->seqnum)
 
 /**
  * GST_MESSAGE_SRC_NAME:
- * @message: a #GstMessage
+ * @message: a [GstMessage]()
  *
- * Get the name of the object that posted @message. Returns "(NULL)" if
+ * Get the name of the object that posted _message_. Returns "(NULL)" if
  * the message has no source object set.
  */
 #define GST_MESSAGE_SRC_NAME(message)   (GST_MESSAGE_SRC(message) ? \
@@ -247,7 +248,7 @@ GST_EXPORT GType _gst_message_type;
  * @GST_STRUCTURE_CHANGE_TYPE_PAD_LINK: Pad linking is starting or done.
  * @GST_STRUCTURE_CHANGE_TYPE_PAD_UNLINK: Pad unlinking is starting or done.
  *
- * The type of a %GST_MESSAGE_STRUCTURE_CHANGE.
+ * The type of a [GST_MESSAGE_STRUCTURE_CHANGE]().
  */
 typedef enum {
   GST_STRUCTURE_CHANGE_TYPE_PAD_LINK   = 0,
@@ -264,7 +265,7 @@ typedef enum {
  * @GST_STREAM_STATUS_TYPE_PAUSE: a thread is paused
  * @GST_STREAM_STATUS_TYPE_STOP: a thread is stopped
  *
- * The type of a %GST_MESSAGE_STREAM_STATUS. The stream status messages inform the
+ * The type of a [GST_MESSAGE_STREAM_STATUS](). The stream status messages inform the
  * application of new streaming threads and their status.
  */
 typedef enum {
@@ -287,7 +288,7 @@ typedef enum {
  * @GST_PROGRESS_TYPE_ERROR: A task caused an error. An error message is also
  *          posted on the bus.
  *
- * The type of a %GST_MESSAGE_PROGRESS. The progress messages inform the
+ * The type of a [GST_MESSAGE_PROGRESS](). The progress messages inform the
  * application of the status of asynchronous tasks.
  */
 typedef enum {
@@ -301,12 +302,12 @@ typedef enum {
 /**
  * GstMessage:
  * @mini_object: the parent structure
- * @type: the #GstMessageType of the message
+ * @type: the [GstMessageType]() of the message
  * @timestamp: the timestamp of the message
  * @src: the src of the message
  * @seqnum: the sequence number of the message
  *
- * A #GstMessage.
+ * A [GstMessage]().
  */
 struct _GstMessage
 {
@@ -335,7 +336,7 @@ GQuark          gst_message_type_to_quark       (GstMessageType type);
  *
  * Convenience macro to increase the reference count of the message.
  *
- * Returns: @msg (for convenience when doing assignments)
+ * Returns: _msg_ (for convenience when doing assignments)
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstMessage * gst_message_ref (GstMessage * msg);
@@ -371,7 +372,7 @@ gst_message_unref (GstMessage * msg)
  *
  * Creates a copy of the message. Returns a copy of the message.
  *
- * Returns: (transfer full): a new copy of @msg.
+ * Returns: (transfer full): a new copy of _msg_.
  *
  * MT safe
  */
@@ -387,7 +388,7 @@ gst_message_copy (const GstMessage * msg)
 
 /**
  * gst_message_is_writable:
- * @msg: a #GstMessage
+ * @msg: a [GstMessage]()
  *
  * Tests if you can safely write into a message's structure or validly
  * modify the seqnum and timestamp fields.
@@ -408,18 +409,18 @@ gst_message_copy (const GstMessage * msg)
 /**
  * gst_message_replace:
  * @old_message: (inout) (transfer full) (nullable): pointer to a
- *     pointer to a #GstMessage to be replaced.
- * @new_message: (allow-none) (transfer none): pointer to a #GstMessage that will
- *     replace the message pointed to by @old_message.
+ *     pointer to a [GstMessage]() to be replaced.
+ * @new_message: (allow-none) (transfer none): pointer to a [GstMessage]() that will
+ *     replace the message pointed to by _old_message_.
  *
- * Modifies a pointer to a #GstMessage to point to a different #GstMessage. The
+ * Modifies a pointer to a [GstMessage]() to point to a different [GstMessage](). The
  * modification is done atomically (so this is useful for ensuring thread safety
  * in some cases), and the reference counts are updated appropriately (the old
  * message is unreffed, the new one is reffed).
  *
- * Either @new_message or the #GstMessage pointed to by @old_message may be %NULL.
+ * Either _new_message_ or the [GstMessage]() pointed to by _old_message_ may be [NULL]().
  *
- * Returns: %TRUE if @new_message was different from @old_message
+ * Returns: [TRUE]() if _new_message_ was different from _old_message_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gboolean gst_message_replace (GstMessage **old_message, GstMessage *new_message);

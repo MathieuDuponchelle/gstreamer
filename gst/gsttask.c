@@ -23,41 +23,41 @@
 /**
  * SECTION:gsttask
  * @short_description: Abstraction of GStreamer streaming threads.
- * @see_also: #GstElement, #GstPad
+ * @see_also: [GstElement](), [GstPad]()
  *
- * #GstTask is used by #GstElement and #GstPad to provide the data passing
- * threads in a #GstPipeline.
+ * [GstTask]() is used by [GstElement]() and [GstPad]() to provide the data passing
+ * threads in a [GstPipeline]().
  *
- * A #GstPad will typically start a #GstTask to push or pull data to/from the
- * peer pads. Most source elements start a #GstTask to push data. In some cases
- * a demuxer element can start a #GstTask to pull data from a peer element. This
+ * A [GstPad]() will typically start a [GstTask]() to push or pull data to/from the
+ * peer pads. Most source elements start a [GstTask]() to push data. In some cases
+ * a demuxer element can start a [GstTask]() to pull data from a peer element. This
  * is typically done when the demuxer can perform random access on the upstream
  * peer element for improved performance.
  *
- * Although convenience functions exist on #GstPad to start/pause/stop tasks, it
- * might sometimes be needed to create a #GstTask manually if it is not related to
- * a #GstPad.
+ * Although convenience functions exist on [GstPad]() to start/pause/stop tasks, it
+ * might sometimes be needed to create a [GstTask]() manually if it is not related to
+ * a [GstPad]().
  *
- * Before the #GstTask can be run, it needs a #GRecMutex that can be set with
- * gst_task_set_lock().
+ * Before the [GstTask]() can be run, it needs a [GRecMutex]() that can be set with
+ * [gst_task_set_lock]().
  *
- * The task can be started, paused and stopped with gst_task_start(), gst_task_pause()
- * and gst_task_stop() respectively or with the gst_task_set_state() function.
+ * The task can be started, paused and stopped with [gst_task_start](), [gst_task_pause]()
+ * and [gst_task_stop]() respectively or with the [gst_task_set_state]() function.
  *
- * A #GstTask will repeatedly call the #GstTaskFunction with the user data
- * that was provided when creating the task with gst_task_new(). While calling
+ * A [GstTask]() will repeatedly call the [GstTaskFunction]() with the user data
+ * that was provided when creating the task with [gst_task_new](). While calling
  * the function it will acquire the provided lock. The provided lock is released
  * when the task pauses or stops.
  *
- * Stopping a task with gst_task_stop() will not immediately make sure the task is
- * not running anymore. Use gst_task_join() to make sure the task is completely
+ * Stopping a task with [gst_task_stop]() will not immediately make sure the task is
+ * not running anymore. Use [gst_task_join]() to make sure the task is completely
  * stopped and the thread is stopped.
  *
- * After creating a #GstTask, use gst_object_unref() to free its resources. This can
+ * After creating a [GstTask](), use [gst_object_unref]() to free its resources. This can
  * only be done when the task is not running anymore.
  *
- * Task functions can send a #GstMessage to send out-of-band data to the
- * application. The application can receive messages from the #GstBus in its
+ * Task functions can send a [GstMessage]() to send out-of-band data to the
+ * application. The application can receive messages from the [GstBus]() in its
  * mainloop.
  *
  * For debugging purposes, the task will configure its object name as the thread
@@ -387,25 +387,25 @@ gst_task_cleanup_all (void)
 
 /**
  * gst_task_new:
- * @func: The #GstTaskFunction to use
- * @user_data: User data to pass to @func
- * @notify: the function to call when @user_data is no longer needed.
+ * @func: The [GstTaskFunction]() to use
+ * @user_data: User data to pass to _func_
+ * @notify: the function to call when _user_data_ is no longer needed.
  *
- * Create a new Task that will repeatedly call the provided @func
- * with @user_data as a parameter. Typically the task will run in
+ * Create a new Task that will repeatedly call the provided _func_
+ * with _user_data_ as a parameter. Typically the task will run in
  * a new thread.
  *
  * The function cannot be changed after the task has been created. You
- * must create a new #GstTask to change the function.
+ * must create a new [GstTask]() to change the function.
  *
- * This function will not yet create and start a thread. Use gst_task_start() or
- * gst_task_pause() to create and start the GThread.
+ * This function will not yet create and start a thread. Use [gst_task_start]() or
+ * [gst_task_pause]() to create and start the GThread.
  *
- * Before the task can be used, a #GRecMutex must be configured using the
- * gst_task_set_lock() function. This lock will always be acquired while
- * @func is called.
+ * Before the task can be used, a [GRecMutex]() must be configured using the
+ * [gst_task_set_lock]() function. This lock will always be acquired while
+ * _func_ is called.
  *
- * Returns: (transfer full): A new #GstTask.
+ * Returns: (transfer full): A new [GstTask]().
  *
  * MT safe.
  */
@@ -428,14 +428,14 @@ gst_task_new (GstTaskFunction func, gpointer user_data, GDestroyNotify notify)
 
 /**
  * gst_task_set_lock:
- * @task: The #GstTask to use
- * @mutex: The #GRecMutex to use
+ * @task: The [GstTask]() to use
+ * @mutex: The [GRecMutex]() to use
  *
  * Set the mutex used by the task. The mutex will be acquired before
- * calling the #GstTaskFunction.
+ * calling the [GstTaskFunction]().
  *
- * This function has to be called before calling gst_task_pause() or
- * gst_task_start().
+ * This function has to be called before calling [gst_task_pause]() or
+ * [gst_task_start]().
  *
  * MT safe.
  */
@@ -463,14 +463,14 @@ is_running:
 
 /**
  * gst_task_get_pool:
- * @task: a #GstTask
+ * @task: a [GstTask]()
  *
- * Get the #GstTaskPool that this task will use for its streaming
+ * Get the [GstTaskPool]() that this task will use for its streaming
  * threads.
  *
  * MT safe.
  *
- * Returns: (transfer full): the #GstTaskPool used by @task. gst_object_unref()
+ * Returns: (transfer full): the [GstTaskPool]() used by _task_. [gst_object_unref]()
  * after usage.
  */
 GstTaskPool *
@@ -492,11 +492,11 @@ gst_task_get_pool (GstTask * task)
 
 /**
  * gst_task_set_pool:
- * @task: a #GstTask
- * @pool: (transfer none): a #GstTaskPool
+ * @task: a [GstTask]()
+ * @pool: (transfer none): a [GstTaskPool]()
  *
- * Set @pool as the new GstTaskPool for @task. Any new streaming threads that
- * will be created by @task will now use @pool.
+ * Set _pool_ as the new GstTaskPool for _task_. Any new streaming threads that
+ * will be created by _task_ will now use _pool_.
  *
  * MT safe.
  */
@@ -525,13 +525,13 @@ gst_task_set_pool (GstTask * task, GstTaskPool * pool)
 
 /**
  * gst_task_set_enter_callback:
- * @task: The #GstTask to use
- * @enter_func: (in): a #GstTaskThreadFunc
- * @user_data: user data passed to @enter_func
- * @notify: called when @user_data is no longer referenced
+ * @task: The [GstTask]() to use
+ * @enter_func: (in): a [GstTaskThreadFunc]()
+ * @user_data: user data passed to _enter_func_
+ * @notify: called when _user_data_ is no longer referenced
  *
- * Call @enter_func when the task function of @task is entered. @user_data will
- * be passed to @enter_func and @notify will be called when @user_data is no
+ * Call _enter_func_ when the task function of _task_ is entered. _user_data_ will
+ * be passed to _enter_func_ and _notify_ will be called when _user_data_ is no
  * longer referenced.
  */
 void
@@ -563,13 +563,13 @@ gst_task_set_enter_callback (GstTask * task, GstTaskThreadFunc enter_func,
 
 /**
  * gst_task_set_leave_callback:
- * @task: The #GstTask to use
- * @leave_func: (in): a #GstTaskThreadFunc
- * @user_data: user data passed to @leave_func
- * @notify: called when @user_data is no longer referenced
+ * @task: The [GstTask]() to use
+ * @leave_func: (in): a [GstTaskThreadFunc]()
+ * @user_data: user data passed to _leave_func_
+ * @notify: called when _user_data_ is no longer referenced
  *
- * Call @leave_func when the task function of @task is left. @user_data will
- * be passed to @leave_func and @notify will be called when @user_data is no
+ * Call _leave_func_ when the task function of _task_ is left. _user_data_ will
+ * be passed to _leave_func_ and _notify_ will be called when _user_data_ is no
  * longer referenced.
  */
 void
@@ -601,11 +601,11 @@ gst_task_set_leave_callback (GstTask * task, GstTaskThreadFunc leave_func,
 
 /**
  * gst_task_get_state:
- * @task: The #GstTask to query
+ * @task: The [GstTask]() to query
  *
  * Get the current state of the task.
  *
- * Returns: The #GstTaskState of the task
+ * Returns: The [GstTaskState]() of the task
  *
  * MT safe.
  */
@@ -657,18 +657,18 @@ start_task (GstTask * task)
 
 /**
  * gst_task_set_state:
- * @task: a #GstTask
+ * @task: a [GstTask]()
  * @state: the new task state
  *
- * Sets the state of @task to @state.
+ * Sets the state of _task_ to _state_.
  *
- * The @task must have a lock associated with it using
- * gst_task_set_lock() when going to GST_TASK_STARTED or GST_TASK_PAUSED or
- * this function will return %FALSE.
+ * The _task_ must have a lock associated with it using
+ * [gst_task_set_lock]() when going to GST_TASK_STARTED or GST_TASK_PAUSED or
+ * this function will return [FALSE]().
  *
  * MT safe.
  *
- * Returns: %TRUE if the state could be changed.
+ * Returns: [TRUE]() if the state could be changed.
  */
 gboolean
 gst_task_set_state (GstTask * task, GstTaskState state)
@@ -722,12 +722,12 @@ no_lock:
 
 /**
  * gst_task_start:
- * @task: The #GstTask to start
+ * @task: The [GstTask]() to start
  *
- * Starts @task. The @task must have a lock associated with it using
- * gst_task_set_lock() or this function will return %FALSE.
+ * Starts _task_. The _task_ must have a lock associated with it using
+ * [gst_task_set_lock]() or this function will return [FALSE]().
  *
- * Returns: %TRUE if the task could be started.
+ * Returns: [TRUE]() if the task could be started.
  *
  * MT safe.
  */
@@ -739,13 +739,13 @@ gst_task_start (GstTask * task)
 
 /**
  * gst_task_stop:
- * @task: The #GstTask to stop
+ * @task: The [GstTask]() to stop
  *
- * Stops @task. This method merely schedules the task to stop and
+ * Stops _task_. This method merely schedules the task to stop and
  * will not wait for the task to have completely stopped. Use
- * gst_task_join() to stop and wait for completion.
+ * [gst_task_join]() to stop and wait for completion.
  *
- * Returns: %TRUE if the task could be stopped.
+ * Returns: [TRUE]() if the task could be stopped.
  *
  * MT safe.
  */
@@ -757,14 +757,14 @@ gst_task_stop (GstTask * task)
 
 /**
  * gst_task_pause:
- * @task: The #GstTask to pause
+ * @task: The [GstTask]() to pause
  *
- * Pauses @task. This method can also be called on a task in the
+ * Pauses _task_. This method can also be called on a task in the
  * stopped state, in which case a thread will be started and will remain
  * in the paused state. This function does not wait for the task to complete
  * the paused state.
  *
- * Returns: %TRUE if the task could be paused.
+ * Returns: [TRUE]() if the task could be paused.
  *
  * MT safe.
  */
@@ -776,10 +776,10 @@ gst_task_pause (GstTask * task)
 
 /**
  * gst_task_join:
- * @task: The #GstTask to join
+ * @task: The [GstTask]() to join
  *
- * Joins @task. After this call, it is safe to unref the task
- * and clean up the lock set with gst_task_set_lock().
+ * Joins _task_. After this call, it is safe to unref the task
+ * and clean up the lock set with [gst_task_set_lock]().
  *
  * The task will automatically be stopped with this call.
  *
@@ -787,7 +787,7 @@ gst_task_pause (GstTask * task)
  * would cause a deadlock. The function will detect this and print a
  * g_warning.
  *
- * Returns: %TRUE if the task could be joined.
+ * Returns: [TRUE]() if the task could be joined.
  *
  * MT safe.
  */

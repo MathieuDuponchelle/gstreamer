@@ -47,7 +47,7 @@ typedef struct _GstAllocationParams GstAllocationParams;
  * gst_memory_alignment:
  *
  * The default memory alignment in bytes - 1
- * an alignment of 7 would be the same as what malloc() guarantees.
+ * an alignment of 7 would be the same as what [malloc]() guarantees.
  */
 GST_EXPORT gsize gst_memory_alignment;
 
@@ -98,11 +98,11 @@ typedef enum {
  * @mem_share: the implementation of the GstMemoryShareFunction
  * @mem_is_span: the implementation of the GstMemoryIsSpanFunction
  * @mem_map_full: the implementation of the GstMemoryMapFullFunction.
- *      Will be used instead of @mem_map if present. (Since 1.6)
+ *      Will be used instead of _mem_map_ if present. (Since 1.6)
  * @mem_unmap_full: the implementation of the GstMemoryUnmapFullFunction.
- *      Will be used instead of @mem_unmap if present. (Since 1.6)
+ *      Will be used instead of _mem_unmap_ if present. (Since 1.6)
  *
- * The #GstAllocator is used to create new memory.
+ * The [GstAllocator]() is used to create new memory.
  */
 struct _GstAllocator
 {
@@ -129,11 +129,11 @@ struct _GstAllocator
 
 /**
  * GstAllocatorClass:
- * @object_class:  Object parent class
+ * @object_class: Object parent class
  * @alloc: implementation that acquires memory
  * @free: implementation that releases memory
  *
- * The #GstAllocator is used to create new memory.
+ * The [GstAllocator]() is used to create new memory.
  */
 struct _GstAllocatorClass {
   GstObjectClass object_class;

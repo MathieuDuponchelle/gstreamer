@@ -24,15 +24,15 @@
 /**
  * SECTION:gstcontext
  * @short_description: Lightweight objects to represent element contexts
- * @see_also: #GstMiniObject, #GstElement
+ * @see_also: [GstMiniObject](), [GstElement]()
  *
- * #GstContext is a container object used to store contexts like a device
+ * [GstContext]() is a container object used to store contexts like a device
  * context, a display server connection and similar concepts that should
  * be shared between multiple elements.
  *
  * Applications can set a context on a complete pipeline by using
- * gst_element_set_context(), which will then be propagated to all
- * child elements. Elements can handle these in #GstElementClass.set_context()
+ * [gst_element_set_context](), which will then be propagated to all
+ * child elements. Elements can handle these in [GstElementClass]().[set_context]()
  * and merge them with the context information they already have.
  *
  * When an element needs a context it will do the following actions in this
@@ -147,7 +147,6 @@ gst_context_init (GstContext * context)
  * Create a new context.
  *
  * Returns: (transfer full): The new context.
- *
  * Since: 1.2
  */
 GstContext *
@@ -175,12 +174,11 @@ gst_context_new (const gchar * context_type, gboolean persistent)
 
 /**
  * gst_context_get_context_type:
- * @context: The #GstContext.
+ * @context: The [GstContext]().
  *
- * Get the type of @context.
+ * Get the type of _context_.
  *
  * Returns: The type of the context.
- *
  * Since: 1.2
  */
 const gchar *
@@ -193,13 +191,12 @@ gst_context_get_context_type (const GstContext * context)
 
 /**
  * gst_context_has_context_type:
- * @context: The #GstContext.
+ * @context: The [GstContext]().
  * @context_type: Context type to check.
  *
- * Checks if @context has @context_type.
+ * Checks if _context_ has _context_type_.
  *
- * Returns: %TRUE if @context has @context_type.
- *
+ * Returns: [TRUE]() if _context_ has _context_type_.
  * Since: 1.2
  */
 gboolean
@@ -214,14 +211,13 @@ gst_context_has_context_type (const GstContext * context,
 
 /**
  * gst_context_get_structure:
- * @context: The #GstContext.
+ * @context: The [GstContext]().
  *
  * Access the structure of the context.
  *
  * Returns: (transfer none): The structure of the context. The structure is
  * still owned by the context, which means that you should not modify it,
  * free it and that the pointer becomes invalid when you free the context.
- *
  * Since: 1.2
  */
 const GstStructure *
@@ -234,15 +230,14 @@ gst_context_get_structure (const GstContext * context)
 
 /**
  * gst_context_writable_structure:
- * @context: The #GstContext.
+ * @context: The [GstContext]().
  *
  * Get a writable version of the structure.
  *
  * Returns: The structure of the context. The structure is still
  * owned by the event, which means that you should not free it and
  * that the pointer becomes invalid when you free the event.
- * This function checks if @context is writable.
- *
+ * This function checks if _context_ is writable.
  * Since: 1.2
  */
 GstStructure *
@@ -256,12 +251,11 @@ gst_context_writable_structure (GstContext * context)
 
 /**
  * gst_context_is_persistent:
- * @context: The #GstContext.
+ * @context: The [GstContext]().
  *
- * Check if @context is persistent.
+ * Check if _context_ is persistent.
  *
- * Returns: %TRUE if the context is persistent.
- *
+ * Returns: [TRUE]() if the context is persistent.
  * Since: 1.2
  */
 gboolean

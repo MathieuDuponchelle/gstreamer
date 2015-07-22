@@ -64,21 +64,20 @@ struct _GstTimedValue
 
 /**
  * GstControlSourceGetValue:
- * @self: the #GstControlSource instance
+ * @self: the [GstControlSource]() instance
  * @timestamp: timestamp for which a value should be calculated
- * @value: a #GValue which will be set to the result. It must be initialized to the correct type.
+ * @value: a [GValue]() which will be set to the result. It must be initialized to the correct type.
  *
  * Function for returning a value for a given timestamp.
  *
- * Returns: %TRUE if the value was successfully calculated.
- *
+ * Returns: [TRUE]() if the value was successfully calculated.
  */
 typedef gboolean (* GstControlSourceGetValue) (GstControlSource *self, 
     GstClockTime timestamp, gdouble *value);
 
 /**
  * GstControlSourceGetValueArray:
- * @self: the #GstControlSource instance
+ * @self: the [GstControlSource]() instance
  * @timestamp: timestamp for which a value should be calculated
  * @interval: the time spacing between subsequent values
  * @n_values: the number of values
@@ -86,8 +85,7 @@ typedef gboolean (* GstControlSourceGetValue) (GstControlSource *self,
  *
  * Function for returning an array of values for starting at a given timestamp.
  *
- * Returns: %TRUE if the values were successfully calculated.
- *
+ * Returns: [TRUE]() if the values were successfully calculated.
  */
 typedef gboolean (* GstControlSourceGetValueArray) (GstControlSource *self, 
     GstClockTime timestamp, GstClockTime interval, guint n_values, gdouble *values);
@@ -95,9 +93,9 @@ typedef gboolean (* GstControlSourceGetValueArray) (GstControlSource *self,
 /**
  * GstControlSource:
  * @get_value: Function for returning a value for a given timestamp
- * @get_value_array: Function for returning a #GstValueArray for a given timestamp
+ * @get_value_array: Function for returning a [GstValueArray]() for a given timestamp
  *
- * The instance structure of #GstControlSource.
+ * The instance structure of [GstControlSource]().
  */
 struct _GstControlSource {
   GstObject parent;
@@ -114,7 +112,7 @@ struct _GstControlSource {
  * GstControlSourceClass:
  * @parent_class: Parent class
  *
- * The class structure of #GstControlSource.
+ * The class structure of [GstControlSource]().
  */
 
 struct _GstControlSourceClass

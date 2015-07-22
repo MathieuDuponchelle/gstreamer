@@ -348,12 +348,12 @@ gst_registry_binary_initialize_magic (GstBinaryRegistryMagic * m)
 
 /**
  * gst_registry_binary_write_cache:
- * @registry: a #GstRegistry
+ * @registry: a [GstRegistry]()
  * @location: a filename
  *
- * Write the @registry to a cache to file at given @location.
+ * Write the _registry_ to a cache to file at given _location_.
  *
- * Returns: %TRUE on success.
+ * Returns: [TRUE]() on success.
  */
 gboolean
 priv_gst_registry_binary_write_cache (GstRegistry * registry, GList * plugins,
@@ -499,12 +499,12 @@ fail:
 
 /**
  * gst_registry_binary_read_cache:
- * @registry: a #GstRegistry
+ * @registry: a [GstRegistry]()
  * @location: a filename
  *
- * Read the contents of the binary cache file at @location into @registry.
+ * Read the contents of the binary cache file at _location_ into _registry_.
  *
- * Returns: %TRUE on success.
+ * Returns: [TRUE]() on success.
  */
 gboolean
 priv_gst_registry_binary_read_cache (GstRegistry * registry,

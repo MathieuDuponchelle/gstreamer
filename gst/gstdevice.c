@@ -22,14 +22,14 @@
 /**
  * SECTION:gstdevice
  * @short_description: Object representing a device
- * @see_also: #GstDeviceProvider
+ * @see_also: [GstDeviceProvider]()
  *
- * #GstDevice are objects representing a device, they contain
- * relevant metadata about the device, such as its class and the #GstCaps
+ * [GstDevice]() are objects representing a device, they contain
+ * relevant metadata about the device, such as its class and the [GstCaps]()
  * representing the media types it can produce or handle.
  *
- * #GstDevice are created by #GstDeviceProvider objects which can be
- * aggregated by #GstDeviceMonitor objects.
+ * [GstDevice]() are created by [GstDeviceProvider]() objects which can be
+ * aggregated by [GstDeviceMonitor]() objects.
  *
  * Since: 1.4
  */
@@ -191,15 +191,14 @@ gst_device_set_property (GObject * object, guint prop_id,
 
 /**
  * gst_device_create_element:
- * @device: a #GstDevice
- * @name: (allow-none): name of new element, or %NULL to automatically
+ * @device: a [GstDevice]()
+ * @name: (allow-none): name of new element, or [NULL]() to automatically
  * create a unique name.
  *
  * Creates the element with all of the required paramaters set to use
  * this device.
  *
- * Returns: (transfer full): a new #GstElement configured to use this device
- *
+ * Returns: (transfer full): a new [GstElement]() configured to use this device
  * Since: 1.4
  */
 GstElement *
@@ -217,13 +216,12 @@ gst_device_create_element (GstDevice * device, const gchar * name)
 
 /**
  * gst_device_get_caps:
- * @device: a #GstDevice
+ * @device: a [GstDevice]()
  *
- * Getter for the #GstCaps that this device supports.
+ * Getter for the [GstCaps]() that this device supports.
  *
- * Returns: The #GstCaps supported by this device. Unref with
- * gst_caps_unref() when done.
- *
+ * Returns: The [GstCaps]() supported by this device. Unref with
+ * [gst_caps_unref]() when done.
  * Since: 1.4
  */
 GstCaps *
@@ -239,12 +237,11 @@ gst_device_get_caps (GstDevice * device)
 
 /**
  * gst_device_get_display_name:
- * @device: a #GstDevice
+ * @device: a [GstDevice]()
  *
  * Gets the user-friendly name of the device.
  *
- * Returns: The device name. Free with g_free() after use.
- *
+ * Returns: The device name. Free with [g_free]() after use.
  * Since: 1.4
  */
 gchar *
@@ -258,14 +255,13 @@ gst_device_get_display_name (GstDevice * device)
 
 /**
  * gst_device_get_device_class:
- * @device: a #GstDevice
+ * @device: a [GstDevice]()
  *
  * Gets the "class" of a device. This is a "/" separated list of
  * classes that represent this device. They are a subset of the
- * classes of the #GstDeviceProvider that produced this device.
+ * classes of the [GstDeviceProvider]() that produced this device.
  *
- * Returns: The device class. Free with g_free() after use.
- *
+ * Returns: The device class. Free with [g_free]() after use.
  * Since: 1.4
  */
 gchar *
@@ -281,13 +277,12 @@ gst_device_get_device_class (GstDevice * device)
 
 /**
  * gst_device_get_properties:
- * @device: a #GstDevice
+ * @device: a [GstDevice]()
  *
  * Gets the extra properties of a device.
  *
- * Returns: The extra properties or %NULL when there are none.
- *          Free with gst_structure_free() after use.
- *
+ * Returns: The extra properties or [NULL]() when there are none.
+ *          Free with [gst_structure_free]() after use.
  * Since: 1.6
  */
 GstStructure *
@@ -303,19 +298,18 @@ gst_device_get_properties (GstDevice * device)
 
 /**
  * gst_device_reconfigure_element:
- * @device: a #GstDevice
- * @element: a #GstElement
+ * @device: a [GstDevice]()
+ * @element: a [GstElement]()
  *
  * Tries to reconfigure an existing element to use the device. If this
  * function fails, then one must destroy the element and create a new one
- * using gst_device_create_element().
+ * using [gst_device_create_element]().
  *
  * Note: This should only be implemented for elements can change their
  * device in the PLAYING state.
  *
- * Returns: %TRUE if the element could be reconfigured to use this device,
- * %FALSE otherwise.
- *
+ * Returns: [TRUE]() if the element could be reconfigured to use this device,
+ * [FALSE]() otherwise.
  * Since: 1.4
  */
 gboolean
@@ -333,14 +327,13 @@ gst_device_reconfigure_element (GstDevice * device, GstElement * element)
 
 /**
  * gst_device_has_classesv:
- * @device: a #GstDevice
- * @classes: (array zero-terminated=1): a %NULL terminated array of classes to match, only match if all
+ * @device: a [GstDevice]()
+ * @classes: (array zero-terminated=1): a [NULL]() terminated array of classes to match, only match if all
  *   classes are matched
  *
- * Check if @factory matches all of the given classes
+ * Check if _factory_ matches all of the given classes
  *
- * Returns: %TRUE if @device matches.
- *
+ * Returns: [TRUE]() if _device_ matches.
  * Since: 1.4
  */
 gboolean
@@ -375,14 +368,13 @@ gst_device_has_classesv (GstDevice * device, gchar ** classes)
 
 /**
  * gst_device_has_classes:
- * @device: a #GstDevice
+ * @device: a [GstDevice]()
  * @classes: a "/" separate list of device classes to match, only match if
  *  all classes are matched
  *
- * Check if @device matches all of the given classes
+ * Check if _device_ matches all of the given classes
  *
- * Returns: %TRUE if @device matches.
- *
+ * Returns: [TRUE]() if _device_ matches.
  * Since: 1.4
  */
 gboolean

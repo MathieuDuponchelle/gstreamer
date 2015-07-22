@@ -38,7 +38,7 @@ typedef struct _GstSegment GstSegment;
  * @GST_SEEK_TYPE_END: relative position to duration is requested
  *
  * The different types of seek events. When constructing a seek event with
- * gst_event_new_seek() or when doing gst_segment_do_seek ().
+ * [gst_event_new_seek]() or when doing [gst_segment_do_seek]().
  */
 typedef enum {
   /* one of these */
@@ -77,9 +77,9 @@ typedef enum {
  *                     playback, request that audio decoder elements skip
  *                     decoding and output only gap events or silence. (Since 1.6)
  * @GST_SEEK_FLAG_SKIP: Deprecated backward compatibility flag, replaced
- *                     by @GST_SEEK_FLAG_TRICKMODE
+ *                     by _GST_SEEK_FLAG_TRICKMODE_
  *
- * Flags to be used with gst_element_seek() or gst_event_new_seek(). All flags
+ * Flags to be used with [gst_element_seek]() or [gst_event_new_seek](). All flags
  * can be used together.
  *
  * A non flushing seek might take some time to perform as the currently
@@ -91,23 +91,23 @@ typedef enum {
  *
  * When performing a segment seek: after the playback of the segment completes,
  * no EOS will be emitted by the element that performed the seek, but a
- * #GST_MESSAGE_SEGMENT_DONE message will be posted on the bus by the element.
+ * [GST_MESSAGE_SEGMENT_DONE]() message will be posted on the bus by the element.
  * When this message is posted, it is possible to send a new seek event to
  * continue playback. With this seek method it is possible to perform seamless
  * looping or simple linear editing.
  *
  * When doing fast forward (rate > 1.0) or fast reverse (rate < -1.0) trickmode
- * playback, the @GST_SEEK_FLAG_TRICKMODE flag can be used to instruct decoders
+ * playback, the _GST_SEEK_FLAG_TRICKMODE_ flag can be used to instruct decoders
  * and demuxers to adjust the playback rate by skipping frames. This can improve
  * performance and decrease CPU usage because not all frames need to be decoded.
  *
- * Beyond that, the @GST_SEEK_FLAG_TRICKMODE_KEY_UNITS flag can be used to
+ * Beyond that, the _GST_SEEK_FLAG_TRICKMODE_KEY_UNITS_ flag can be used to
  * request that decoders skip all frames except key units, and
- * @GST_SEEK_FLAG_TRICKMODE_NO_AUDIO flags can be used to request that audio
+ * _GST_SEEK_FLAG_TRICKMODE_NO_AUDIO_ flags can be used to request that audio
  * decoders do no decoding at all, and simple output silence.
  *
- * The @GST_SEEK_FLAG_SNAP_BEFORE flag can be used to snap to the previous
- * relevant location, and the @GST_SEEK_FLAG_SNAP_AFTER flag can be used to
+ * The _GST_SEEK_FLAG_SNAP_BEFORE_ flag can be used to snap to the previous
+ * relevant location, and the _GST_SEEK_FLAG_SNAP_AFTER_ flag can be used to
  * select the next relevant location. If KEY_UNIT is specified, the relevant
  * location is a keyframe. If both flags are specified, the nearest of these
  * locations will be selected. If none are specified, the implementation is
@@ -150,7 +150,7 @@ typedef enum {
  * @GST_SEGMENT_FLAG_TRICKMODE_NO_AUDIO: Do not decode any audio, where
  *                                        possible (Since 1.6)
  * @GST_SEGMENT_FLAG_SKIP: Deprecated backward compatibility flag, replaced
- *                         by @GST_SEGMENT_FLAG_TRICKMODE
+ *                         by _GST_SEGMENT_FLAG_TRICKMODE_
  *
  * Flags for the GstSegment structure. Currently mapped to the corresponding
  * values of the seek flags.
@@ -175,7 +175,7 @@ typedef enum { /*< flags >*/
  * @applied_rate: the already applied rate to the segment
  * @format: the format of the segment values
  * @base: the base of the segment
- * @offset: the offset to apply to @start or @stop
+ * @offset: the offset to apply to _start_ or _stop_
  * @start: the start of the segment
  * @stop: the stop of the segment
  * @time: the stream time of the segment

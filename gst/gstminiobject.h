@@ -51,11 +51,11 @@ typedef GstMiniObject * (*GstMiniObjectCopyFunction) (const GstMiniObject *obj);
  *
  * Function prototype for when a miniobject has lost its last refcount.
  * Implementation of the mini object are allowed to revive the
- * passed object by doing a gst_mini_object_ref(). If the object is not
- * revived after the dispose function, the function should return %TRUE
+ * passed object by doing a [gst_mini_object_ref](). If the object is not
+ * revived after the dispose function, the function should return [TRUE]()
  * and the memory associated with the object is freed.
  *
- * Returns: %TRUE if the object should be cleaned up.
+ * Returns: [TRUE]() if the object should be cleaned up.
  */
 typedef gboolean (*GstMiniObjectDisposeFunction) (GstMiniObject *obj);
 /**
@@ -67,14 +67,14 @@ typedef gboolean (*GstMiniObjectDisposeFunction) (GstMiniObject *obj);
  */
 typedef void (*GstMiniObjectFreeFunction) (GstMiniObject *obj);
 
- /**
+/**
  * GstMiniObjectNotify:
  * @user_data: data that was provided when the notify was added
  * @obj: the mini object
  *
- * A #GstMiniObjectNotify function can be added to a mini object as a
- * callback that gets triggered when gst_mini_object_unref() drops the
- * last ref and @obj is about to be freed.
+ * A [GstMiniObjectNotify]() function can be added to a mini object as a
+ * callback that gets triggered when [gst_mini_object_unref]() drops the
+ * last ref and _obj_ is about to be freed.
  */
 typedef void (*GstMiniObjectNotify) (gpointer user_data, GstMiniObject * obj);
 
@@ -121,7 +121,7 @@ typedef void (*GstMiniObjectNotify) (gpointer user_data, GstMiniObject * obj);
 /**
  * GstMiniObjectFlags:
  * @GST_MINI_OBJECT_FLAG_LOCKABLE: the object can be locked and unlocked with
- * gst_mini_object_lock() and gst_mini_object_unlock().
+ * [gst_mini_object_lock]() and [gst_mini_object_unlock]().
  * @GST_MINI_OBJECT_FLAG_LOCK_READONLY: the object is permanently locked in
  * READONLY mode. Only read locks can be performed on the object.
  * @GST_MINI_OBJECT_FLAG_LAST: first flag that can be used by subclasses.
@@ -138,10 +138,10 @@ typedef enum
 
 /**
  * GST_MINI_OBJECT_IS_LOCKABLE:
- * @obj: a #GstMiniObject
+ * @obj: a [GstMiniObject]()
  *
- * Check if @obj is lockable. A lockable object can be locked and unlocked with
- * gst_mini_object_lock() and gst_mini_object_unlock().
+ * Check if _obj_ is lockable. A lockable object can be locked and unlocked with
+ * [gst_mini_object_lock]() and [gst_mini_object_unlock]().
  */
 #define GST_MINI_OBJECT_IS_LOCKABLE(obj)  GST_MINI_OBJECT_FLAG_IS_SET(obj, GST_MINI_OBJECT_FLAG_LOCKABLE)
 
@@ -171,21 +171,21 @@ typedef enum {
 
 /**
  * GST_MINI_OBJECT_REFCOUNT:
- * @obj: a #GstMiniObject
+ * @obj: a [GstMiniObject]()
  *
  * Get access to the reference count field of the mini-object.
  */
 #define GST_MINI_OBJECT_REFCOUNT(obj)           ((GST_MINI_OBJECT_CAST(obj))->refcount)
 /**
  * GST_MINI_OBJECT_REFCOUNT_VALUE:
- * @obj: a #GstMiniObject
+ * @obj: a [GstMiniObject]()
  *
  * Get the reference count value of the mini-object.
  */
 #define GST_MINI_OBJECT_REFCOUNT_VALUE(obj)     (g_atomic_int_get (&(GST_MINI_OBJECT_CAST(obj))->refcount))
 
 /**
- * GstMiniObject: (ref-func gst_mini_object_ref) (unref-func gst_mini_object_unref) (set-value-func g_value_set_boxed) (get-value-func g_value_get_boxed)
+ * GstMiniObject: (ref-func gst_mini_object_ref) (unref-func gst_mini_object_unref) (set-value-func g_value_set_boxed) (get-value-func g_value_get_boxed):
  * @type: the GType of the object
  * @refcount: atomic refcount
  * @lockstate: atomic state of the locks

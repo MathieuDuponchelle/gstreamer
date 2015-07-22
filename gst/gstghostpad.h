@@ -81,7 +81,7 @@ GstFlowReturn       gst_proxy_pad_getrange_default               (GstPad *pad, G
 /**
  * GstGhostPad:
  *
- * Opaque #GstGhostPad structure.
+ * Opaque [GstGhostPad]() structure.
  */
 typedef struct _GstGhostPad GstGhostPad;
 typedef struct _GstGhostPadPrivate GstGhostPadPrivate;

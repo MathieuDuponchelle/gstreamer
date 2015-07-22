@@ -41,13 +41,13 @@ typedef struct _GstAllocator GstAllocator;
 /**
  * GstMemoryFlags:
  * @GST_MEMORY_FLAG_READONLY: memory is readonly. It is not allowed to map the
- * memory with #GST_MAP_WRITE.
+ * memory with [GST_MAP_WRITE]().
  * @GST_MEMORY_FLAG_NO_SHARE: memory must not be shared. Copies will have to be
  * made when this memory needs to be shared between buffers.
  * @GST_MEMORY_FLAG_ZERO_PREFIXED: the memory prefix is filled with 0 bytes
  * @GST_MEMORY_FLAG_ZERO_PADDED: the memory padding is filled with 0 bytes
  * @GST_MEMORY_FLAG_PHYSICALLY_CONTIGUOUS: the memory is physically contiguous. (Since 2.2)
- * @GST_MEMORY_FLAG_NOT_MAPPABLE: the memory can't be mapped via gst_memory_map() without any preconditions. (Since 1.2)
+ * @GST_MEMORY_FLAG_NOT_MAPPABLE: the memory can't be mapped via [gst_memory_map]() without any preconditions. (Since 1.2)
  * @GST_MEMORY_FLAG_LAST: first flag that can be used for custom purposes
  *
  * Flags for wrapped memory.
@@ -65,62 +65,62 @@ typedef enum {
 
 /**
  * GST_MEMORY_FLAGS:
- * @mem: a #GstMemory.
+ * @mem: a [GstMemory]().
  *
- * A flags word containing #GstMemoryFlags flags set on @mem
+ * A flags word containing [GstMemoryFlags]() flags set on _mem_
  */
 #define GST_MEMORY_FLAGS(mem)  GST_MINI_OBJECT_FLAGS (mem)
 /**
  * GST_MEMORY_FLAG_IS_SET:
- * @mem: a #GstMemory.
- * @flag: the #GstMemoryFlags to check.
+ * @mem: a [GstMemory]().
+ * @flag: the [GstMemoryFlags]() to check.
  *
- * Gives the status of a specific flag on a @mem.
+ * Gives the status of a specific flag on a _mem_.
  */
 #define GST_MEMORY_FLAG_IS_SET(mem,flag)   GST_MINI_OBJECT_FLAG_IS_SET (mem,flag)
 /**
  * GST_MEMORY_FLAG_UNSET:
- * @mem: a #GstMemory.
- * @flag: the #GstMemoryFlags to clear.
+ * @mem: a [GstMemory]().
+ * @flag: the [GstMemoryFlags]() to clear.
  *
- * Clear a specific flag on a @mem.
+ * Clear a specific flag on a _mem_.
  */
 #define GST_MEMORY_FLAG_UNSET(mem,flag)   GST_MINI_OBJECT_FLAG_UNSET (mem, flag)
 
 /**
  * GST_MEMORY_IS_READONLY:
- * @mem: a #GstMemory.
+ * @mem: a [GstMemory]().
  *
- * Check if @mem is readonly.
+ * Check if _mem_ is readonly.
  */
 #define GST_MEMORY_IS_READONLY(mem)        GST_MEMORY_FLAG_IS_SET(mem,GST_MEMORY_FLAG_READONLY)
 /**
  * GST_MEMORY_IS_NO_SHARE:
- * @mem: a #GstMemory.
+ * @mem: a [GstMemory]().
  *
- * Check if @mem cannot be shared between buffers
+ * Check if _mem_ cannot be shared between buffers
  */
 #define GST_MEMORY_IS_NO_SHARE(mem)        GST_MEMORY_FLAG_IS_SET(mem,GST_MEMORY_FLAG_NO_SHARE)
 /**
  * GST_MEMORY_IS_ZERO_PREFIXED:
- * @mem: a #GstMemory.
+ * @mem: a [GstMemory]().
  *
- * Check if the prefix in @mem is 0 filled.
+ * Check if the prefix in _mem_ is 0 filled.
  */
 #define GST_MEMORY_IS_ZERO_PREFIXED(mem)   GST_MEMORY_FLAG_IS_SET(mem,GST_MEMORY_FLAG_ZERO_PREFIXED)
 /**
  * GST_MEMORY_IS_ZERO_PADDED:
- * @mem: a #GstMemory.
+ * @mem: a [GstMemory]().
  *
- * Check if the padding in @mem is 0 filled.
+ * Check if the padding in _mem_ is 0 filled.
  */
 #define GST_MEMORY_IS_ZERO_PADDED(mem)     GST_MEMORY_FLAG_IS_SET(mem,GST_MEMORY_FLAG_ZERO_PADDED)
 
 /**
  * GST_MEMORY_IS_PHYSICALLY_CONTIGUOUS:
- * @mem: a #GstMemory.
+ * @mem: a [GstMemory]().
  *
- * Check if @mem is physically contiguous.
+ * Check if _mem_ is physically contiguous.
  *
  * Since: 1.2
  */
@@ -128,9 +128,9 @@ typedef enum {
 
 /**
  * GST_MEMORY_IS_NOT_MAPPABLE:
- * @mem: a #GstMemory.
+ * @mem: a [GstMemory]().
  *
- * Check if @mem can't be mapped via gst_memory_map() without any preconditions
+ * Check if _mem_ can't be mapped via [gst_memory_map]() without any preconditions
  *
  * Since: 1.2
  */
@@ -139,7 +139,7 @@ typedef enum {
 /**
  * GstMemory:
  * @mini_object: parent structure
- * @allocator: pointer to the #GstAllocator
+ * @allocator: pointer to the [GstAllocator]()
  * @parent: parent memory block
  * @maxsize: the maximum size allocated
  * @align: the alignment of the memory
@@ -189,13 +189,13 @@ typedef enum {
  * @memory: a pointer to the mapped memory
  * @flags: flags used when mapping the memory
  * @data: (array length=size): a pointer to the mapped data
- * @size: the valid size in @data
- * @maxsize: the maximum bytes in @data
+ * @size: the valid size in _data_
+ * @maxsize: the maximum bytes in _data_
  * @user_data: extra private user_data that the implementation of the memory
  *             can use to store extra info.
  *
  * A structure containing the result of a map operation such as
- * gst_memory_map(). It contains the data and size.
+ * [gst_memory_map](). It contains the data and size.
  */
 typedef struct {
   GstMemory *memory;
@@ -213,96 +213,96 @@ typedef struct {
 /**
  * GST_MAP_INFO_INIT:
  *
- * Initializer for #GstMapInfo
+ * Initializer for [GstMapInfo]()
  */
 #define GST_MAP_INFO_INIT { NULL, 0, NULL, 0, 0, {0, }, {0, }}
 
 /**
  * GstMemoryMapFunction:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @maxsize: size to map
  * @flags: access mode for the memory
  *
- * Get the memory of @mem that can be accessed according to the mode specified
- * in @flags. The function should return a pointer that contains at least
- * @maxsize bytes.
+ * Get the memory of _mem_ that can be accessed according to the mode specified
+ * in _flags_. The function should return a pointer that contains at least
+ * _maxsize_ bytes.
  *
- * Returns: a pointer to memory of which at least @maxsize bytes can be
- * accessed according to the access pattern in @flags.
+ * Returns: a pointer to memory of which at least _maxsize_ bytes can be
+ * accessed according to the access pattern in _flags_.
  */
 typedef gpointer    (*GstMemoryMapFunction)       (GstMemory *mem, gsize maxsize, GstMapFlags flags);
 
 /**
  * GstMemoryMapFullFunction:
- * @mem: a #GstMemory
- * @info: the #GstMapInfo to map with
+ * @mem: a [GstMemory]()
+ * @info: the [GstMapInfo]() to map with
  * @maxsize: size to map
  *
- * Get the memory of @mem that can be accessed according to the mode specified
- * in @info's flags. The function should return a pointer that contains at least
- * @maxsize bytes.
+ * Get the memory of _mem_ that can be accessed according to the mode specified
+ * in _info_'s flags. The function should return a pointer that contains at least
+ * _maxsize_ bytes.
  *
- * Returns: a pointer to memory of which at least @maxsize bytes can be
- * accessed according to the access pattern in @info's flags.
+ * Returns: a pointer to memory of which at least _maxsize_ bytes can be
+ * accessed according to the access pattern in _info_'s flags.
  */
 typedef gpointer    (*GstMemoryMapFullFunction)       (GstMemory *mem, GstMapInfo * info, gsize maxsize);
 
 /**
  * GstMemoryUnmapFunction:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  *
- * Return the pointer previously retrieved with gst_memory_map().
+ * Return the pointer previously retrieved with [gst_memory_map]().
  */
 typedef void        (*GstMemoryUnmapFunction)     (GstMemory *mem);
 
 /**
  * GstMemoryUnmapFullFunction:
- * @mem: a #GstMemory
- * @info: a #GstMapInfo
+ * @mem: a [GstMemory]()
+ * @info: a [GstMapInfo]()
  *
- * Return the pointer previously retrieved with gst_memory_map() with @info.
+ * Return the pointer previously retrieved with [gst_memory_map]() with _info_.
  */
 typedef void        (*GstMemoryUnmapFullFunction)     (GstMemory *mem, GstMapInfo * info);
 
 /**
  * GstMemoryCopyFunction:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @offset: an offset
  * @size: a size or -1
  *
- * Copy @size bytes from @mem starting at @offset and return them wrapped in a
+ * Copy _size_ bytes from _mem_ starting at _offset_ and return them wrapped in a
  * new GstMemory object.
- * If @size is set to -1, all bytes starting at @offset are copied.
+ * If _size_ is set to -1, all bytes starting at _offset_ are copied.
  *
- * Returns: a new #GstMemory object wrapping a copy of the requested region in
- * @mem.
+ * Returns: a new [GstMemory]() object wrapping a copy of the requested region in
+ * _mem_.
  */
 typedef GstMemory * (*GstMemoryCopyFunction)      (GstMemory *mem, gssize offset, gssize size);
 
 /**
  * GstMemoryShareFunction:
- * @mem: a #GstMemory
+ * @mem: a [GstMemory]()
  * @offset: an offset
  * @size: a size or -1
  *
- * Share @size bytes from @mem starting at @offset and return them wrapped in a
- * new GstMemory object. If @size is set to -1, all bytes starting at @offset are
- * shared. This function does not make a copy of the bytes in @mem.
+ * Share _size_ bytes from _mem_ starting at _offset_ and return them wrapped in a
+ * new GstMemory object. If _size_ is set to -1, all bytes starting at _offset_ are
+ * shared. This function does not make a copy of the bytes in _mem_.
  *
- * Returns: a new #GstMemory object sharing the requested region in @mem.
+ * Returns: a new [GstMemory]() object sharing the requested region in _mem_.
  */
 typedef GstMemory * (*GstMemoryShareFunction)     (GstMemory *mem, gssize offset, gssize size);
 
 /**
  * GstMemoryIsSpanFunction:
- * @mem1: a #GstMemory
- * @mem2: a #GstMemory
+ * @mem1: a [GstMemory]()
+ * @mem2: a [GstMemory]()
  * @offset: a result offset
  *
- * Check if @mem1 and @mem2 occupy contiguous memory and return the offset of
- * @mem1 in the parent buffer in @offset.
+ * Check if _mem1_ and _mem2_ occupy contiguous memory and return the offset of
+ * _mem1_ in the parent buffer in _offset_.
  *
- * Returns: %TRUE if @mem1 and @mem2 are in contiguous memory.
+ * Returns: [TRUE]() if _mem1_ and _mem2_ are in contiguous memory.
  */
 typedef gboolean    (*GstMemoryIsSpanFunction)    (GstMemory *mem1, GstMemory *mem2, gsize *offset);
 
@@ -320,7 +320,7 @@ gboolean       gst_memory_is_type      (GstMemory *mem, const gchar *mem_type);
  *
  * Increase the refcount of this memory.
  *
- * Returns: (transfer full): @memory (for convenience when doing assignments)
+ * Returns: (transfer full): _memory_ (for convenience when doing assignments)
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstMemory * gst_memory_ref (GstMemory * memory);

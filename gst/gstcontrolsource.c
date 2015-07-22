@@ -24,19 +24,19 @@
  * SECTION:gstcontrolsource
  * @short_description: base class for control source sources
  *
- * The #GstControlSource is a base class for control value sources that could
+ * The [GstControlSource]() is a base class for control value sources that could
  * be used to get timestamp-value pairs. A control source essentially is a
  * function over time, returning float values between 0.0 and 1.0.
  *
- * A #GstControlSource is used by first getting an instance of a specific
+ * A [GstControlSource]() is used by first getting an instance of a specific
  * control-source, creating a binding for the control-source to the target property
  * of the element and then adding the binding to the element. The binding will
  * convert the data types and value range to fit to the bound property.
  *
- * For implementing a new #GstControlSource one has to implement
- * #GstControlSourceGetValue and #GstControlSourceGetValueArray functions.
- * These are then used by gst_control_source_get_value() and
- * gst_control_source_get_value_array() to get values for specific timestamps.
+ * For implementing a new [GstControlSource]() one has to implement
+ * [GstControlSourceGetValue]() and [GstControlSourceGetValueArray]() functions.
+ * These are then used by [gst_control_source_get_value]() and
+ * [gst_control_source_get_value_array]() to get values for specific timestamps.
  */
 
 #include "gst_private.h"
@@ -90,13 +90,13 @@ gst_control_source_constructor (GType type, guint n_construct_params,
 
 /**
  * gst_control_source_get_value:
- * @self: the #GstControlSource object
+ * @self: the [GstControlSource]() object
  * @timestamp: the time for which the value should be returned
  * @value: the value
  *
- * Gets the value for this #GstControlSource at a given timestamp.
+ * Gets the value for this [GstControlSource]() at a given timestamp.
  *
- * Returns: %FALSE if the value couldn't be returned, %TRUE otherwise.
+ * Returns: [FALSE]() if the value couldn't be returned, [TRUE]() otherwise.
  */
 gboolean
 gst_control_source_get_value (GstControlSource * self, GstClockTime timestamp,
@@ -114,16 +114,16 @@ gst_control_source_get_value (GstControlSource * self, GstClockTime timestamp,
 
 /**
  * gst_control_source_get_value_array:
- * @self: the #GstControlSource object
+ * @self: the [GstControlSource]() object
  * @timestamp: the first timestamp
  * @interval: the time steps
  * @n_values: the number of values to fetch
  * @values: (array length=n_values): array to put control-values in
  *
- * Gets an array of values for for this #GstControlSource. Values that are
+ * Gets an array of values for for this [GstControlSource](). Values that are
  * undefined contain NANs.
  *
- * Returns: %TRUE if the given array could be filled, %FALSE otherwise
+ * Returns: [TRUE]() if the given array could be filled, [FALSE]() otherwise
  */
 gboolean
 gst_control_source_get_value_array (GstControlSource * self,

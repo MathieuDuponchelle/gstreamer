@@ -25,21 +25,21 @@
  * SECTION:gstobject
  * @short_description: Base class for the GStreamer object hierarchy
  *
- * #GstObject provides a root for the object hierarchy tree filed in by the
+ * [GstObject]() provides a root for the object hierarchy tree filed in by the
  * GStreamer library.  It is currently a thin wrapper on top of
- * #GInitiallyUnowned. It is an abstract class that is not very usable on its own.
+ * [GInitiallyUnowned](). It is an abstract class that is not very usable on its own.
  *
- * #GstObject gives us basic refcounting, parenting functionality and locking.
+ * [GstObject]() gives us basic refcounting, parenting functionality and locking.
  * Most of the functions are just extended for special GStreamer needs and can be
- * found under the same name in the base class of #GstObject which is #GObject
- * (e.g. g_object_ref() becomes gst_object_ref()).
+ * found under the same name in the base class of [GstObject]() which is [GObject]()
+ * (e.g. [g_object_ref]() becomes [gst_object_ref]()).
  *
- * Since #GstObject derives from #GInitiallyUnowned, it also inherits the
- * floating reference. Be aware that functions such as gst_bin_add() and
- * gst_element_add_pad() take ownership of the floating reference.
+ * Since [GstObject]() derives from [GInitiallyUnowned](), it also inherits the
+ * floating reference. Be aware that functions such as [gst_bin_add]() and
+ * [gst_element_add_pad]() take ownership of the floating reference.
  *
- * In contrast to #GObject instances, #GstObject adds a name property. The functions
- * gst_object_set_name() and gst_object_get_name() are used to set/get the name
+ * In contrast to [GObject]() instances, [GstObject]() adds a name property. The functions
+ * [gst_object_set_name]() and [gst_object_get_name]() are used to set/get the name
  * of the object.
  *
  * <refsect2>
@@ -50,7 +50,7 @@
  * for element-properties. At run-time the elements continuously pull value
  * changes for the current stream-time.
  *
- * What needs to be changed in a #GstElement?
+ * What needs to be changed in a [GstElement]()?
  * Very little - it is just two steps to make a plugin controllable!
  * <orderedlist>
  *   <listitem><para>
@@ -69,12 +69,12 @@
  * Again it's not a lot to change.
  * <orderedlist>
  *   <listitem><para>
- *     create a #GstControlSource.
- *     csource = gst_interpolation_control_source_new ();
+ *     create a [GstControlSource]().
+ *     csource = [gst_interpolation_control_source_new]();
  *     g_object_set (csource, "mode", GST_INTERPOLATION_MODE_LINEAR, NULL);
  *   </para></listitem>
  *   <listitem><para>
- *     Attach the #GstControlSource on the controller to a property.
+ *     Attach the [GstControlSource]() on the controller to a property.
  *     gst_object_add_control_binding (object, gst_direct_control_binding_new (object, "prop1", csource));
  *   </para></listitem>
  *   <listitem><para>
@@ -174,9 +174,9 @@ gst_object_class_init (GstObjectClass * klass)
    * GstObject:parent:
    *
    * The parent of the object. Please note, that when changing the 'parent'
-   * property, we don't emit #GObject::notify and #GstObject::deep-notify
+   * property, we don't emit [GObject:notify](signal) and [GstObject:deep-notify](signal)
    * signals due to locking issues. In some cases one can use
-   * #GstBin::element-added or #GstBin::element-removed signals on the parent to
+   * [GstBin:element-added](signal) or [GstBin:element-removed](signal) signals on the parent to
    * achieve a similar effect.
    */
   properties[PROP_PARENT] =
@@ -187,7 +187,7 @@ gst_object_class_init (GstObjectClass * klass)
 
   /**
    * GstObject::deep-notify:
-   * @gstobject: a #GstObject
+   * @gstobject: a [GstObject]()
    * @prop_object: the object that originated the signal
    * @prop: the property that changed
    *
@@ -232,17 +232,17 @@ gst_object_init (GstObject * object)
 
 /**
  * gst_object_ref:
- * @object: (type Gst.Object): a #GstObject to reference
+ * @object: (type Gst.Object): a [GstObject]() to reference
  *
- * Increments the reference count on @object. This function
- * does not take the lock on @object because it relies on
+ * Increments the reference count on _object_. This function
+ * does not take the lock on _object_ because it relies on
  * atomic refcounting.
  *
  * This object returns the input parameter to ease writing
  * constructs like :
  *  result = gst_object_ref (object->parent);
  *
- * Returns: (transfer full) (type Gst.Object): A pointer to @object
+ * Returns: (transfer full) (type Gst.Object): A pointer to _object_
  */
 gpointer
 gst_object_ref (gpointer object)
@@ -260,11 +260,11 @@ gst_object_ref (gpointer object)
 
 /**
  * gst_object_unref:
- * @object: (type Gst.Object): a #GstObject to unreference
+ * @object: (type Gst.Object): a [GstObject]() to unreference
  *
- * Decrements the reference count on @object.  If reference count hits
- * zero, destroy @object. This function does not take the lock
- * on @object as it relies on atomic refcounting.
+ * Decrements the reference count on _object_.  If reference count hits
+ * zero, destroy _object_. This function does not take the lock
+ * on _object_ as it relies on atomic refcounting.
  *
  * The unref method should never be called with the LOCK held since
  * this might deadlock the dispose function.
@@ -283,11 +283,11 @@ gst_object_unref (gpointer object)
 }
 
 /**
- * gst_object_ref_sink: (skip)
- * @object: a #GstObject to sink
+ * gst_object_ref_sink: (skip):
+ * @object: a [GstObject]() to sink
  *
- * Increase the reference count of @object, and possibly remove the floating
- * reference, if @object has a floating reference.
+ * Increase the reference count of _object_, and possibly remove the floating
+ * reference, if _object_ has a floating reference.
  *
  * In other words, if the object is floating, then this call "assumes ownership"
  * of the floating reference, converting it to a normal reference by clearing
@@ -311,16 +311,16 @@ gst_object_ref_sink (gpointer object)
 /**
  * gst_object_replace:
  * @oldobj: (inout) (transfer full) (nullable): pointer to a place of
- *     a #GstObject to replace
- * @newobj: (transfer none) (allow-none): a new #GstObject
+ *     a [GstObject]() to replace
+ * @newobj: (transfer none) (allow-none): a new [GstObject]()
  *
  * Atomically modifies a pointer to point to a new object.
- * The reference count of @oldobj is decreased and the reference count of
- * @newobj is increased.
+ * The reference count of _oldobj_ is decreased and the reference count of
+ * _newobj_ is increased.
  *
- * Either @newobj and the value pointed to by @oldobj may be %NULL.
+ * Either _newobj_ and the value pointed to by _oldobj_ may be [NULL]().
  *
- * Returns: %TRUE if @newobj was different from @oldobj
+ * Returns: [TRUE]() if _newobj_ was different from _oldobj_
  */
 gboolean
 gst_object_replace (GstObject ** oldobj, GstObject * newobj)
@@ -477,11 +477,11 @@ gst_object_dispatch_properties_changed (GObject * object,
 
 /**
  * gst_object_default_deep_notify:
- * @object: the #GObject that signalled the notify.
- * @orig: a #GstObject that initiated the notify.
- * @pspec: a #GParamSpec of the property.
- * @excluded_props: (array zero-terminated=1) (element-type gchar*) (allow-none):
- *     a set of user-specified properties to exclude or %NULL to show
+ * @object: the [GObject]() that signalled the notify.
+ * @orig: a [GstObject]() that initiated the notify.
+ * @pspec: a [GParamSpec]() of the property.
+ * @excluded_props: (array zero-terminated=1) (element-type gchar*) (allow-none): 
+ *     a set of user-specified properties to exclude or [NULL]() to show
  *     all changes.
  *
  * A default deep_notify signal callback for an object. The user data
@@ -489,7 +489,7 @@ gst_object_dispatch_properties_changed (GObject * object,
  * from the notify. The default handler will print the new value of the property
  * using g_print.
  *
- * MT safe. This function grabs and releases @object's LOCK for getting its
+ * MT safe. This function grabs and releases _object_'s LOCK for getting its
  *          path string.
  */
 void
@@ -587,19 +587,19 @@ had_parent:
 
 /**
  * gst_object_set_name:
- * @object: a #GstObject
+ * @object: a [GstObject]()
  * @name: (allow-none): new name of object
  *
- * Sets the name of @object, or gives @object a guaranteed unique
- * name (if @name is %NULL).
+ * Sets the name of _object_, or gives _object_ a guaranteed unique
+ * name (if _name_ is [NULL]()).
  * This function makes a copy of the provided name, so the caller
  * retains ownership of the name it sent.
  *
- * Returns: %TRUE if the name could be set. Since Objects that have
- * a parent cannot be renamed, this function returns %FALSE in those
+ * Returns: [TRUE]() if the name could be set. Since Objects that have
+ * a parent cannot be renamed, this function returns [FALSE]() in those
  * cases.
  *
- * MT safe.  This function grabs and releases @object's LOCK.
+ * MT safe.  This function grabs and releases _object_'s LOCK.
  */
 gboolean
 gst_object_set_name (GstObject * object, const gchar * name)
@@ -640,19 +640,19 @@ had_parent:
 
 /**
  * gst_object_get_name:
- * @object: a #GstObject
+ * @object: a [GstObject]()
  *
- * Returns a copy of the name of @object.
- * Caller should g_free() the return value after usage.
- * For a nameless object, this returns %NULL, which you can safely g_free()
+ * Returns a copy of the name of _object_.
+ * Caller should [g_free]() the return value after usage.
+ * For a nameless object, this returns [NULL](), which you can safely [g_free]()
  * as well.
  *
  * Free-function: g_free
  *
- * Returns: (transfer full) (nullable): the name of @object. g_free()
+ * Returns: (transfer full) (nullable): the name of _object_. [g_free]()
  * after usage.
  *
- * MT safe. This function grabs and releases @object's LOCK.
+ * MT safe. This function grabs and releases _object_'s LOCK.
  */
 gchar *
 gst_object_get_name (GstObject * object)
@@ -670,16 +670,16 @@ gst_object_get_name (GstObject * object)
 
 /**
  * gst_object_set_parent:
- * @object: a #GstObject
+ * @object: a [GstObject]()
  * @parent: new parent of object
  *
- * Sets the parent of @object to @parent. The object's reference count will
- * be incremented, and any floating reference will be removed (see gst_object_ref_sink()).
+ * Sets the parent of _object_ to _parent_. The object's reference count will
+ * be incremented, and any floating reference will be removed (see [gst_object_ref_sink]()).
  *
- * Returns: %TRUE if @parent could be set or %FALSE when @object
- * already had a parent or @object and @parent are the same.
+ * Returns: [TRUE]() if _parent_ could be set or [FALSE]() when _object_
+ * already had a parent or _object_ and _parent_ are the same.
  *
- * MT safe. Grabs and releases @object's LOCK.
+ * MT safe. Grabs and releases _object_'s LOCK.
  */
 gboolean
 gst_object_set_parent (GstObject * object, GstObject * parent)
@@ -720,15 +720,15 @@ had_parent:
 
 /**
  * gst_object_get_parent:
- * @object: a #GstObject
+ * @object: a [GstObject]()
  *
- * Returns the parent of @object. This function increases the refcount
- * of the parent object so you should gst_object_unref() it after usage.
+ * Returns the parent of _object_. This function increases the refcount
+ * of the parent object so you should [gst_object_unref]() it after usage.
  *
- * Returns: (transfer full) (nullable): parent of @object, this can be
- *   %NULL if @object has no parent. unref after usage.
+ * Returns: (transfer full) (nullable): parent of _object_, this can be
+ *   [NULL]() if _object_ has no parent. unref after usage.
  *
- * MT safe. Grabs and releases @object's LOCK.
+ * MT safe. Grabs and releases _object_'s LOCK.
  */
 GstObject *
 gst_object_get_parent (GstObject * object)
@@ -748,12 +748,12 @@ gst_object_get_parent (GstObject * object)
 
 /**
  * gst_object_unparent:
- * @object: a #GstObject to unparent
+ * @object: a [GstObject]() to unparent
  *
- * Clear the parent of @object, removing the associated reference.
- * This function decreases the refcount of @object.
+ * Clear the parent of _object_, removing the associated reference.
+ * This function decreases the refcount of _object_.
  *
- * MT safe. Grabs and releases @object's lock.
+ * MT safe. Grabs and releases _object_'s lock.
  */
 void
 gst_object_unparent (GstObject * object)
@@ -780,16 +780,16 @@ gst_object_unparent (GstObject * object)
 
 /**
  * gst_object_has_as_parent:
- * @object: a #GstObject to check
- * @parent: a #GstObject to check as parent
+ * @object: a [GstObject]() to check
+ * @parent: a [GstObject]() to check as parent
  *
- * Check if @parent is the parent of @object.
- * E.g. a #GstElement can check if it owns a given #GstPad.
+ * Check if _parent_ is the parent of _object_.
+ * E.g. a [GstElement]() can check if it owns a given [GstPad]().
  *
- * Returns: %FALSE if either @object or @parent is %NULL. %TRUE if @parent is
- *          the parent of @object. Otherwise %FALSE.
+ * Returns: [FALSE]() if either _object_ or _parent_ is [NULL](). [TRUE]() if _parent_ is
+ *          the parent of _object_. Otherwise [FALSE]().
  *
- * MT safe. Grabs and releases @object's locks.
+ * MT safe. Grabs and releases _object_'s locks.
  * Since: 1.6
  */
 gboolean
@@ -808,15 +808,15 @@ gst_object_has_as_parent (GstObject * object, GstObject * parent)
 
 /**
  * gst_object_has_as_ancestor:
- * @object: a #GstObject to check
- * @ancestor: a #GstObject to check as ancestor
+ * @object: a [GstObject]() to check
+ * @ancestor: a [GstObject]() to check as ancestor
  *
- * Check if @object has an ancestor @ancestor somewhere up in
- * the hierarchy. One can e.g. check if a #GstElement is inside a #GstPipeline.
+ * Check if _object_ has an ancestor _ancestor_ somewhere up in
+ * the hierarchy. One can e.g. check if a [GstElement]() is inside a [GstPipeline]().
  *
- * Returns: %TRUE if @ancestor is an ancestor of @object.
+ * Returns: [TRUE]() if _ancestor_ is an ancestor of _object_.
  *
- * MT safe. Grabs and releases @object's locks.
+ * MT safe. Grabs and releases _object_'s locks.
  */
 gboolean
 gst_object_has_as_ancestor (GstObject * object, GstObject * ancestor)
@@ -843,17 +843,16 @@ gst_object_has_as_ancestor (GstObject * object, GstObject * ancestor)
 
 /**
  * gst_object_has_ancestor:
- * @object: a #GstObject to check
- * @ancestor: a #GstObject to check as ancestor
+ * @object: a [GstObject]() to check
+ * @ancestor: a [GstObject]() to check as ancestor
  *
- * Check if @object has an ancestor @ancestor somewhere up in
- * the hierarchy. One can e.g. check if a #GstElement is inside a #GstPipeline.
+ * Check if _object_ has an ancestor _ancestor_ somewhere up in
+ * the hierarchy. One can e.g. check if a [GstElement]() is inside a [GstPipeline]().
  *
- * Returns: %TRUE if @ancestor is an ancestor of @object.
+ * Returns: [TRUE]() if _ancestor_ is an ancestor of _object_.
+ * Deprecated: Use [gst_object_has_as_ancestor]() instead.
  *
- * Deprecated: Use gst_object_has_as_ancestor() instead.
- *
- * MT safe. Grabs and releases @object's locks.
+ * MT safe. Grabs and releases _object_'s locks.
  */
 /* FIXME 2.0: remove */
 #ifndef GST_REMOVE_DEPRECATED
@@ -869,18 +868,18 @@ gst_object_has_ancestor (GstObject * object, GstObject * ancestor)
 
 /**
  * gst_object_check_uniqueness:
- * @list: (transfer none) (element-type Gst.Object): a list of #GstObject to
+ * @list: (transfer none) (element-type Gst.Object): a list of [GstObject]() to
  *      check through
  * @name: the name to search for
  *
- * Checks to see if there is any object named @name in @list. This function
+ * Checks to see if there is any object named _name_ in _list_. This function
  * does not do any locking of any kind. You might want to protect the
  * provided list with the lock of the owner of the list. This function
- * will lock each #GstObject in the list to compare the name, so be
+ * will lock each [GstObject]() in the list to compare the name, so be
  * careful when passing a list with a locked object.
  *
- * Returns: %TRUE if a #GstObject named @name does not appear in @list,
- * %FALSE if it does.
+ * Returns: [TRUE]() if a [GstObject]() named _name_ does not appear in _list_,
+ * [FALSE]() if it does.
  *
  * MT safe. Grabs and releases the LOCK of each object in the list.
  */
@@ -954,17 +953,17 @@ gst_object_get_property (GObject * object, guint prop_id,
 
 /**
  * gst_object_get_path_string:
- * @object: a #GstObject
+ * @object: a [GstObject]()
  *
- * Generates a string describing the path of @object in
+ * Generates a string describing the path of _object_ in
  * the object hierarchy. Only useful (or used) for debugging.
  *
  * Free-function: g_free
  *
- * Returns: (transfer full): a string describing the path of @object. You must
- *          g_free() the string after usage.
+ * Returns: (transfer full): a string describing the path of _object_. You must
+ *          [g_free]() the string after usage.
  *
- * MT safe. Grabs and releases the #GstObject's LOCK for all objects
+ * MT safe. Grabs and releases the [GstObject]()'s LOCK for all objects
  *          in the hierarchy.
  */
 gchar *
@@ -1078,7 +1077,7 @@ gst_object_find_control_binding (GstObject * self, const gchar * name)
  * Returns a suggestion for timestamps where buffers should be split
  * to get best controller results.
  *
- * Returns: Returns the suggested timestamp or %GST_CLOCK_TIME_NONE
+ * Returns: Returns the suggested timestamp or [GST_CLOCK_TIME_NONE]()
  * if no control-rate was set.
  */
 GstClockTime
@@ -1108,14 +1107,14 @@ gst_object_suggest_next_sync (GstObject * object)
  * @object: the object that has controlled properties
  * @timestamp: the time that should be processed
  *
- * Sets the properties of the object, according to the #GstControlSources that
+ * Sets the properties of the object, according to the [GstControlSources]() that
  * (maybe) handle them and for the given timestamp.
  *
  * If this function fails, it is most likely the application developers fault.
  * Most probably the control sources are not setup correctly.
  *
- * Returns: %TRUE if the controller values could be applied to the object
- * properties, %FALSE otherwise
+ * Returns: [TRUE]() if the controller values could be applied to the object
+ * properties, [FALSE]() otherwise
  */
 gboolean
 gst_object_sync_values (GstObject * object, GstClockTime timestamp)
@@ -1149,9 +1148,9 @@ gst_object_sync_values (GstObject * object, GstClockTime timestamp)
  * gst_object_has_active_control_bindings:
  * @object: the object that has controlled properties
  *
- * Check if the @object has an active controlled properties.
+ * Check if the _object_ has an active controlled properties.
  *
- * Returns: %TRUE if the object has active controlled properties
+ * Returns: [TRUE]() if the object has active controlled properties
  */
 gboolean
 gst_object_has_active_control_bindings (GstObject * object)
@@ -1175,8 +1174,8 @@ gst_object_has_active_control_bindings (GstObject * object)
  * @disabled: boolean that specifies whether to disable the controller
  * or not.
  *
- * This function is used to disable all controlled properties of the @object for
- * some time, i.e. gst_object_sync_values() will do nothing.
+ * This function is used to disable all controlled properties of the _object_ for
+ * some time, i.e. [gst_object_sync_values]() will do nothing.
  */
 void
 gst_object_set_control_bindings_disabled (GstObject * object, gboolean disabled)
@@ -1201,7 +1200,7 @@ gst_object_set_control_bindings_disabled (GstObject * object, gboolean disabled)
  * or not.
  *
  * This function is used to disable the control bindings on a property for
- * some time, i.e. gst_object_sync_values() will do nothing for the
+ * some time, i.e. [gst_object_sync_values]() will do nothing for the
  * property.
  */
 void
@@ -1224,15 +1223,15 @@ gst_object_set_control_binding_disabled (GstObject * object,
 /**
  * gst_object_add_control_binding:
  * @object: the controller object
- * @binding: (transfer full): the #GstControlBinding that should be used
+ * @binding: (transfer full): the [GstControlBinding]() that should be used
  *
- * Attach the #GstControlBinding to the object. If there already was a
- * #GstControlBinding for this property it will be replaced.
+ * Attach the [GstControlBinding]() to the object. If there already was a
+ * [GstControlBinding]() for this property it will be replaced.
  *
- * The @object will take ownership of the @binding.
+ * The _object_ will take ownership of the _binding_.
  *
- * Returns: %FALSE if the given @binding has not been setup for this object or
- * has been setup for a non suitable property, %TRUE otherwise.
+ * Returns: [FALSE]() if the given _binding_ has not been setup for this object or
+ * has been setup for a non suitable property, [TRUE]() otherwise.
  */
 gboolean
 gst_object_add_control_binding (GstObject * object, GstControlBinding * binding)
@@ -1262,11 +1261,11 @@ gst_object_add_control_binding (GstObject * object, GstControlBinding * binding)
  * @object: the object
  * @property_name: name of the property
  *
- * Gets the corresponding #GstControlBinding for the property. This should be
+ * Gets the corresponding [GstControlBinding]() for the property. This should be
  * unreferenced again after use.
  *
- * Returns: (transfer full) (nullable): the #GstControlBinding for
- * @property_name or %NULL if the property is not controlled.
+ * Returns: (transfer full) (nullable): the [GstControlBinding]() for
+ * _property_name_ or [NULL]() if the property is not controlled.
  */
 GstControlBinding *
 gst_object_get_control_binding (GstObject * object, const gchar * property_name)
@@ -1290,10 +1289,10 @@ gst_object_get_control_binding (GstObject * object, const gchar * property_name)
  * @object: the object
  * @binding: the binding
  *
- * Removes the corresponding #GstControlBinding. If it was the
- * last ref of the binding, it will be disposed.  
+ * Removes the corresponding [GstControlBinding](). If it was the
+ * last ref of the binding, it will be disposed.
  *
- * Returns: %TRUE if the binding could be removed.
+ * Returns: [TRUE]() if the binding could be removed.
  */
 gboolean
 gst_object_remove_control_binding (GstObject * object,
@@ -1327,7 +1326,7 @@ gst_object_remove_control_binding (GstObject * object,
  * Gets the value for the given controlled property at the requested time.
  *
  * Returns: (nullable): the GValue of the property at the given time,
- * or %NULL if the property isn't controlled.
+ * or [NULL]() if the property isn't controlled.
  */
 GValue *
 gst_object_get_value (GstObject * object, const gchar * property_name,
@@ -1359,17 +1358,17 @@ gst_object_get_value (GstObject * object, const gchar * property_name,
  * @values: array to put control-values in
  *
  * Gets a number of values for the given controlled property starting at the
- * requested time. The array @values need to hold enough space for @n_values of
+ * requested time. The array _values_ need to hold enough space for _n_values_ of
  * the same type as the objects property's type.
  *
  * This function is useful if one wants to e.g. draw a graph of the control
  * curve or apply a control curve sample by sample.
  *
- * The values are unboxed and ready to be used. The similar function 
- * gst_object_get_g_value_array() returns the array as #GValues and is
+ * The values are unboxed and ready to be used. The similar function
+ * [gst_object_get_g_value_array]() returns the array as [GValues]() and is
  * better suites for bindings.
  *
- * Returns: %TRUE if the given array could be filled, %FALSE otherwise
+ * Returns: [TRUE]() if the given array could be filled, [FALSE]() otherwise
  */
 gboolean
 gst_object_get_value_array (GstObject * object, const gchar * property_name,
@@ -1403,14 +1402,14 @@ gst_object_get_value_array (GstObject * object, const gchar * property_name,
  * @n_values: the number of values
  * @values: array to put control-values in
  *
- * Gets a number of #GValues for the given controlled property starting at the
- * requested time. The array @values need to hold enough space for @n_values of
- * #GValue.
+ * Gets a number of [GValues]() for the given controlled property starting at the
+ * requested time. The array _values_ need to hold enough space for _n_values_ of
+ * [GValue]().
  *
  * This function is useful if one wants to e.g. draw a graph of the control
  * curve or apply a control curve sample by sample.
  *
- * Returns: %TRUE if the given array could be filled, %FALSE otherwise
+ * Returns: [TRUE]() if the given array could be filled, [FALSE]() otherwise
  */
 gboolean
 gst_object_get_g_value_array (GstObject * object, const gchar * property_name,
@@ -1440,16 +1439,16 @@ gst_object_get_g_value_array (GstObject * object, const gchar * property_name,
  * gst_object_get_control_rate:
  * @object: the object that has controlled properties
  *
- * Obtain the control-rate for this @object. Audio processing #GstElement
+ * Obtain the control-rate for this _object_. Audio processing [GstElement]()
  * objects will use this rate to sub-divide their processing loop and call
- * gst_object_sync_values() inbetween. The length of the processing segment
- * should be up to @control-rate nanoseconds.
+ * [gst_object_sync_values]() inbetween. The length of the processing segment
+ * should be up to _control_-rate nanoseconds.
  *
- * If the @object is not under property control, this will return
- * %GST_CLOCK_TIME_NONE. This allows the element to avoid the sub-dividing.
+ * If the _object_ is not under property control, this will return
+ * [GST_CLOCK_TIME_NONE](). This allows the element to avoid the sub-dividing.
  *
  * The control-rate is not expected to change if the element is in
- * %GST_STATE_PAUSED or %GST_STATE_PLAYING.
+ * [GST_STATE_PAUSED]() or [GST_STATE_PLAYING]().
  *
  * Returns: the control rate in nanoseconds
  */
@@ -1466,13 +1465,13 @@ gst_object_get_control_rate (GstObject * object)
  * @object: the object that has controlled properties
  * @control_rate: the new control-rate in nanoseconds.
  *
- * Change the control-rate for this @object. Audio processing #GstElement
+ * Change the control-rate for this _object_. Audio processing [GstElement]()
  * objects will use this rate to sub-divide their processing loop and call
- * gst_object_sync_values() inbetween. The length of the processing segment
- * should be up to @control-rate nanoseconds.
+ * [gst_object_sync_values]() inbetween. The length of the processing segment
+ * should be up to _control_-rate nanoseconds.
  *
- * The control-rate should not change if the element is in %GST_STATE_PAUSED or
- * %GST_STATE_PLAYING.
+ * The control-rate should not change if the element is in [GST_STATE_PAUSED]() or
+ * [GST_STATE_PLAYING]().
  */
 void
 gst_object_set_control_rate (GstObject * object, GstClockTime control_rate)

@@ -24,7 +24,7 @@
 /**
  * SECTION:gstformat
  * @short_description: Dynamically register new data formats
- * @see_also: #GstPad, #GstElement
+ * @see_also: [GstPad](), [GstElement]()
  *
  * GstFormats functions are used to register a new format to the gstreamer
  * core.  Formats can be used to perform seeking or conversions/query
@@ -81,12 +81,12 @@ _priv_gst_format_initialize (void)
 
 /**
  * gst_format_get_name:
- * @format: a #GstFormat
+ * @format: a [GstFormat]()
  *
  * Get a printable name for the given format. Do not modify or free.
  *
  * Returns: (nullable): a reference to the static name of the format
- * or %NULL if the format is unknown.
+ * or [NULL]() if the format is unknown.
  */
 const gchar *
 gst_format_get_name (GstFormat format)
@@ -104,7 +104,7 @@ gst_format_get_name (GstFormat format)
 
 /**
  * gst_format_to_quark:
- * @format: a #GstFormat
+ * @format: a [GstFormat]()
  *
  * Get the unique quark for the given format.
  *
@@ -174,7 +174,7 @@ gst_format_register (const gchar * nick, const gchar * description)
  *
  * Return the format registered with the given nick.
  *
- * Returns: The format with @nick or GST_FORMAT_UNDEFINED
+ * Returns: The format with _nick_ or GST_FORMAT_UNDEFINED
  * if the format was not registered.
  */
 GstFormat
@@ -201,7 +201,7 @@ gst_format_get_by_nick (const gchar * nick)
  *
  * See if the given format is inside the format array.
  *
- * Returns: %TRUE if the format is found inside the array
+ * Returns: [TRUE]() if the format is found inside the array
  */
 gboolean
 gst_formats_contains (const GstFormat * formats, GstFormat format)
@@ -225,7 +225,7 @@ gst_formats_contains (const GstFormat * formats, GstFormat format)
  *
  * Get details about the given format.
  *
- * Returns: (nullable): The #GstFormatDefinition for @format or %NULL
+ * Returns: (nullable): The [GstFormatDefinition]() for _format_ or [NULL]()
  * on failure.
  *
  * MT safe.
@@ -248,7 +248,7 @@ gst_format_get_details (GstFormat format)
  * Iterate all the registered formats. The format definition is read
  * only.
  *
- * Returns: (transfer full): a GstIterator of #GstFormatDefinition.
+ * Returns: (transfer full): a GstIterator of [GstFormatDefinition]().
  */
 GstIterator *
 gst_format_iterate_definitions (void)

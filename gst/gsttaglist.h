@@ -44,8 +44,8 @@ G_BEGIN_DECLS
  * The different tag merging modes are basically replace, overwrite and append,
  * but they can be seen from two directions. Given two taglists: (A) the tags
  * already in the element and (B) the ones that are supplied to the element (
- * e.g. via gst_tag_setter_merge_tags() / gst_tag_setter_add_tags() or a
- * %GST_EVENT_TAG), how are these tags merged?
+ * e.g. via [gst_tag_setter_merge_tags]() / [gst_tag_setter_add_tags]() or a
+ * [GST_EVENT_TAG]()), how are these tags merged?
  * In the table below this is shown for the cases that a tag exists in the list
  * (A) or does not exists (!A) and combinations thereof.
  *
@@ -162,11 +162,11 @@ GST_EXPORT GType _gst_tag_list_type;
 
 /**
  * GstTagForeachFunc:
- * @list: the #GstTagList
- * @tag: a name of a tag in @list
+ * @list: the [GstTagList]()
+ * @tag: a name of a tag in _list_
  * @user_data: user data
  *
- * A function that will be called in gst_tag_list_foreach(). The function may
+ * A function that will be called in [gst_tag_list_foreach](). The function may
  * not modify the tag list.
  */
 typedef void (*GstTagForeachFunc) (const GstTagList * list,
@@ -175,8 +175,8 @@ typedef void (*GstTagForeachFunc) (const GstTagList * list,
 
 /**
  * GstTagMergeFunc:
- * @dest: the destination #GValue
- * @src: the source #GValue
+ * @dest: the destination [GValue]()
+ * @src: the source [GValue]()
  *
  * A function for merging multiple values of a tag used when registering
  * tags.
@@ -377,17 +377,17 @@ gboolean     gst_tag_list_get_sample_index  (const GstTagList * list,
 /* refcounting */
 /**
  * gst_tag_list_ref:
- * @taglist: the #GstTagList to reference
+ * @taglist: the [GstTagList]() to reference
  *
- * Add a reference to a #GstTagList mini object.
+ * Add a reference to a [GstTagList]() mini object.
  *
- * From this point on, until the caller calls gst_tag_list_unref() or
- * gst_tag_list_make_writable(), it is guaranteed that the taglist object will
- * not change. To use a #GstTagList object, you must always have a refcount on
- * it -- either the one made implicitly by e.g. gst_tag_list_new(), or via
+ * From this point on, until the caller calls [gst_tag_list_unref]() or
+ * [gst_tag_list_make_writable](), it is guaranteed that the taglist object will
+ * not change. To use a [GstTagList]() object, you must always have a refcount on
+ * it -- either the one made implicitly by e.g. [gst_tag_list_new](), or via
  * taking one explicitly with this function.
  *
- * Returns: the same #GstTagList mini object.
+ * Returns: the same [GstTagList]() mini object.
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstTagList * gst_tag_list_ref (GstTagList * taglist);
@@ -401,9 +401,9 @@ gst_tag_list_ref (GstTagList * taglist)
 
 /**
  * gst_tag_list_unref:
- * @taglist: a #GstTagList.
+ * @taglist: a [GstTagList]().
  *
- * Unref a #GstTagList, and and free all its memory when the refcount reaches 0.
+ * Unref a [GstTagList](), and and free all its memory when the refcount reaches 0.
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC void gst_tag_list_unref (GstTagList * taglist);
@@ -417,19 +417,19 @@ gst_tag_list_unref (GstTagList * taglist)
 
 /**
  * gst_tag_list_copy:
- * @taglist: a #GstTagList.
+ * @taglist: a [GstTagList]().
  *
- * Creates a new #GstTagList as a copy of the old @taglist. The new taglist
+ * Creates a new [GstTagList]() as a copy of the old _taglist_. The new taglist
  * will have a refcount of 1, owned by the caller, and will be writable as
  * a result.
  *
- * Note that this function is the semantic equivalent of a gst_tag_list_ref()
- * followed by a gst_tag_list_make_writable(). If you only want to hold on to a
- * reference to the data, you should use gst_tag_list_ref().
+ * Note that this function is the semantic equivalent of a [gst_tag_list_ref]()
+ * followed by a [gst_tag_list_make_writable](). If you only want to hold on to a
+ * reference to the data, you should use [gst_tag_list_ref]().
  *
- * When you are finished with the taglist, call gst_tag_list_unref() on it.
+ * When you are finished with the taglist, call [gst_tag_list_unref]() on it.
  *
- * Returns: the new #GstTagList
+ * Returns: the new [GstTagList]()
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstTagList * gst_tag_list_copy (const GstTagList * taglist);
@@ -443,32 +443,32 @@ gst_tag_list_copy (const GstTagList * taglist)
 
 /**
  * gst_tag_list_is_writable:
- * @taglist: a #GstTagList
+ * @taglist: a [GstTagList]()
  *
- * Tests if you can safely modify @taglist. It is only safe to modify taglist
+ * Tests if you can safely modify _taglist_. It is only safe to modify taglist
  * when there is only one owner of the taglist - ie, the refcount is 1.
  */
 #define gst_tag_list_is_writable(taglist)    gst_mini_object_is_writable (GST_MINI_OBJECT_CAST (taglist))
 
 /**
  * gst_tag_list_make_writable:
- * @taglist: (transfer full): a #GstTagList
+ * @taglist: (transfer full): a [GstTagList]()
  *
- * Returns a writable copy of @taglist.
+ * Returns a writable copy of _taglist_.
  *
- * If there is only one reference count on @taglist, the caller must be the
+ * If there is only one reference count on _taglist_, the caller must be the
  * owner, and so this function will return the taglist object unchanged. If on
  * the other hand there is more than one reference on the object, a new taglist
- * object will be returned (which will be a copy of @taglist). The caller's
- * reference on @taglist will be removed, and instead the caller will own a
+ * object will be returned (which will be a copy of _taglist_). The caller's
+ * reference on _taglist_ will be removed, and instead the caller will own a
  * reference to the returned object.
  *
  * In short, this function unrefs the taglist in the argument and refs the
  * taglist that it returns. Don't access the argument after calling this
- * function. See also: gst_tag_list_ref().
+ * function. See also: [gst_tag_list_ref]().
  *
  * Returns: (transfer full): a writable taglist which may or may not be the
- *     same as @taglist
+ *     same as _taglist_
  */
 #define gst_tag_list_make_writable(taglist)   GST_TAG_LIST (gst_mini_object_make_writable (GST_MINI_OBJECT_CAST (taglist)))
 
@@ -544,13 +544,13 @@ gst_tag_list_copy (const GstTagList * taglist)
 /**
  * GST_TAG_DATE:
  *
- * date the data was created (#GDate structure)
+ * date the data was created ([GDate]() structure)
  */
 #define GST_TAG_DATE                   "date"
 /**
  * GST_TAG_DATE_TIME:
  *
- * date and time the data was created (#GstDateTime structure)
+ * date and time the data was created ([GstDateTime]() structure)
  */
 #define GST_TAG_DATE_TIME              "datetime"
 /**
@@ -659,7 +659,7 @@ gst_tag_list_copy (const GstTagList * taglist)
  * (string)
  *
  * Note: do not use this field to describe the encoding application. Use
- * #GST_TAG_APPLICATION_NAME or #GST_TAG_COMMENT for that.
+ * [GST_TAG_APPLICATION_NAME]() or [GST_TAG_COMMENT]() for that.
  */
 #define GST_TAG_ENCODED_BY             "encoded-by"
 /**
@@ -801,7 +801,7 @@ gst_tag_list_copy (const GstTagList * taglist)
  * ISO-639-2 or ISO-639-1 code for the language the content is in (string)
  *
  * There is utility API in libgsttag in gst-plugins-base to obtain a translated
- * language name from the language code: gst_tag_get_language_name()
+ * language name from the language code: [gst_tag_get_language_name]()
  */
 #define GST_TAG_LANGUAGE_CODE          "language-code"
 /**
@@ -818,7 +818,7 @@ gst_tag_list_copy (const GstTagList * taglist)
  * GST_TAG_IMAGE:
  *
  * image (sample) (sample taglist should specify the content type and preferably
- * also set "image-type" field as #GstTagImageType)
+ * also set "image-type" field as [GstTagImageType]())
  */
 #define GST_TAG_IMAGE                  "image"
 /**
@@ -920,7 +920,7 @@ gst_tag_list_copy (const GstTagList * taglist)
  * Speed of the capturing device when performing the capture.
  * Represented in m/s. (double)
  *
- * See also #GST_TAG_GEO_LOCATION_MOVEMENT_DIRECTION
+ * See also [GST_TAG_GEO_LOCATION_MOVEMENT_DIRECTION]()
  */
 #define GST_TAG_GEO_LOCATION_MOVEMENT_SPEED       "geo-location-movement-speed"
 /**
@@ -930,7 +930,7 @@ gst_tag_list_copy (const GstTagList * taglist)
  * of a media. It is represented as degrees in floating point representation,
  * 0 means the geographic north, and increases clockwise (double from 0 to 360)
  *
- * See also #GST_TAG_GEO_LOCATION_CAPTURE_DIRECTION
+ * See also [GST_TAG_GEO_LOCATION_CAPTURE_DIRECTION]()
  */
 #define GST_TAG_GEO_LOCATION_MOVEMENT_DIRECTION "geo-location-movement-direction"
 /**
@@ -940,7 +940,7 @@ gst_tag_list_copy (const GstTagList * taglist)
  * a media. It is represented as degrees in floating point representation,
  * 0 means the geographic north, and increases clockwise (double from 0 to 360)
  *
- * See also #GST_TAG_GEO_LOCATION_MOVEMENT_DIRECTION
+ * See also [GST_TAG_GEO_LOCATION_MOVEMENT_DIRECTION]()
  */
 #define GST_TAG_GEO_LOCATION_CAPTURE_DIRECTION  "geo-location-capture-direction"
 /**
@@ -1065,7 +1065,7 @@ gst_tag_list_copy (const GstTagList * taglist)
 /**
  * GST_TAG_MIDI_BASE_NOTE:
  *
- * <ulink url="http://en.wikipedia.org/wiki/Note#Note_designation_in_accordance_with_octave_name">Midi note number</ulink>
+ * <ulink url="http://en.wikipedia.org/wiki/Note[Note_designation_in_accordance_with_octave_name]()">Midi note number</ulink>
  * of the audio track. This is useful for sample instruments and in particular
  * for multi-samples.
  *

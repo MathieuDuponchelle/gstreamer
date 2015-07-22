@@ -22,21 +22,21 @@
 /**
  * SECTION:gstchildproxy
  * @short_description: Interface for multi child elements.
- * @see_also: #GstBin
+ * @see_also: [GstBin]()
  *
  * This interface abstracts handling of property sets for elements with
  * children. Imagine elements such as mixers or polyphonic generators. They all
- * have multiple #GstPad or some kind of voice objects. Another use case are
- * container elements like #GstBin.
+ * have multiple [GstPad]() or some kind of voice objects. Another use case are
+ * container elements like [GstBin]().
  * The element implementing the interface acts as a parent for those child
  * objects.
  *
  * By implementing this interface the child properties can be accessed from the
- * parent element by using gst_child_proxy_get() and gst_child_proxy_set().
+ * parent element by using [gst_child_proxy_get]() and [gst_child_proxy_set]().
  *
  * Property names are written as "child-name::property-name". The whole naming
  * scheme is recursive. Thus "child1::child2::property" is valid too, if
- * "child1" and "child2" implement the #GstChildProxy interface.
+ * "child1" and "child2" implement the [GstChildProxy]() interface.
  */
 
 #include "gst_private.h"
@@ -104,11 +104,11 @@ gst_child_proxy_default_get_child_by_name (GstChildProxy * parent,
  *
  * Looks up a child element by the given name.
  *
- * This virtual method has a default implementation that uses #GstObject
- * together with gst_object_get_name(). If the interface is to be used with
- * #GObjects, this methods needs to be overridden.
+ * This virtual method has a default implementation that uses [GstObject]()
+ * together with [gst_object_get_name](). If the interface is to be used with
+ * [GObjects](), this methods needs to be overridden.
  *
- * Returns: (transfer full) (nullable): the child object or %NULL if
+ * Returns: (transfer full) (nullable): the child object or [NULL]() if
  *     not found. Unref after usage.
  *
  * MT safe.
@@ -129,7 +129,7 @@ gst_child_proxy_get_child_by_name (GstChildProxy * parent, const gchar * name)
  *
  * Fetches a child by its number.
  *
- * Returns: (transfer full) (nullable): the child object or %NULL if
+ * Returns: (transfer full) (nullable): the child object or [NULL]() if
  *     not found (index too high). Unref after usage.
  *
  * MT safe.
@@ -165,18 +165,18 @@ gst_child_proxy_get_children_count (GstChildProxy * parent)
  * gst_child_proxy_lookup:
  * @object: child proxy object to lookup the property in
  * @name: name of the property to look up
- * @target: (out) (allow-none) (transfer full): pointer to a #GObject that
+ * @target: (out) (allow-none) (transfer full): pointer to a [GObject]() that
  *     takes the real object to set property on
- * @pspec: (out) (allow-none) (transfer none): pointer to take the #GParamSpec
+ * @pspec: (out) (allow-none) (transfer none): pointer to take the [GParamSpec]()
  *     describing the property
  *
- * Looks up which object and #GParamSpec would be effected by the given @name.
+ * Looks up which object and [GParamSpec]() would be effected by the given _name_.
  *
  * MT safe.
  *
- * Returns: %TRUE if @target and @pspec could be found. %FALSE otherwise. In that
- * case the values for @pspec and @target are not modified. Unref @target after
- * usage. For plain GObjects @target is the same as @object.
+ * Returns: [TRUE]() if _target_ and _pspec_ could be found. [FALSE]() otherwise. In that
+ * case the values for _pspec_ and _target_ are not modified. Unref _target_ after
+ * usage. For plain GObjects _target_ is the same as _object_.
  */
 gboolean
 gst_child_proxy_lookup (GstChildProxy * object, const gchar * name,
@@ -238,10 +238,10 @@ gst_child_proxy_lookup (GstChildProxy * object, const gchar * name,
  * gst_child_proxy_get_property:
  * @object: object to query
  * @name: name of the property
- * @value: (out caller-allocates): a #GValue that should take the result.
+ * @value: (out caller-allocates): a [GValue]() that should take the result.
  *
  * Gets a single property using the GstChildProxy mechanism.
- * You are responsible for freeing it by calling g_value_unset()
+ * You are responsible for freeing it by calling [g_value_unset]()
  */
 void
 gst_child_proxy_get_property (GstChildProxy * object, const gchar * name,
@@ -274,7 +274,7 @@ not_found:
  * gst_child_proxy_get_valist:
  * @object: the object to query
  * @first_property_name: name of the first property to get
- * @var_args: return location for the first property, followed optionally by more name/return location pairs, followed by %NULL
+ * @var_args: return location for the first property, followed optionally by more name/return location pairs, followed by [NULL]()
  *
  * Gets properties of the parent object and its children.
  */
@@ -328,7 +328,7 @@ cant_copy:
  * gst_child_proxy_get:
  * @object: the parent object
  * @first_property_name: name of the first property to get
- * @...: return location for the first property, followed optionally by more name/return location pairs, followed by %NULL
+ * @...: return location for the first property, followed optionally by more name/return location pairs, followed by [NULL]()
  *
  * Gets properties of the parent object and its children.
  */
@@ -349,7 +349,7 @@ gst_child_proxy_get (GstChildProxy * object, const gchar * first_property_name,
  * gst_child_proxy_set_property:
  * @object: the parent object
  * @name: name of the property to set
- * @value: new #GValue for the property
+ * @value: new [GValue]() for the property
  *
  * Sets a single property using the GstChildProxy mechanism.
  */
@@ -383,7 +383,7 @@ not_found:
  * gst_child_proxy_set_valist:
  * @object: the parent object
  * @first_property_name: name of the first property to set
- * @var_args: value for the first property, followed optionally by more name/value pairs, followed by %NULL
+ * @var_args: value for the first property, followed optionally by more name/value pairs, followed by [NULL]()
  *
  * Sets properties of the parent object and its children.
  */
@@ -440,7 +440,7 @@ cant_copy:
  * gst_child_proxy_set:
  * @object: the parent object
  * @first_property_name: name of the first property to set
- * @...: value for the first property, followed optionally by more name/value pairs, followed by %NULL
+ * @...: value for the first property, followed optionally by more name/value pairs, followed by [NULL]()
  *
  * Sets properties of the parent object and its children.
  */
@@ -506,11 +506,11 @@ gst_child_proxy_base_init (gpointer g_class)
     /* create interface signals and properties here. */
     /**
      * GstChildProxy::child-added:
-     * @child_proxy: the #GstChildProxy
-     * @object: the #GObject that was added
+     * @child_proxy: the [GstChildProxy]()
+     * @object: the [GObject]() that was added
      * @name: the name of the new child
      *
-     * Will be emitted after the @object was added to the @child_proxy.
+     * Will be emitted after the _object_ was added to the _child_proxy_.
      */
     signals[CHILD_ADDED] =
         g_signal_new ("child-added", G_TYPE_FROM_CLASS (g_class),
@@ -520,11 +520,11 @@ gst_child_proxy_base_init (gpointer g_class)
 
     /**
      * GstChildProxy::child-removed:
-     * @child_proxy: the #GstChildProxy
-     * @object: the #GObject that was removed
+     * @child_proxy: the [GstChildProxy]()
+     * @object: the [GObject]() that was removed
      * @name: the name of the old child
      *
-     * Will be emitted after the @object was removed from the @child_proxy.
+     * Will be emitted after the _object_ was removed from the _child_proxy_.
      */
     signals[CHILD_REMOVED] =
         g_signal_new ("child-removed", G_TYPE_FROM_CLASS (g_class),

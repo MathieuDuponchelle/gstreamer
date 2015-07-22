@@ -36,7 +36,7 @@ G_BEGIN_DECLS
  * @GST_FORMAT_UNDEFINED: undefined format
  * @GST_FORMAT_DEFAULT: the default format of the pad/element. This can be
  *    samples for raw audio, frames/fields for raw video (some, but not all,
- *    elements support this; use @GST_FORMAT_TIME if you don't have a good
+ *    elements support this; use _GST_FORMAT_TIME_ if you don't have a good
  *    reason to query for samples/frames)
  * @GST_FORMAT_BYTES: bytes
  * @GST_FORMAT_TIME: time in nanoseconds

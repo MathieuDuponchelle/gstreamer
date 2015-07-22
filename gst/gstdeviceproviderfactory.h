@@ -29,7 +29,7 @@
 /**
  * GstDeviceProviderFactory:
  *
- * The opaque #GstDeviceProviderFactory data structure.
+ * The opaque [GstDeviceProviderFactory]() data structure.
  *
  * Since: 1.4
  */
@@ -37,7 +37,7 @@
 /**
  * GstDeviceProviderFactoryClass:
  *
- * The opaque #GstDeviceProviderFactoryClass data structure.
+ * The opaque [GstDeviceProviderFactoryClass]() data structure.
  *
  * Since: 1.4
  */

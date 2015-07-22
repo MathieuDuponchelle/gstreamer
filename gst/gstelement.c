@@ -23,56 +23,56 @@
 /**
  * SECTION:gstelement
  * @short_description: Abstract base class for all pipeline elements
- * @see_also: #GstElementFactory, #GstPad
+ * @see_also: [GstElementFactory](), [GstPad]()
  *
  * GstElement is the abstract base class needed to construct an element that
  * can be used in a GStreamer pipeline. Please refer to the plugin writers
- * guide for more information on creating #GstElement subclasses.
+ * guide for more information on creating [GstElement]() subclasses.
  *
- * The name of a #GstElement can be get with gst_element_get_name() and set with
- * gst_element_set_name().  For speed, GST_ELEMENT_NAME() can be used in the
+ * The name of a [GstElement]() can be get with [gst_element_get_name]() and set with
+ * [gst_element_set_name]().  For speed, [GST_ELEMENT_NAME]() can be used in the
  * core when using the appropriate locking. Do not use this in plug-ins or
  * applications in order to retain ABI compatibility.
  *
- * Elements can have pads (of the type #GstPad).  These pads link to pads on
- * other elements.  #GstBuffer flow between these linked pads.
- * A #GstElement has a #GList of #GstPad structures for all their input (or sink)
+ * Elements can have pads (of the type [GstPad]()).  These pads link to pads on
+ * other elements.  [GstBuffer]() flow between these linked pads.
+ * A [GstElement]() has a [GList]() of [GstPad]() structures for all their input (or sink)
  * and output (or source) pads.
- * Core and plug-in writers can add and remove pads with gst_element_add_pad()
- * and gst_element_remove_pad().
+ * Core and plug-in writers can add and remove pads with [gst_element_add_pad]()
+ * and [gst_element_remove_pad]().
  *
  * An existing pad of an element can be retrieved by name with
- * gst_element_get_static_pad(). A new dynamic pad can be created using
- * gst_element_request_pad() with a #GstPadTemplate.
- * An iterator of all pads can be retrieved with gst_element_iterate_pads().
+ * [gst_element_get_static_pad](). A new dynamic pad can be created using
+ * [gst_element_request_pad]() with a [GstPadTemplate]().
+ * An iterator of all pads can be retrieved with [gst_element_iterate_pads]().
  *
  * Elements can be linked through their pads.
- * If the link is straightforward, use the gst_element_link()
- * convenience function to link two elements, or gst_element_link_many()
+ * If the link is straightforward, use the [gst_element_link]()
+ * convenience function to link two elements, or [gst_element_link_many]()
  * for more elements in a row.
- * Use gst_element_link_filtered() to link two elements constrained by
- * a specified set of #GstCaps.
- * For finer control, use gst_element_link_pads() and
- * gst_element_link_pads_filtered() to specify the pads to link on
+ * Use [gst_element_link_filtered]() to link two elements constrained by
+ * a specified set of [GstCaps]().
+ * For finer control, use [gst_element_link_pads]() and
+ * [gst_element_link_pads_filtered]() to specify the pads to link on
  * each element by name.
  *
- * Each element has a state (see #GstState).  You can get and set the state
- * of an element with gst_element_get_state() and gst_element_set_state().
- * Setting a state triggers a #GstStateChange. To get a string representation
- * of a #GstState, use gst_element_state_get_name().
+ * Each element has a state (see [GstState]()).  You can get and set the state
+ * of an element with [gst_element_get_state]() and [gst_element_set_state]().
+ * Setting a state triggers a [GstStateChange](). To get a string representation
+ * of a [GstState](), use [gst_element_state_get_name]().
  *
- * You can get and set a #GstClock on an element using gst_element_get_clock()
- * and gst_element_set_clock().
+ * You can get and set a [GstClock]() on an element using [gst_element_get_clock]()
+ * and [gst_element_set_clock]().
  * Some elements can provide a clock for the pipeline if
- * the #GST_ELEMENT_FLAG_PROVIDE_CLOCK flag is set. With the
- * gst_element_provide_clock() method one can retrieve the clock provided by
+ * the [GST_ELEMENT_FLAG_PROVIDE_CLOCK]() flag is set. With the
+ * [gst_element_provide_clock]() method one can retrieve the clock provided by
  * such an element.
  * Not all elements require a clock to operate correctly. If the
- * #GST_ELEMENT_FLAG_REQUIRE_CLOCK() flag is set, a clock should be set on the
- * element with gst_element_set_clock().
+ * [GST_ELEMENT_FLAG_REQUIRE_CLOCK]()() flag is set, a clock should be set on the
+ * element with [gst_element_set_clock]().
  *
  * Note that clock selection and distribution is normally handled by the
- * toplevel #GstPipeline so the clock functions are only to be used in very
+ * toplevel [GstPipeline]() so the clock functions are only to be used in very
  * specific situations.
  */
 
@@ -193,11 +193,11 @@ gst_element_class_init (GstElementClass * klass)
    * @gstelement: the object which received the signal
    * @new_pad: the pad that has been added
    *
-   * a new #GstPad has been added to the element. Note that this signal will
+   * a new [GstPad]() has been added to the element. Note that this signal will
    * usually be emitted from the context of the streaming thread. Also keep in
    * mind that if you add new elements to the pipeline in the signal handler
    * you will need to set them to the desired target state with
-   * gst_element_set_state() or gst_element_sync_state_with_parent().
+   * [gst_element_set_state]() or [gst_element_sync_state_with_parent]().
    */
   gst_element_signals[PAD_ADDED] =
       g_signal_new ("pad-added", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
@@ -208,7 +208,7 @@ gst_element_class_init (GstElementClass * klass)
    * @gstelement: the object which received the signal
    * @old_pad: the pad that has been removed
    *
-   * a #GstPad has been removed from the element
+   * a [GstPad]() has been removed from the element
    */
   gst_element_signals[PAD_REMOVED] =
       g_signal_new ("pad-removed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
@@ -301,15 +301,15 @@ gst_element_init (GstElement * element)
 
 /**
  * gst_element_release_request_pad:
- * @element: a #GstElement to release the request pad of.
- * @pad: the #GstPad to release.
+ * @element: a [GstElement]() to release the request pad of.
+ * @pad: the [GstPad]() to release.
  *
  * Makes the element free the previously requested pad as obtained
- * with gst_element_request_pad().
+ * with [gst_element_request_pad]().
  *
  * This does not unref the pad. If the pad was created by using
- * gst_element_request_pad(), gst_element_release_request_pad() needs to be
- * followed by gst_object_unref() to free the @pad.
+ * [gst_element_request_pad](), [gst_element_release_request_pad]() needs to be
+ * followed by [gst_object_unref]() to free the _pad_.
  *
  * MT safe.
  */
@@ -336,14 +336,14 @@ gst_element_release_request_pad (GstElement * element, GstPad * pad)
 
 /**
  * gst_element_provide_clock:
- * @element: a #GstElement to query
+ * @element: a [GstElement]() to query
  *
  * Get the clock provided by the given element.
  * <note>An element is only required to provide a clock in the PAUSED
  * state. Some elements can provide a clock in other states.</note>
  *
  * Returns: (transfer full) (nullable): the GstClock provided by the
- * element or %NULL if no clock could be provided.  Unref after usage.
+ * element or [NULL]() if no clock could be provided.  Unref after usage.
  *
  * MT safe.
  */
@@ -378,16 +378,16 @@ gst_element_set_clock_func (GstElement * element, GstClock * clock)
 
 /**
  * gst_element_set_clock:
- * @element: a #GstElement to set the clock for.
- * @clock: the #GstClock to set for the element.
+ * @element: a [GstElement]() to set the clock for.
+ * @clock: the [GstClock]() to set for the element.
  *
  * Sets the clock for the element. This function increases the
  * refcount on the clock. Any previously set clock on the object
  * is unreffed.
  *
- * Returns: %TRUE if the element accepted the clock. An element can refuse a
+ * Returns: [TRUE]() if the element accepted the clock. An element can refuse a
  * clock when it, for example, is not able to slave its internal clock to the
- * @clock or when it requires a specific clock to operate.
+ * _clock_ or when it requires a specific clock to operate.
  *
  * MT safe.
  */
@@ -412,15 +412,15 @@ gst_element_set_clock (GstElement * element, GstClock * clock)
 
 /**
  * gst_element_get_clock:
- * @element: a #GstElement to get the clock of.
+ * @element: a [GstElement]() to get the clock of.
  *
  * Gets the currently configured clock of the element. This is the clock as was
- * last set with gst_element_set_clock().
+ * last set with [gst_element_set_clock]().
  *
  * Elements in a pipeline will only have their clock set when the
  * pipeline is in the PLAYING state.
  *
- * Returns: (transfer full): the #GstClock of the element. unref after usage.
+ * Returns: (transfer full): the [GstClock]() of the element. unref after usage.
  *
  * MT safe.
  */
@@ -441,10 +441,10 @@ gst_element_get_clock (GstElement * element)
 
 /**
  * gst_element_set_base_time:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  * @time: the base time to set.
  *
- * Set the base time of an element. See gst_element_get_base_time().
+ * Set the base time of an element. See [gst_element_get_base_time]().
  *
  * MT safe.
  */
@@ -467,7 +467,7 @@ gst_element_set_base_time (GstElement * element, GstClockTime time)
 
 /**
  * gst_element_get_base_time:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  *
  * Returns the base time of the element. The base time is the
  * absolute time of the clock when this element was last put to
@@ -494,15 +494,15 @@ gst_element_get_base_time (GstElement * element)
 
 /**
  * gst_element_set_start_time:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  * @time: the base time to set.
  *
  * Set the start time of an element. The start time of the element is the
  * running time of the element when it last went to the PAUSED state. In READY
  * or after a flushing seek, it is set to 0.
  *
- * Toplevel elements like #GstPipeline will manage the start_time and
- * base_time on its children. Setting the start_time to #GST_CLOCK_TIME_NONE
+ * Toplevel elements like [GstPipeline]() will manage the start_time and
+ * base_time on its children. Setting the start_time to [GST_CLOCK_TIME_NONE]()
  * on such a toplevel element will disable the distribution of the base_time to
  * the children and can be useful if the application manages the base_time
  * itself, for example if you want to synchronize capture from multiple
@@ -529,13 +529,13 @@ gst_element_set_start_time (GstElement * element, GstClockTime time)
 
 /**
  * gst_element_get_start_time:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  *
  * Returns the start time of the element. The start time is the
  * running time of the clock when this element was last put to PAUSED.
  *
  * Usually the start_time is managed by a toplevel element such as
- * #GstPipeline.
+ * [GstPipeline]().
  *
  * MT safe.
  *
@@ -558,10 +558,10 @@ gst_element_get_start_time (GstElement * element)
 #if 0
 /**
  * gst_element_set_index:
- * @element: a #GstElement.
- * @index: (transfer none): a #GstIndex.
+ * @element: a [GstElement]().
+ * @index: (transfer none): a [GstIndex]().
  *
- * Set @index on the element. The refcount of the index
+ * Set _index_ on the element. The refcount of the index
  * will be increased, any previously set index is unreffed.
  *
  * MT safe.
@@ -582,11 +582,11 @@ gst_element_set_index (GstElement * element, GstIndex * index)
 
 /**
  * gst_element_get_index:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  *
  * Gets the index from the element.
  *
- * Returns: (transfer full) (nullable): a #GstIndex or %NULL when no
+ * Returns: (transfer full) (nullable): a [GstIndex]() or [NULL]() when no
  * index was set on the element. unref after usage.
  *
  * MT safe.
@@ -610,21 +610,21 @@ gst_element_get_index (GstElement * element)
 
 /**
  * gst_element_add_pad:
- * @element: a #GstElement to add the pad to.
- * @pad: (transfer full): the #GstPad to add to the element.
+ * @element: a [GstElement]() to add the pad to.
+ * @pad: (transfer full): the [GstPad]() to add to the element.
  *
- * Adds a pad (link point) to @element. @pad's parent will be set to @element;
- * see gst_object_set_parent() for refcounting information.
+ * Adds a pad (link point) to _element_. _pad_'s parent will be set to _element_;
+ * see [gst_object_set_parent]() for refcounting information.
  *
  * Pads are not automatically activated so elements should perform the needed
  * steps to activate the pad in case this pad is added in the PAUSED or PLAYING
- * state. See gst_pad_set_active() for more information about activating pads.
+ * state. See [gst_pad_set_active]() for more information about activating pads.
  *
  * The pad and the element should be unlocked when calling this function.
  *
- * This function will emit the #GstElement::pad-added signal on the element.
+ * This function will emit the [GstElement:pad-added](signal) signal on the element.
  *
- * Returns: %TRUE if the pad could be added. This function can fail when
+ * Returns: [TRUE]() if the pad could be added. This function can fail when
  * a pad with the same name already existed or the pad already had another
  * parent.
  *
@@ -727,27 +727,27 @@ no_direction:
 
 /**
  * gst_element_remove_pad:
- * @element: a #GstElement to remove pad from.
- * @pad: (transfer full): the #GstPad to remove from the element.
+ * @element: a [GstElement]() to remove pad from.
+ * @pad: (transfer full): the [GstPad]() to remove from the element.
  *
- * Removes @pad from @element. @pad will be destroyed if it has not been
- * referenced elsewhere using gst_object_unparent().
+ * Removes _pad_ from _element_. _pad_ will be destroyed if it has not been
+ * referenced elsewhere using [gst_object_unparent]().
  *
  * This function is used by plugin developers and should not be used
  * by applications. Pads that were dynamically requested from elements
- * with gst_element_request_pad() should be released with the
- * gst_element_release_request_pad() function instead.
+ * with [gst_element_request_pad]() should be released with the
+ * [gst_element_release_request_pad]() function instead.
  *
  * Pads are not automatically deactivated so elements should perform the needed
  * steps to deactivate the pad in case this pad is removed in the PAUSED or
- * PLAYING state. See gst_pad_set_active() for more information about
+ * PLAYING state. See [gst_pad_set_active]() for more information about
  * deactivating pads.
  *
  * The pad and the element should be unlocked when calling this function.
  *
- * This function will emit the #GstElement::pad-removed signal on the element.
+ * This function will emit the [GstElement:pad-removed](signal) signal on the element.
  *
- * Returns: %TRUE if the pad could be removed. Can return %FALSE if the
+ * Returns: [TRUE]() if the pad could be removed. Can return [FALSE]() if the
  * pad does not belong to the provided element.
  *
  * MT safe.
@@ -827,15 +827,15 @@ not_our_pad:
 
 /**
  * gst_element_no_more_pads:
- * @element: a #GstElement
+ * @element: a [GstElement]()
  *
  * Use this function to signal that the element does not expect any more pads
  * to show up in the current pipeline. This function should be called whenever
- * pads have been added by the element itself. Elements with #GST_PAD_SOMETIMES
+ * pads have been added by the element itself. Elements with [GST_PAD_SOMETIMES]()
  * pad templates use this in combination with autopluggers to figure out that
  * the element is done initializing its pads.
  *
- * This function emits the #GstElement::no-more-pads signal.
+ * This function emits the [GstElement:no-more-pads](signal) signal.
  *
  * MT safe.
  */
@@ -861,14 +861,14 @@ pad_compare_name (GstPad * pad1, const gchar * name)
 
 /**
  * gst_element_get_static_pad:
- * @element: a #GstElement to find a static pad of.
- * @name: the name of the static #GstPad to retrieve.
+ * @element: a [GstElement]() to find a static pad of.
+ * @name: the name of the static [GstPad]() to retrieve.
  *
- * Retrieves a pad from @element by name. This version only retrieves
+ * Retrieves a pad from _element_ by name. This version only retrieves
  * already-existing (i.e. 'static') pads.
  *
- * Returns: (transfer full) (nullable): the requested #GstPad if
- *     found, otherwise %NULL.  unref after usage.
+ * Returns: (transfer full) (nullable): the requested [GstPad]() if
+ *     found, otherwise [NULL]().  unref after usage.
  *
  * MT safe.
  */
@@ -970,19 +970,19 @@ _gst_element_request_pad (GstElement * element, GstPadTemplate * templ,
 
 /**
  * gst_element_get_request_pad:
- * @element: a #GstElement to find a request pad of.
- * @name: the name of the request #GstPad to retrieve.
+ * @element: a [GstElement]() to find a request pad of.
+ * @name: the name of the request [GstPad]() to retrieve.
  *
- * Retrieves a pad from the element by name (e.g. "src_\%d"). This version only
+ * Retrieves a pad from the element by name (e.g. "src_\[d]()"). This version only
  * retrieves request pads. The pad should be released with
- * gst_element_release_request_pad().
+ * [gst_element_release_request_pad]().
  *
  * This method is slower than manually getting the pad template and calling
- * gst_element_request_pad() if the pads should have a specific name (e.g.
- * @name is "src_1" instead of "src_\%u").
+ * [gst_element_request_pad]() if the pads should have a specific name (e.g.
+ * _name_ is "src_1" instead of "src_\[u]()").
  *
- * Returns: (transfer full) (nullable): requested #GstPad if found,
- *     otherwise %NULL.  Release after usage.
+ * Returns: (transfer full) (nullable): requested [GstPad]() if found,
+ *     otherwise [NULL]().  Release after usage.
  */
 GstPad *
 gst_element_get_request_pad (GstElement * element, const gchar * name)
@@ -1072,22 +1072,22 @@ gst_element_get_request_pad (GstElement * element, const gchar * name)
 }
 
 /**
- * gst_element_request_pad: (virtual request_new_pad)
- * @element: a #GstElement to find a request pad of.
- * @templ: a #GstPadTemplate of which we want a pad of.
- * @name: (transfer none) (allow-none): the name of the request #GstPad
- * to retrieve. Can be %NULL.
+ * gst_element_request_pad: (virtual request_new_pad):
+ * @element: a [GstElement]() to find a request pad of.
+ * @templ: a [GstPadTemplate]() of which we want a pad of.
+ * @name: (transfer none) (allow-none): the name of the request [GstPad]()
+ * to retrieve. Can be [NULL]().
  * @caps: (transfer none) (allow-none): the caps of the pad we want to
- * request. Can be %NULL.
+ * request. Can be [NULL]().
  *
  * Retrieves a request pad from the element according to the provided template.
  * Pad templates can be looked up using
- * gst_element_factory_get_static_pad_templates().
+ * [gst_element_factory_get_static_pad_templates]().
  *
- * The pad should be released with gst_element_release_request_pad().
+ * The pad should be released with [gst_element_release_request_pad]().
  *
- * Returns: (transfer full) (nullable): requested #GstPad if found,
- *     otherwise %NULL.  Release after usage.
+ * Returns: (transfer full) (nullable): requested [GstPad]() if found,
+ *     otherwise [NULL]().  Release after usage.
  */
 GstPad *
 gst_element_request_pad (GstElement * element,
@@ -1116,16 +1116,16 @@ gst_element_iterate_pad_list (GstElement * element, GList ** padlist)
 
 /**
  * gst_element_iterate_pads:
- * @element: a #GstElement to iterate pads of.
+ * @element: a [GstElement]() to iterate pads of.
  *
- * Retrieves an iterator of @element's pads. The iterator should
+ * Retrieves an iterator of _element_'s pads. The iterator should
  * be freed after usage. Also more specialized iterators exists such as
- * gst_element_iterate_src_pads() or gst_element_iterate_sink_pads().
+ * [gst_element_iterate_src_pads]() or [gst_element_iterate_sink_pads]().
  *
  * The order of pads returned by the iterator will be the order in which
  * the pads were added to the element.
  *
- * Returns: (transfer full): the #GstIterator of #GstPad.
+ * Returns: (transfer full): the [GstIterator]() of [GstPad]().
  *
  * MT safe.
  */
@@ -1139,14 +1139,14 @@ gst_element_iterate_pads (GstElement * element)
 
 /**
  * gst_element_iterate_src_pads:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  *
- * Retrieves an iterator of @element's source pads.
+ * Retrieves an iterator of _element_'s source pads.
  *
  * The order of pads returned by the iterator will be the order in which
  * the pads were added to the element.
  *
- * Returns: (transfer full): the #GstIterator of #GstPad.
+ * Returns: (transfer full): the [GstIterator]() of [GstPad]().
  *
  * MT safe.
  */
@@ -1160,14 +1160,14 @@ gst_element_iterate_src_pads (GstElement * element)
 
 /**
  * gst_element_iterate_sink_pads:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  *
- * Retrieves an iterator of @element's sink pads.
+ * Retrieves an iterator of _element_'s sink pads.
  *
  * The order of pads returned by the iterator will be the order in which
  * the pads were added to the element.
  *
- * Returns: (transfer full): the #GstIterator of #GstPad.
+ * Returns: (transfer full): the [GstIterator]() of [GstPad]().
  *
  * MT safe.
  */
@@ -1181,13 +1181,12 @@ gst_element_iterate_sink_pads (GstElement * element)
 
 /**
  * gst_element_class_add_pad_template:
- * @klass: the #GstElementClass to add the pad template to.
- * @templ: (transfer full): a #GstPadTemplate to add to the element class.
+ * @klass: the [GstElementClass]() to add the pad template to.
+ * @templ: (transfer full): a [GstPadTemplate]() to add to the element class.
  *
  * Adds a padtemplate to an element class. This is mainly used in the _class_init
  * functions of classes. If a pad template with the same name as an already
  * existing one is added the old one is replaced by the new one.
- *
  */
 void
 gst_element_class_add_pad_template (GstElementClass * klass,
@@ -1225,7 +1224,7 @@ gst_element_class_add_pad_template (GstElementClass * klass,
  * @key: the key to set
  * @value: the value to set
  *
- * Set @key with @value as metadata in @klass.
+ * Set _key_ with _value_ as metadata in _klass_.
  */
 void
 gst_element_class_add_metadata (GstElementClass * klass,
@@ -1245,9 +1244,9 @@ gst_element_class_add_metadata (GstElementClass * klass,
  * @key: the key to set
  * @value: the value to set
  *
- * Set @key with @value as metadata in @klass.
+ * Set _key_ with _value_ as metadata in _klass_.
  *
- * Same as gst_element_class_add_metadata(), but @value must be a static string
+ * Same as [gst_element_class_add_metadata](), but _value_ must be a static string
  * or an inlined string, as it will not be copied. (GStreamer plugins will
  * be made resident once loaded, so this function can be used even from
  * dynamically loaded plugins.)
@@ -1279,7 +1278,7 @@ gst_element_class_add_static_metadata (GstElementClass * klass,
  * @author: Name and contact details of the author(s). Use \n to separate
  * multiple author metadata. E.g: "Joe Bloggs &lt;joe.blogs at foo.com&gt;"
  *
- * Sets the detailed information for a #GstElementClass.
+ * Sets the detailed information for a [GstElementClass]().
  * <note>This function is for use in _class_init functions only.</note>
  */
 void
@@ -1312,11 +1311,11 @@ gst_element_class_set_metadata (GstElementClass * klass,
  * @author: Name and contact details of the author(s). Use \n to separate
  * multiple author metadata. E.g: "Joe Bloggs &lt;joe.blogs at foo.com&gt;"
  *
- * Sets the detailed information for a #GstElementClass.
+ * Sets the detailed information for a [GstElementClass]().
  * <note>This function is for use in _class_init functions only.</note>
  *
- * Same as gst_element_class_set_metadata(), but @longname, @classification,
- * @description, and @author must be static strings or inlined strings, as
+ * Same as [gst_element_class_set_metadata](), but _longname_, _classification_,
+ * _description_, and _author_ must be static strings or inlined strings, as
  * they will not be copied. (GStreamer plugins will be made resident once
  * loaded, so this function can be used even from dynamically loaded plugins.)
  */
@@ -1355,9 +1354,9 @@ gst_element_class_set_static_metadata (GstElementClass * klass,
  * @klass: class to get metadata for
  * @key: the key to get
  *
- * Get metadata with @key in @klass.
+ * Get metadata with _key_ in _klass_.
  *
- * Returns: the metadata for @key.
+ * Returns: the metadata for _key_.
  */
 const gchar *
 gst_element_class_get_metadata (GstElementClass * klass, const gchar * key)
@@ -1370,15 +1369,15 @@ gst_element_class_get_metadata (GstElementClass * klass, const gchar * key)
 
 /**
  * gst_element_class_get_pad_template_list:
- * @element_class: a #GstElementClass to get pad templates of.
+ * @element_class: a [GstElementClass]() to get pad templates of.
  *
- * Retrieves a list of the pad templates associated with @element_class. The
+ * Retrieves a list of the pad templates associated with _element_class_. The
  * list must not be modified by the calling code.
- * <note>If you use this function in the #GInstanceInitFunc of an object class
+ * <note>If you use this function in the [GInstanceInitFunc]() of an object class
  * that has subclasses, make sure to pass the g_class parameter of the
- * #GInstanceInitFunc here.</note>
+ * [GInstanceInitFunc]() here.</note>
  *
- * Returns: (transfer none) (element-type Gst.PadTemplate): the #GList of
+ * Returns: (transfer none) (element-type Gst.PadTemplate): the [GList]() of
  *     pad templates.
  */
 GList *
@@ -1391,16 +1390,16 @@ gst_element_class_get_pad_template_list (GstElementClass * element_class)
 
 /**
  * gst_element_class_get_pad_template:
- * @element_class: a #GstElementClass to get the pad template of.
- * @name: the name of the #GstPadTemplate to get.
+ * @element_class: a [GstElementClass]() to get the pad template of.
+ * @name: the name of the [GstPadTemplate]() to get.
  *
- * Retrieves a padtemplate from @element_class with the given name.
- * <note>If you use this function in the #GInstanceInitFunc of an object class
+ * Retrieves a padtemplate from _element_class_ with the given name.
+ * <note>If you use this function in the [GInstanceInitFunc]() of an object class
  * that has subclasses, make sure to pass the g_class parameter of the
- * #GInstanceInitFunc here.</note>
+ * [GInstanceInitFunc]() here.</note>
  *
- * Returns: (transfer none) (nullable): the #GstPadTemplate with the
- *     given name, or %NULL if none was found. No unreferencing is
+ * Returns: (transfer none) (nullable): the [GstPadTemplate]() with the
+ *     given name, or [NULL]() if none was found. No unreferencing is
  *     necessary.
  */
 GstPadTemplate *
@@ -1530,20 +1529,20 @@ gst_element_default_send_event (GstElement * element, GstEvent * event)
 
 /**
  * gst_element_send_event:
- * @element: a #GstElement to send the event to.
- * @event: (transfer full): the #GstEvent to send to the element.
+ * @element: a [GstElement]() to send the event to.
+ * @event: (transfer full): the [GstEvent]() to send to the element.
  *
  * Sends an event to an element. If the element doesn't implement an
  * event handler, the event will be pushed on a random linked sink pad for
  * downstream events or a random linked source pad for upstream events.
  *
  * This function takes ownership of the provided event so you should
- * gst_event_ref() it if you want to reuse the event after this call.
+ * [gst_event_ref]() it if you want to reuse the event after this call.
  *
  * MT safe.
  *
- * Returns: %TRUE if the event was handled. Events that trigger a preroll (such
- * as flushing seeks and steps) will emit %GST_MESSAGE_ASYNC_DONE.
+ * Returns: [TRUE]() if the event was handled. Events that trigger a preroll (such
+ * as flushing seeks and steps) will emit [GST_MESSAGE_ASYNC_DONE]().
  */
 gboolean
 gst_element_send_event (GstElement * element, GstEvent * event)
@@ -1569,7 +1568,7 @@ gst_element_send_event (GstElement * element, GstEvent * event)
 
 /**
  * gst_element_seek:
- * @element: a #GstElement to send the event to.
+ * @element: a [GstElement]() to send the event to.
  * @rate: The new playback rate
  * @format: The format of the seek values
  * @flags: The optional seek flags.
@@ -1578,14 +1577,14 @@ gst_element_send_event (GstElement * element, GstEvent * event)
  * @stop_type: The type and flags for the new stop position
  * @stop: The value of the new stop position
  *
- * Sends a seek event to an element. See gst_event_new_seek() for the details of
+ * Sends a seek event to an element. See [gst_event_new_seek]() for the details of
  * the parameters. The seek event is sent to the element using
- * gst_element_send_event().
+ * [gst_element_send_event]().
  *
  * MT safe.
  *
- * Returns: %TRUE if the event was handled. Flushing seeks will trigger a
- * preroll, which will emit %GST_MESSAGE_ASYNC_DONE.
+ * Returns: [TRUE]() if the event was handled. Flushing seeks will trigger a
+ * preroll, which will emit [GST_MESSAGE_ASYNC_DONE]().
  */
 gboolean
 gst_element_seek (GstElement * element, gdouble rate, GstFormat format,
@@ -1634,8 +1633,8 @@ gst_element_default_query (GstElement * element, GstQuery * query)
 
 /**
  * gst_element_query:
- * @element: a #GstElement to perform the query on.
- * @query: (transfer none): the #GstQuery.
+ * @element: a [GstElement]() to perform the query on.
+ * @query: (transfer none): the [GstQuery]().
  *
  * Performs a query on the given element.
  *
@@ -1645,7 +1644,7 @@ gst_element_default_query (GstElement * element, GstQuery * query)
  *
  * Please note that some queries might need a running pipeline to work.
  *
- * Returns: %TRUE if the query could be performed.
+ * Returns: [TRUE]() if the query could be performed.
  *
  * MT safe.
  */
@@ -1705,15 +1704,15 @@ no_bus:
 
 /**
  * gst_element_post_message:
- * @element: a #GstElement posting the message
- * @message: (transfer full): a #GstMessage to post
+ * @element: a [GstElement]() posting the message
+ * @message: (transfer full): a [GstMessage]() to post
  *
- * Post a message on the element's #GstBus. This function takes ownership of the
+ * Post a message on the element's [GstBus](). This function takes ownership of the
  * message; if you want to access the message after this call, you should add an
  * additional reference before calling.
  *
- * Returns: %TRUE if the message was successfully posted. The function returns
- * %FALSE if the element did not have a bus.
+ * Returns: [TRUE]() if the message was successfully posted. The function returns
+ * [FALSE]() if the element did not have a bus.
  *
  * MT safe.
  */
@@ -1734,12 +1733,12 @@ gst_element_post_message (GstElement * element, GstMessage * message)
 
 /**
  * _gst_element_error_printf:
- * @format: (allow-none): the printf-like format to use, or %NULL
+ * @format: (allow-none): the printf-like format to use, or [NULL]()
  *
- * This function is only used internally by the gst_element_error() macro.
+ * This function is only used internally by the [gst_element_error]() macro.
  *
  * Returns: (transfer full) (nullable): a newly allocated string, or
- *     %NULL if the format was %NULL or ""
+ *     [NULL]() if the format was [NULL]() or ""
  *
  * MT safe.
  */
@@ -1769,24 +1768,24 @@ _gst_element_error_printf (const gchar * format, ...)
 
 /**
  * gst_element_message_full:
- * @element:  a #GstElement to send message from
- * @type:     the #GstMessageType
- * @domain:   the GStreamer GError domain this message belongs to
- * @code:     the GError code belonging to the domain
- * @text:     (allow-none) (transfer full): an allocated text string to be used
+ * @element: a [GstElement]() to send message from
+ * @type: the [GstMessageType]()
+ * @domain: the GStreamer GError domain this message belongs to
+ * @code: the GError code belonging to the domain
+ * @text: (allow-none) (transfer full): an allocated text string to be used
  *            as a replacement for the default message connected to code,
- *            or %NULL
- * @debug:    (allow-none) (transfer full): an allocated debug message to be
+ *            or [NULL]()
+ * @debug: (allow-none) (transfer full): an allocated debug message to be
  *            used as a replacement for the default debugging information,
- *            or %NULL
- * @file:     the source code file where the error was generated
+ *            or [NULL]()
+ * @file: the source code file where the error was generated
  * @function: the source code function where the error was generated
- * @line:     the source code line where the error was generated
+ * @line: the source code line where the error was generated
  *
  * Post an error, warning or info message on the bus from inside an element.
  *
- * @type must be of #GST_MESSAGE_ERROR, #GST_MESSAGE_WARNING or
- * #GST_MESSAGE_INFO.
+ * _type_ must be of [GST_MESSAGE_ERROR](), [GST_MESSAGE_WARNING]() or
+ * [GST_MESSAGE_INFO]().
  *
  * MT safe.
  */
@@ -1867,17 +1866,17 @@ void gst_element_message_full
 
 /**
  * gst_element_is_locked_state:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  *
  * Checks if the state of an element is locked.
  * If the state of an element is locked, state changes of the parent don't
  * affect the element.
  * This way you can leave currently unused elements inside bins. Just lock their
- * state before changing the state from #GST_STATE_NULL.
+ * state before changing the state from [GST_STATE_NULL]().
  *
  * MT safe.
  *
- * Returns: %TRUE, if the element's state is locked.
+ * Returns: [TRUE](), if the element's state is locked.
  */
 gboolean
 gst_element_is_locked_state (GstElement * element)
@@ -1895,15 +1894,15 @@ gst_element_is_locked_state (GstElement * element)
 
 /**
  * gst_element_set_locked_state:
- * @element: a #GstElement
- * @locked_state: %TRUE to lock the element's state
+ * @element: a [GstElement]()
+ * @locked_state: [TRUE]() to lock the element's state
  *
  * Locks the state of an element, so state changes of the parent don't affect
  * this element anymore.
  *
  * MT safe.
  *
- * Returns: %TRUE if the state was changed, %FALSE if bad parameters were given
+ * Returns: [TRUE]() if the state was changed, [FALSE]() if bad parameters were given
  * or the elements state-locking needed no change.
  */
 gboolean
@@ -1945,12 +1944,12 @@ was_ok:
 
 /**
  * gst_element_sync_state_with_parent:
- * @element: a #GstElement.
+ * @element: a [GstElement]().
  *
  * Tries to change the state of the element to the same as its parent.
- * If this function returns %FALSE, the state of element is undefined.
+ * If this function returns [FALSE](), the state of element is undefined.
  *
- * Returns: %TRUE, if the element's state could be synced to the parent's state.
+ * Returns: [TRUE](), if the element's state could be synced to the parent's state.
  *
  * MT safe.
  */
@@ -2114,39 +2113,39 @@ interrupted:
 
 /**
  * gst_element_get_state:
- * @element: a #GstElement to get the state of.
- * @state: (out) (allow-none): a pointer to #GstState to hold the state.
- *     Can be %NULL.
- * @pending: (out) (allow-none): a pointer to #GstState to hold the pending
- *     state. Can be %NULL.
- * @timeout: a #GstClockTime to specify the timeout for an async
- *           state change or %GST_CLOCK_TIME_NONE for infinite timeout.
+ * @element: a [GstElement]() to get the state of.
+ * @state: (out) (allow-none): a pointer to [GstState]() to hold the state.
+ *     Can be [NULL]().
+ * @pending: (out) (allow-none): a pointer to [GstState]() to hold the pending
+ *     state. Can be [NULL]().
+ * @timeout: a [GstClockTime]() to specify the timeout for an async
+ *           state change or [GST_CLOCK_TIME_NONE]() for infinite timeout.
  *
  * Gets the state of the element.
  *
  * For elements that performed an ASYNC state change, as reported by
- * gst_element_set_state(), this function will block up to the
+ * [gst_element_set_state](), this function will block up to the
  * specified timeout value for the state change to complete.
  * If the element completes the state change or goes into
  * an error, this function returns immediately with a return value of
- * %GST_STATE_CHANGE_SUCCESS or %GST_STATE_CHANGE_FAILURE respectively.
+ * [GST_STATE_CHANGE_SUCCESS]() or [GST_STATE_CHANGE_FAILURE]() respectively.
  *
- * For elements that did not return %GST_STATE_CHANGE_ASYNC, this function
+ * For elements that did not return [GST_STATE_CHANGE_ASYNC](), this function
  * returns the current and pending state immediately.
  *
- * This function returns %GST_STATE_CHANGE_NO_PREROLL if the element
+ * This function returns [GST_STATE_CHANGE_NO_PREROLL]() if the element
  * successfully changed its state but is not able to provide data yet.
  * This mostly happens for live sources that only produce data in
- * %GST_STATE_PLAYING. While the state change return is equivalent to
- * %GST_STATE_CHANGE_SUCCESS, it is returned to the application to signal that
+ * [GST_STATE_PLAYING](). While the state change return is equivalent to
+ * [GST_STATE_CHANGE_SUCCESS](), it is returned to the application to signal that
  * some sink elements might not be able to complete their state change because
  * an element is not producing data to complete the preroll. When setting the
  * element to playing, the preroll will complete and playback will start.
  *
- * Returns: %GST_STATE_CHANGE_SUCCESS if the element has no more pending state
- *          and the last state change succeeded, %GST_STATE_CHANGE_ASYNC if the
+ * Returns: [GST_STATE_CHANGE_SUCCESS]() if the element has no more pending state
+ *          and the last state change succeeded, [GST_STATE_CHANGE_ASYNC]() if the
  *          element is still performing a state change or
- *          %GST_STATE_CHANGE_FAILURE if the last state change failed.
+ *          [GST_STATE_CHANGE_FAILURE]() if the last state change failed.
  *
  * MT safe.
  */
@@ -2169,7 +2168,7 @@ gst_element_get_state (GstElement * element,
 
 /**
  * gst_element_abort_state:
- * @element: a #GstElement to abort the state of.
+ * @element: a [GstElement]() to abort the state of.
  *
  * Abort the state change of the element. This function is used
  * by elements that do asynchronous state changes and find out
@@ -2244,14 +2243,14 @@ _priv_gst_element_state_changed (GstElement * element, GstState oldstate,
 
 /**
  * gst_element_continue_state:
- * @element: a #GstElement to continue the state change of.
+ * @element: a [GstElement]() to continue the state change of.
  * @ret: The previous state return value
  *
  * Commit the state change of the element and proceed to the next
  * pending state if any. This function is used
  * by elements that do asynchronous state changes.
  * The core will normally call this method automatically when an
- * element returned %GST_STATE_CHANGE_SUCCESS from the state change function.
+ * element returned [GST_STATE_CHANGE_SUCCESS]() from the state change function.
  *
  * If after calling this method the element still has not reached
  * the pending state, the next state change is performed.
@@ -2348,18 +2347,18 @@ complete:
 
 /**
  * gst_element_lost_state:
- * @element: a #GstElement the state is lost of
+ * @element: a [GstElement]() the state is lost of
  *
  * Brings the element to the lost state. The current state of the
  * element is copied to the pending state so that any call to
- * gst_element_get_state() will return %GST_STATE_CHANGE_ASYNC.
+ * [gst_element_get_state]() will return [GST_STATE_CHANGE_ASYNC]().
  *
  * An ASYNC_START message is posted. If the element was PLAYING, it will
  * go to PAUSED. The element will be restored to its PLAYING state by
  * the parent pipeline when it prerolls again.
  *
  * This is mostly used for elements that lost their preroll buffer
- * in the %GST_STATE_PAUSED or %GST_STATE_PLAYING state after a flush,
+ * in the [GST_STATE_PAUSED]() or [GST_STATE_PLAYING]() state after a flush,
  * they will go to their pending state again when a new preroll buffer is
  * queued. This function can only be called when the element is currently
  * not in error or an async state change.
@@ -2426,24 +2425,24 @@ only_async_start:
 
 /**
  * gst_element_set_state:
- * @element: a #GstElement to change state of.
- * @state: the element's new #GstState.
+ * @element: a [GstElement]() to change state of.
+ * @state: the element's new [GstState]().
  *
  * Sets the state of the element. This function will try to set the
  * requested state by going through all the intermediary states and calling
  * the class's state change function for each.
  *
- * This function can return #GST_STATE_CHANGE_ASYNC, in which case the
+ * This function can return [GST_STATE_CHANGE_ASYNC](), in which case the
  * element will perform the remainder of the state change asynchronously in
  * another thread.
- * An application can use gst_element_get_state() to wait for the completion
- * of the state change or it can wait for a %GST_MESSAGE_ASYNC_DONE or
- * %GST_MESSAGE_STATE_CHANGED on the bus.
+ * An application can use [gst_element_get_state]() to wait for the completion
+ * of the state change or it can wait for a [GST_MESSAGE_ASYNC_DONE]() or
+ * [GST_MESSAGE_STATE_CHANGED]() on the bus.
  *
- * State changes to %GST_STATE_READY or %GST_STATE_NULL never return
- * #GST_STATE_CHANGE_ASYNC.
+ * State changes to [GST_STATE_READY]() or [GST_STATE_NULL]() never return
+ * [GST_STATE_CHANGE_ASYNC]().
  *
- * Returns: Result of the state change using #GstStateChangeReturn.
+ * Returns: Result of the state change using [GstStateChangeReturn]().
  *
  * MT safe.
  */
@@ -2581,15 +2580,15 @@ was_busy:
 
 /**
  * gst_element_change_state:
- * @element: a #GstElement
+ * @element: a [GstElement]()
  * @transition: the requested transition
  *
- * Perform @transition on @element.
+ * Perform _transition_ on _element_.
  *
  * This function must be called with STATE_LOCK held and is mainly used
  * internally.
  *
- * Returns: the #GstStateChangeReturn of the state transition.
+ * Returns: the [GstStateChangeReturn]() of the state transition.
  */
 GstStateChangeReturn
 gst_element_change_state (GstElement * element, GstStateChange transition)
@@ -2846,11 +2845,11 @@ was_ok:
 
 /**
  * gst_element_get_factory:
- * @element: a #GstElement to request the element factory of.
+ * @element: a [GstElement]() to request the element factory of.
  *
  * Retrieves the factory that was used to create this element.
  *
- * Returns: (transfer none): the #GstElementFactory used for creating this
+ * Returns: (transfer none): the [GstElementFactory]() used for creating this
  *     element. no refcounting is needed.
  */
 GstElementFactory *
@@ -2974,8 +2973,8 @@ gst_element_set_bus_func (GstElement * element, GstBus * bus)
 
 /**
  * gst_element_set_bus:
- * @element: a #GstElement to set the bus of.
- * @bus: (transfer none): the #GstBus to set.
+ * @element: a [GstElement]() to set the bus of.
+ * @bus: (transfer none): the [GstBus]() to set.
  *
  * Sets the bus of the element. Increases the refcount on the bus.
  * For internal use only, unless you're testing elements.
@@ -2997,12 +2996,12 @@ gst_element_set_bus (GstElement * element, GstBus * bus)
 
 /**
  * gst_element_get_bus:
- * @element: a #GstElement to get the bus of.
+ * @element: a [GstElement]() to get the bus of.
  *
- * Returns the bus of the element. Note that only a #GstPipeline will provide a
+ * Returns the bus of the element. Note that only a [GstPipeline]() will provide a
  * bus for the application.
  *
- * Returns: (transfer full): the element's #GstBus. unref after usage.
+ * Returns: (transfer full): the element's [GstBus](). unref after usage.
  *
  * MT safe.
  */
@@ -3026,8 +3025,8 @@ gst_element_get_bus (GstElement * element)
 
 /**
  * gst_element_set_context:
- * @element: a #GstElement to set the context of.
- * @context: (transfer none): the #GstContext to set.
+ * @element: a [GstElement]() to set the context of.
+ * @context: (transfer none): the [GstContext]() to set.
  *
  * Sets the context of the element. Increases the refcount of the context.
  *

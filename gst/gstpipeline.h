@@ -64,7 +64,7 @@ typedef enum {
  * @delay: Extra delay added to base_time to compensate for computing delays
  *         when setting elements to PLAYING.
  *
- * The #GstPipeline structure.
+ * The [GstPipeline]() structure.
  */
 struct _GstPipeline {
   GstBin         bin;

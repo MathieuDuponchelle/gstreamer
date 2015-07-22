@@ -36,7 +36,7 @@ G_BEGIN_DECLS
 /**
  * GstChildProxy:
  *
- * Opaque #GstChildProxy data structure.
+ * Opaque [GstChildProxy]() data structure.
  */
 typedef struct _GstChildProxy GstChildProxy;    /* dummy object */
 typedef struct _GstChildProxyInterface GstChildProxyInterface;
@@ -44,11 +44,11 @@ typedef struct _GstChildProxyInterface GstChildProxyInterface;
 /**
  * GstChildProxyInterface:
  * @parent: parent interface type.
- * @get_child_by_name:  virtual method to fetch the child by name
+ * @get_child_by_name: virtual method to fetch the child by name
  * @get_child_by_index: virtual method to fetch the child by index
  * @get_children_count: virtual method to get the children count
  *
- * #GstChildProxy interface.
+ * [GstChildProxy]() interface.
  */
 struct _GstChildProxyInterface
 {

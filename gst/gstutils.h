@@ -41,20 +41,20 @@ gdouble         gst_util_guint64_to_gdouble     (guint64 value)  G_GNUC_CONST;
 
 /**
  * gst_guint64_to_gdouble:
- * @value: the #guint64 value to convert
+ * @value: the [guint64]() value to convert
  *
- * Convert @value to a gdouble.
+ * Convert _value_ to a gdouble.
  *
- * Returns: @value converted to a #gdouble.
+ * Returns: _value_ converted to a [gdouble]().
  */
 
 /**
  * gst_gdouble_to_guint64:
- * @value: the #gdouble value to convert
+ * @value: the [gdouble]() value to convert
  *
- * Convert @value to a guint64.
+ * Convert _value_ to a guint64.
  *
- * Returns: @value converted to a #guint64.
+ * Returns: _value_ converted to a [guint64]().
  */
 #ifdef WIN32
 #define         gst_gdouble_to_guint64(value)   gst_util_gdouble_to_guint64(value)
@@ -99,8 +99,8 @@ guint           gst_util_group_id_next          (void);
  * @args: arguments enclosed in '( )'
  * @def_return: default result
  *
- * Same as GST_CALL_PARENT(), but in case there is no implementation, it
- * evaluates to @def_return.
+ * Same as [GST_CALL_PARENT](), but in case there is no implementation, it
+ * evaluates to _def_return_.
  */
 #define GST_CALL_PARENT_WITH_DEFAULT(parent_class_cast, name, args, def_return)\
         ((parent_class_cast(parent_class)->name != NULL) ?              \
@@ -449,7 +449,7 @@ static inline guint16 __gst_slow_read16_le (const guint8 * data) {
  *
  * Swap byte order of a 32-bit floating point value (float).
  *
- * Returns: @in byte-swapped.
+ * Returns: _in_ byte-swapped.
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gfloat GFLOAT_SWAP_LE_BE (gfloat in);
@@ -475,7 +475,7 @@ GFLOAT_SWAP_LE_BE(gfloat in)
  *
  * Swap byte order of a 64-bit floating point value (double).
  *
- * Returns: @in byte-swapped.
+ * Returns: _in_ byte-swapped.
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gdouble GDOUBLE_SWAP_LE_BE (gdouble in);
@@ -582,7 +582,7 @@ GDOUBLE_SWAP_LE_BE(gdouble in)
  *
  * Read a 32 bit float value in little endian format from the memory buffer.
  *
- * Returns: The floating point value read from @data
+ * Returns: The floating point value read from _data_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gfloat GST_READ_FLOAT_LE (const guint8 *data);
@@ -607,7 +607,7 @@ GST_READ_FLOAT_LE(const guint8 *data)
  *
  * Read a 32 bit float value in big endian format from the memory buffer.
  *
- * Returns: The floating point value read from @data
+ * Returns: The floating point value read from _data_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gfloat GST_READ_FLOAT_BE (const guint8 *data);
@@ -632,7 +632,7 @@ GST_READ_FLOAT_BE(const guint8 *data)
  *
  * Read a 64 bit double value in little endian format from the memory buffer.
  *
- * Returns: The double-precision floating point value read from @data
+ * Returns: The double-precision floating point value read from _data_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gdouble GST_READ_DOUBLE_LE (const guint8 *data);
@@ -657,7 +657,7 @@ GST_READ_DOUBLE_LE(const guint8 *data)
  *
  * Read a 64 bit double value in big endian format from the memory buffer.
  *
- * Returns: The double-precision floating point value read from @data
+ * Returns: The double-precision floating point value read from _data_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gdouble GST_READ_DOUBLE_BE (const guint8 *data);
@@ -821,6 +821,7 @@ GST_WRITE_DOUBLE_BE(guint8 *data, gdouble num)
  * @num: integer value to round up
  *
  * Rounds an integer value up to the next multiple of 128.
+ *
  * Since: 1.4
  */
 #define GST_ROUND_UP_128(num) (((num)+127)&~127)
@@ -829,7 +830,7 @@ GST_WRITE_DOUBLE_BE(guint8 *data, gdouble num)
  * @num: integrer value to round up
  * @align: a power of two to round up to
  *
- * Rounds an integer value up to the next multiple of @align. @align MUST be a
+ * Rounds an integer value up to the next multiple of _align_. _align_ MUST be a
  * power of two.
  */
 #define GST_ROUND_UP_N(num,align) ((((num) + ((align) - 1)) & ~((align) - 1)))
@@ -882,6 +883,7 @@ GST_WRITE_DOUBLE_BE(guint8 *data, gdouble num)
  * @num: integer value to round down
  *
  * Rounds an integer value down to the next multiple of 128.
+ *
  * Since: 1.4
  */
 #define GST_ROUND_DOWN_128(num) ((num)&(~127))
@@ -890,7 +892,7 @@ GST_WRITE_DOUBLE_BE(guint8 *data, gdouble num)
  * @num: integrer value to round down
  * @align: a power of two to round down to
  *
- * Rounds an integer value down to the next multiple of @align. @align MUST be a
+ * Rounds an integer value down to the next multiple of _align_. _align_ MUST be a
  * power of two.
  */
 #define GST_ROUND_DOWN_N(num,align) (((num) & ~((align) - 1)))
@@ -1000,9 +1002,9 @@ GstClockTime            gst_util_get_timestamp          (void);
 
 /**
  * GstSearchMode:
- * @GST_SEARCH_MODE_EXACT : Only search for exact matches.
+ * @GST_SEARCH_MODE_EXACT: Only search for exact matches.
  * @GST_SEARCH_MODE_BEFORE: Search for an exact match or the element just before.
- * @GST_SEARCH_MODE_AFTER : Search for an exact match or the element just after.
+ * @GST_SEARCH_MODE_AFTER: Search for an exact match or the element just after.
  *
  * The different search modes.
  */

@@ -24,14 +24,14 @@
 /**
  * SECTION:gstbufferlist
  * @short_description: Lists of buffers for data-passing
- * @see_also: #GstPad, #GstMiniObject
+ * @see_also: [GstPad](), [GstMiniObject]()
  *
  * Buffer lists are an object containing a list of buffers.
  *
- * Buffer lists are created with gst_buffer_list_new() and filled with data
- * using a gst_buffer_list_insert().
+ * Buffer lists are created with [gst_buffer_list_new]() and filled with data
+ * using a [gst_buffer_list_insert]().
  *
- * Buffer lists can be pushed on a srcpad with gst_pad_push_list(). This is
+ * Buffer lists can be pushed on a srcpad with [gst_pad_push_list](). This is
  * interesting when multiple buffers need to be pushed in one go because it
  * can reduce the amount of overhead for pushing each buffer individually.
  */
@@ -132,13 +132,13 @@ gst_buffer_list_init (GstBufferList * list, guint n_allocated, gsize slice_size)
  * gst_buffer_list_new_sized:
  * @size: an initial reserved size
  *
- * Creates a new, empty #GstBufferList. The caller is responsible for unreffing
- * the returned #GstBufferList. The list will have @size space preallocated so
+ * Creates a new, empty [GstBufferList](). The caller is responsible for unreffing
+ * the returned [GstBufferList](). The list will have _size_ space preallocated so
  * that memory reallocations can be avoided.
  *
  * Free-function: gst_buffer_list_unref
  *
- * Returns: (transfer full): the new #GstBufferList. gst_buffer_list_unref()
+ * Returns: (transfer full): the new [GstBufferList](). [gst_buffer_list_unref]()
  *     after usage.
  */
 GstBufferList *
@@ -164,12 +164,12 @@ gst_buffer_list_new_sized (guint size)
 /**
  * gst_buffer_list_new:
  *
- * Creates a new, empty #GstBufferList. The caller is responsible for unreffing
- * the returned #GstBufferList.
+ * Creates a new, empty [GstBufferList](). The caller is responsible for unreffing
+ * the returned [GstBufferList]().
  *
  * Free-function: gst_buffer_list_unref
  *
- * Returns: (transfer full): the new #GstBufferList. gst_buffer_list_unref()
+ * Returns: (transfer full): the new [GstBufferList](). [gst_buffer_list_unref]()
  *     after usage.
  */
 GstBufferList *
@@ -180,9 +180,9 @@ gst_buffer_list_new (void)
 
 /**
  * gst_buffer_list_length:
- * @list: a #GstBufferList
+ * @list: a [GstBufferList]()
  *
- * Returns the number of buffers in @list.
+ * Returns the number of buffers in _list_.
  *
  * Returns: the number of buffers in the buffer list
  */
@@ -215,18 +215,18 @@ gst_buffer_list_remove_range_internal (GstBufferList * list, guint idx,
 
 /**
  * gst_buffer_list_foreach:
- * @list: a #GstBufferList
- * @func: (scope call): a #GstBufferListFunc to call
- * @user_data: (closure): user data passed to @func
+ * @list: a [GstBufferList]()
+ * @func: (scope call): a [GstBufferListFunc]() to call
+ * @user_data: (closure): user data passed to _func_
  *
- * Call @func with @data for each buffer in @list.
+ * Call _func_ with _data_ for each buffer in _list_.
  *
- * @func can modify the passed buffer pointer or its contents. The return value
- * of @func define if this function returns or if the remaining buffers in
+ * _func_ can modify the passed buffer pointer or its contents. The return value
+ * of _func_ define if this function returns or if the remaining buffers in
  * the list should be skipped.
  *
- * Returns: %TRUE when @func returned %TRUE for each buffer in @list or when
- * @list is empty.
+ * Returns: [TRUE]() when _func_ returned [TRUE]() for each buffer in _list_ or when
+ * _list_ is empty.
  */
 gboolean
 gst_buffer_list_foreach (GstBufferList * list, GstBufferListFunc func,
@@ -267,14 +267,14 @@ gst_buffer_list_foreach (GstBufferList * list, GstBufferListFunc func,
 
 /**
  * gst_buffer_list_get:
- * @list: a #GstBufferList
+ * @list: a [GstBufferList]()
  * @idx: the index
  *
- * Get the buffer at @idx.
+ * Get the buffer at _idx_.
  *
- * Returns: (transfer none) (nullable): the buffer at @idx in @group
- *     or %NULL when there is no buffer. The buffer remains valid as
- *     long as @list is valid and buffer is not removed from the list.
+ * Returns: (transfer none) (nullable): the buffer at _idx_ in _group_
+ *     or [NULL]() when there is no buffer. The buffer remains valid as
+ *     long as _list_ is valid and buffer is not removed from the list.
  */
 GstBuffer *
 gst_buffer_list_get (GstBufferList * list, guint idx)
@@ -287,21 +287,21 @@ gst_buffer_list_get (GstBufferList * list, guint idx)
 
 /**
  * gst_buffer_list_add:
- * @l: a #GstBufferList
- * @b: a #GstBuffer
+ * @l: a [GstBufferList]()
+ * @b: a [GstBuffer]()
  *
- * Append @b at the end of @l.
+ * Append _b_ at the end of _l_.
  */
 /**
  * gst_buffer_list_insert:
- * @list: a #GstBufferList
+ * @list: a [GstBufferList]()
  * @idx: the index
- * @buffer: (transfer full): a #GstBuffer
+ * @buffer: (transfer full): a [GstBuffer]()
  *
- * Insert @buffer at @idx in @list. Other buffers are moved to make room for
+ * Insert _buffer_ at _idx_ in _list_. Other buffers are moved to make room for
  * this new buffer.
  *
- * A -1 value for @idx will append the buffer at the end.
+ * A -1 value for _idx_ will append the buffer at the end.
  */
 void
 gst_buffer_list_insert (GstBufferList * list, gint idx, GstBuffer * buffer)
@@ -347,11 +347,11 @@ gst_buffer_list_insert (GstBufferList * list, gint idx, GstBuffer * buffer)
 
 /**
  * gst_buffer_list_remove:
- * @list: a #GstBufferList
+ * @list: a [GstBufferList]()
  * @idx: the index
  * @length: the amount to remove
  *
- * Remove @length buffers starting from @idx in @list. The following buffers
+ * Remove _length_ buffers starting from _idx_ in _list_. The following buffers
  * are moved to close the gap.
  */
 void
@@ -367,13 +367,12 @@ gst_buffer_list_remove (GstBufferList * list, guint idx, guint length)
 
 /**
  * gst_buffer_list_copy_deep:
- * @list: a #GstBufferList
+ * @list: a [GstBufferList]()
  *
  * Create a copy of the given buffer list. This will make a newly allocated
  * copy of the buffer that the source buffer list contains.
  *
- * Returns: (transfer full): a new copy of @list.
- *
+ * Returns: (transfer full): a new copy of _list_.
  * Since: 1.6
  */
 GstBufferList *

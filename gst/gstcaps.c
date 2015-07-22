@@ -20,21 +20,21 @@
 /**
  * SECTION:gstcaps
  * @short_description: Structure describing sets of media formats
- * @see_also: #GstStructure, #GstMiniObject
+ * @see_also: [GstStructure](), [GstMiniObject]()
  *
  * Caps (capabilities) are lightweight refcounted objects describing media types.
- * They are composed of an array of #GstStructure.
+ * They are composed of an array of [GstStructure]().
  *
- * Caps are exposed on #GstPadTemplate to describe all possible types a
- * given pad can handle. They are also stored in the #GstRegistry along with
- * a description of the #GstElement.
+ * Caps are exposed on [GstPadTemplate]() to describe all possible types a
+ * given pad can handle. They are also stored in the [GstRegistry]() along with
+ * a description of the [GstElement]().
  *
- * Caps are exposed on the element pads using the gst_pad_query_caps() pad
+ * Caps are exposed on the element pads using the [gst_pad_query_caps]() pad
  * function. This function describes the possible types that the pad can
  * handle or produce at runtime.
  *
- * A #GstCaps can be constructed with the following code fragment:
- * |[
+ * A [GstCaps]() can be constructed with the following code fragment:
+ * ```
  *   GstCaps *caps = gst_caps_new_simple ("video/x-raw",
  *      "format", G_TYPE_STRING, "I420",
  *      "framerate", GST_TYPE_FRACTION, 25, 1,
@@ -42,20 +42,20 @@
  *      "width", G_TYPE_INT, 320,
  *      "height", G_TYPE_INT, 240,
  *      NULL);
- * ]|
+ * ```
  *
- * A #GstCaps is fixed when it has no properties with ranges or lists. Use
- * gst_caps_is_fixed() to test for fixed caps. Fixed caps can be used in a
+ * A [GstCaps]() is fixed when it has no properties with ranges or lists. Use
+ * [gst_caps_is_fixed]() to test for fixed caps. Fixed caps can be used in a
  * caps event to notify downstream elements of the current media type.
  *
  * Various methods exist to work with the media types such as subtracting
  * or intersecting.
  *
- * Be aware that the current #GstCaps / #GstStructure serialization into string
- * has limited support for nested #GstCaps / #GstStructure fields. It can only
+ * Be aware that the current [GstCaps]() / [GstStructure]() serialization into string
+ * has limited support for nested [GstCaps]() / [GstStructure]() fields. It can only
  * support one level of nesting. Using more levels will lead to unexpected
- * behavior when using serialization features, such as gst_caps_to_string() or
- * gst_value_serialize() and their counterparts.
+ * behavior when using serialization features, such as [gst_caps_to_string]() or
+ * [gst_value_serialize]() and their counterparts.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -228,12 +228,12 @@ gst_caps_init (GstCaps * caps)
 /**
  * gst_caps_new_empty:
  *
- * Creates a new #GstCaps that is empty.  That is, the returned
- * #GstCaps contains no media formats.
- * The #GstCaps is guaranteed to be writable.
+ * Creates a new [GstCaps]() that is empty.  That is, the returned
+ * [GstCaps]() contains no media formats.
+ * The [GstCaps]() is guaranteed to be writable.
  * Caller is responsible for unreffing the returned caps.
  *
- * Returns: (transfer full): the new #GstCaps
+ * Returns: (transfer full): the new [GstCaps]()
  */
 GstCaps *
 gst_caps_new_empty (void)
@@ -254,10 +254,10 @@ gst_caps_new_empty (void)
 /**
  * gst_caps_new_any:
  *
- * Creates a new #GstCaps that indicates that it is compatible with
+ * Creates a new [GstCaps]() that indicates that it is compatible with
  * any media format.
  *
- * Returns: (transfer full): the new #GstCaps
+ * Returns: (transfer full): the new [GstCaps]()
  */
 GstCaps *
 gst_caps_new_any (void)
@@ -273,11 +273,11 @@ gst_caps_new_any (void)
  * gst_caps_new_empty_simple:
  * @media_type: the media type of the structure
  *
- * Creates a new #GstCaps that contains one #GstStructure with name
- * @media_type.
+ * Creates a new [GstCaps]() that contains one [GstStructure]() with name
+ * _media_type_.
  * Caller is responsible for unreffing the returned caps.
  *
- * Returns: (transfer full): the new #GstCaps
+ * Returns: (transfer full): the new [GstCaps]()
  */
 GstCaps *
 gst_caps_new_empty_simple (const char *media_type)
@@ -299,12 +299,12 @@ gst_caps_new_empty_simple (const char *media_type)
  * @fieldname: first field to set
  * @...: additional arguments
  *
- * Creates a new #GstCaps that contains one #GstStructure.  The
+ * Creates a new [GstCaps]() that contains one [GstStructure]().  The
  * structure is defined by the arguments, which have the same format
- * as gst_structure_new().
+ * as [gst_structure_new]().
  * Caller is responsible for unreffing the returned caps.
  *
- * Returns: (transfer full): the new #GstCaps
+ * Returns: (transfer full): the new [GstCaps]()
  */
 GstCaps *
 gst_caps_new_simple (const char *media_type, const char *fieldname, ...)
@@ -332,11 +332,11 @@ gst_caps_new_simple (const char *media_type, const char *fieldname, ...)
  * @struct1: the first structure to add
  * @...: additional structures to add
  *
- * Creates a new #GstCaps and adds all the structures listed as
- * arguments.  The list must be %NULL-terminated.  The structures
- * are not copied; the returned #GstCaps owns the structures.
+ * Creates a new [GstCaps]() and adds all the structures listed as
+ * arguments.  The list must be [NULL]()-terminated.  The structures
+ * are not copied; the returned [GstCaps]() owns the structures.
  *
- * Returns: (transfer full): the new #GstCaps
+ * Returns: (transfer full): the new [GstCaps]()
  */
 GstCaps *
 gst_caps_new_full (GstStructure * struct1, ...)
@@ -356,11 +356,11 @@ gst_caps_new_full (GstStructure * struct1, ...)
  * @structure: the first structure to add
  * @var_args: additional structures to add
  *
- * Creates a new #GstCaps and adds all the structures listed as
- * arguments.  The list must be %NULL-terminated.  The structures
- * are not copied; the returned #GstCaps owns the structures.
+ * Creates a new [GstCaps]() and adds all the structures listed as
+ * arguments.  The list must be [NULL]()-terminated.  The structures
+ * are not copied; the returned [GstCaps]() owns the structures.
  *
- * Returns: (transfer full): the new #GstCaps
+ * Returns: (transfer full): the new [GstCaps]()
  */
 GstCaps *
 gst_caps_new_full_valist (GstStructure * structure, va_list var_args)
@@ -381,13 +381,13 @@ G_DEFINE_POINTER_TYPE (GstStaticCaps, gst_static_caps);
 
 /**
  * gst_static_caps_get:
- * @static_caps: the #GstStaticCaps to convert
+ * @static_caps: the [GstStaticCaps]() to convert
  *
- * Converts a #GstStaticCaps to a #GstCaps.
+ * Converts a [GstStaticCaps]() to a [GstCaps]().
  *
- * Returns: (transfer full): a pointer to the #GstCaps. Unref after usage.
+ * Returns: (transfer full): a pointer to the [GstCaps](). Unref after usage.
  *     Since the core holds an additional ref to the returned caps,
- *     use gst_caps_make_writable() on the returned caps to modify it.
+ *     use [gst_caps_make_writable]() on the returned caps to modify it.
  */
 GstCaps *
 gst_static_caps_get (GstStaticCaps * static_caps)
@@ -440,9 +440,9 @@ no_string:
 
 /**
  * gst_static_caps_cleanup:
- * @static_caps: the #GstStaticCaps to clean
+ * @static_caps: the [GstStaticCaps]() to clean
  *
- * Clean up the cached caps contained in @static_caps.
+ * Clean up the cached caps contained in _static_caps_.
  */
 void
 gst_static_caps_cleanup (GstStaticCaps * static_caps)
@@ -492,14 +492,14 @@ gst_caps_remove_and_get_structure (GstCaps * caps, guint idx)
 
 /**
  * gst_caps_steal_structure:
- * @caps: the #GstCaps to retrieve from
+ * @caps: the [GstCaps]() to retrieve from
  * @index: Index of the structure to retrieve
  *
  * Retrieves the structure with the given index from the list of structures
- * contained in @caps. The caller becomes the owner of the returned structure.
+ * contained in _caps_. The caller becomes the owner of the returned structure.
  *
- * Returns: (transfer full): a pointer to the #GstStructure corresponding
- *     to @index.
+ * Returns: (transfer full): a pointer to the [GstStructure]() corresponding
+ *     to _index_.
  */
 GstStructure *
 gst_caps_steal_structure (GstCaps * caps, guint index)
@@ -515,11 +515,11 @@ gst_caps_steal_structure (GstCaps * caps, guint index)
 
 /**
  * gst_caps_append:
- * @caps1: the #GstCaps that will be appended to
- * @caps2: (transfer full): the #GstCaps to append
+ * @caps1: the [GstCaps]() that will be appended to
+ * @caps2: (transfer full): the [GstCaps]() to append
  *
- * Appends the structures contained in @caps2 to @caps1. The structures in
- * @caps2 are not copied -- they are transferred to @caps1, and then @caps2 is
+ * Appends the structures contained in _caps2_ to _caps1_. The structures in
+ * _caps2_ are not copied -- they are transferred to _caps1_, and then _caps2_ is
  * freed. If either caps is ANY, the resulting caps will be ANY.
  */
 void
@@ -550,12 +550,12 @@ gst_caps_append (GstCaps * caps1, GstCaps * caps2)
 
 /**
  * gst_caps_merge:
- * @caps1: (transfer full): the #GstCaps that will take the new entries
- * @caps2: (transfer full): the #GstCaps to merge in
+ * @caps1: (transfer full): the [GstCaps]() that will take the new entries
+ * @caps2: (transfer full): the [GstCaps]() to merge in
  *
- * Appends the structures contained in @caps2 to @caps1 if they are not yet
- * expressed by @caps1. The structures in @caps2 are not copied -- they are
- * transferred to a writable copy of @caps1, and then @caps2 is freed.
+ * Appends the structures contained in _caps2_ to _caps1_ if they are not yet
+ * expressed by _caps1_. The structures in _caps2_ are not copied -- they are
+ * transferred to a writable copy of _caps1_, and then _caps2_ is freed.
  * If either caps is ANY, the resulting caps will be ANY.
  *
  * Returns: (transfer full): the merged caps.
@@ -604,11 +604,11 @@ gst_caps_merge (GstCaps * caps1, GstCaps * caps2)
 
 /**
  * gst_caps_append_structure:
- * @caps: the #GstCaps that will be appended to
- * @structure: (transfer full): the #GstStructure to append
+ * @caps: the [GstCaps]() that will be appended to
+ * @structure: (transfer full): the [GstStructure]() to append
  *
- * Appends @structure to @caps.  The structure is not copied; @caps
- * becomes the owner of @structure.
+ * Appends _structure_ to _caps_.  The structure is not copied; _caps_
+ * becomes the owner of _structure_.
  */
 void
 gst_caps_append_structure (GstCaps * caps, GstStructure * structure)
@@ -623,12 +623,12 @@ gst_caps_append_structure (GstCaps * caps, GstStructure * structure)
 
 /**
  * gst_caps_append_structure_full:
- * @caps: the #GstCaps that will be appended to
- * @structure: (transfer full): the #GstStructure to append
- * @features: (transfer full) (allow-none): the #GstCapsFeatures to append
+ * @caps: the [GstCaps]() that will be appended to
+ * @structure: (transfer full): the [GstStructure]() to append
+ * @features: (transfer full) (allow-none): the [GstCapsFeatures]() to append
  *
- * Appends @structure with @features to @caps.  The structure is not copied; @caps
- * becomes the owner of @structure.
+ * Appends _structure_ with _features_ to _caps_.  The structure is not copied; _caps_
+ * becomes the owner of _structure_.
  *
  * Since: 1.2
  */
@@ -646,11 +646,11 @@ gst_caps_append_structure_full (GstCaps * caps, GstStructure * structure,
 
 /**
  * gst_caps_remove_structure:
- * @caps: the #GstCaps to remove from
+ * @caps: the [GstCaps]() to remove from
  * @idx: Index of the structure to remove
  *
  * removes the structure with the given index from the list of structures
- * contained in @caps.
+ * contained in _caps_.
  */
 void
 gst_caps_remove_structure (GstCaps * caps, guint idx)
@@ -667,10 +667,10 @@ gst_caps_remove_structure (GstCaps * caps, guint idx)
 
 /**
  * gst_caps_merge_structure:
- * @caps: (transfer full): the #GstCaps to merge into
- * @structure: (transfer full): the #GstStructure to merge
+ * @caps: (transfer full): the [GstCaps]() to merge into
+ * @structure: (transfer full): the [GstStructure]() to merge
  *
- * Appends @structure to @caps if its not already expressed by @caps.
+ * Appends _structure_ to _caps_ if its not already expressed by _caps_.
  *
  * Returns: (transfer full): the merged caps.
  */
@@ -714,14 +714,13 @@ gst_caps_merge_structure (GstCaps * caps, GstStructure * structure)
 
 /**
  * gst_caps_merge_structure_full:
- * @caps: (transfer full): the #GstCaps to merge into
- * @structure: (transfer full): the #GstStructure to merge
- * @features: (transfer full) (allow-none): the #GstCapsFeatures to merge
+ * @caps: (transfer full): the [GstCaps]() to merge into
+ * @structure: (transfer full): the [GstStructure]() to merge
+ * @features: (transfer full) (allow-none): the [GstCapsFeatures]() to merge
  *
- * Appends @structure with @features to @caps if its not already expressed by @caps.
+ * Appends _structure_ with _features_ to _caps_ if its not already expressed by _caps_.
  *
  * Returns: (transfer full): the merged caps.
- *
  * Since: 1.2
  */
 GstCaps *
@@ -775,11 +774,11 @@ gst_caps_merge_structure_full (GstCaps * caps, GstStructure * structure,
 
 /**
  * gst_caps_get_size:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  *
- * Gets the number of structures contained in @caps.
+ * Gets the number of structures contained in _caps_.
  *
- * Returns: the number of structures that @caps contains
+ * Returns: the number of structures that _caps_ contains
  */
 guint
 gst_caps_get_size (const GstCaps * caps)
@@ -791,26 +790,26 @@ gst_caps_get_size (const GstCaps * caps)
 
 /**
  * gst_caps_get_structure:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  * @index: the index of the structure
  *
- * Finds the structure in @caps that has the index @index, and
+ * Finds the structure in _caps_ that has the index _index_, and
  * returns it.
  *
  * WARNING: This function takes a const GstCaps *, but returns a
  * non-const GstStructure *.  This is for programming convenience --
  * the caller should be aware that structures inside a constant
- * #GstCaps should not be modified. However, if you know the caps
+ * [GstCaps]() should not be modified. However, if you know the caps
  * are writable, either because you have just copied them or made
- * them writable with gst_caps_make_writable(), you may modify the
+ * them writable with [gst_caps_make_writable](), you may modify the
  * structure returned in the usual way, e.g. with functions like
- * gst_structure_set().
+ * [gst_structure_set]().
  *
  * You do not need to free or unref the structure returned, it
- * belongs to the #GstCaps.
+ * belongs to the [GstCaps]().
  *
- * Returns: (transfer none): a pointer to the #GstStructure corresponding
- *     to @index
+ * Returns: (transfer none): a pointer to the [GstStructure]() corresponding
+ *     to _index_
  */
 GstStructure *
 gst_caps_get_structure (const GstCaps * caps, guint index)
@@ -823,27 +822,26 @@ gst_caps_get_structure (const GstCaps * caps, guint index)
 
 /**
  * gst_caps_get_features:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  * @index: the index of the structure
  *
- * Finds the features in @caps that has the index @index, and
+ * Finds the features in _caps_ that has the index _index_, and
  * returns it.
  *
  * WARNING: This function takes a const GstCaps *, but returns a
  * non-const GstCapsFeatures *.  This is for programming convenience --
  * the caller should be aware that structures inside a constant
- * #GstCaps should not be modified. However, if you know the caps
+ * [GstCaps]() should not be modified. However, if you know the caps
  * are writable, either because you have just copied them or made
- * them writable with gst_caps_make_writable(), you may modify the
+ * them writable with [gst_caps_make_writable](), you may modify the
  * features returned in the usual way, e.g. with functions like
- * gst_caps_features_add().
+ * [gst_caps_features_add]().
  *
  * You do not need to free or unref the structure returned, it
- * belongs to the #GstCaps.
+ * belongs to the [GstCaps]().
  *
- * Returns: (transfer none): a pointer to the #GstCapsFeatures corresponding
- *     to @index
- *
+ * Returns: (transfer none): a pointer to the [GstCapsFeatures]() corresponding
+ *     to _index_
  * Since: 1.2
  */
 GstCapsFeatures *
@@ -880,11 +878,11 @@ gst_caps_get_features (const GstCaps * caps, guint index)
 
 /**
  * gst_caps_set_features:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  * @index: the index of the structure
- * @features: (allow-none) (transfer full): the #GstCapsFeatures to set
+ * @features: (allow-none) (transfer full): the [GstCapsFeatures]() to set
  *
- * Sets the #GstCapsFeatures @features for the structure at @index.
+ * Sets the [GstCapsFeatures]() _features_ for the structure at _index_.
  *
  * Since: 1.2
  */
@@ -913,13 +911,13 @@ gst_caps_set_features (GstCaps * caps, guint index, GstCapsFeatures * features)
 
 /**
  * gst_caps_copy_nth:
- * @caps: the #GstCaps to copy
+ * @caps: the [GstCaps]() to copy
  * @nth: the nth structure to copy
  *
- * Creates a new #GstCaps and appends a copy of the nth structure
- * contained in @caps.
+ * Creates a new [GstCaps]() and appends a copy of the nth structure
+ * contained in _caps_.
  *
- * Returns: (transfer full): the new #GstCaps
+ * Returns: (transfer full): the new [GstCaps]()
  */
 GstCaps *
 gst_caps_copy_nth (const GstCaps * caps, guint nth)
@@ -946,9 +944,9 @@ gst_caps_copy_nth (const GstCaps * caps, guint nth)
 
 /**
  * gst_caps_truncate:
- * @caps: (transfer full): the #GstCaps to truncate
+ * @caps: (transfer full): the [GstCaps]() to truncate
  *
- * Discard all but the first structure from @caps. Useful when
+ * Discard all but the first structure from _caps_. Useful when
  * fixating.
  *
  * Returns: (transfer full): truncated caps
@@ -977,10 +975,10 @@ gst_caps_truncate (GstCaps * caps)
  * @field: name of the field to set
  * @value: value to set the field to
  *
- * Sets the given @field on all structures of @caps to the given @value.
- * This is a convenience function for calling gst_structure_set_value() on
- * all structures of @caps.
- **/
+ * Sets the given _field_ on all structures of _caps_ to the given _value_.
+ * This is a convenience function for calling [gst_structure_set_value]() on
+ * all structures of _caps_.
+ */
 void
 gst_caps_set_value (GstCaps * caps, const char *field, const GValue * value)
 {
@@ -1000,12 +998,12 @@ gst_caps_set_value (GstCaps * caps, const char *field, const GValue * value)
 
 /**
  * gst_caps_set_simple_valist:
- * @caps: the #GstCaps to set
+ * @caps: the [GstCaps]() to set
  * @field: first field to set
  * @varargs: additional parameters
  *
- * Sets fields in a #GstCaps.  The arguments must be passed in the same
- * manner as gst_structure_set(), and be %NULL-terminated.
+ * Sets fields in a [GstCaps]().  The arguments must be passed in the same
+ * manner as [gst_structure_set](), and be [NULL]()-terminated.
  */
 void
 gst_caps_set_simple_valist (GstCaps * caps, const char *field, va_list varargs)
@@ -1037,12 +1035,12 @@ gst_caps_set_simple_valist (GstCaps * caps, const char *field, va_list varargs)
 
 /**
  * gst_caps_set_simple:
- * @caps: the #GstCaps to set
+ * @caps: the [GstCaps]() to set
  * @field: first field to set
  * @...: additional parameters
  *
- * Sets fields in a #GstCaps.  The arguments must be passed in the same
- * manner as gst_structure_set(), and be %NULL-terminated.
+ * Sets fields in a [GstCaps]().  The arguments must be passed in the same
+ * manner as [gst_structure_set](), and be [NULL]()-terminated.
  */
 void
 gst_caps_set_simple (GstCaps * caps, const char *field, ...)
@@ -1061,11 +1059,11 @@ gst_caps_set_simple (GstCaps * caps, const char *field, ...)
 
 /**
  * gst_caps_is_any:
- * @caps: the #GstCaps to test
+ * @caps: the [GstCaps]() to test
  *
- * Determines if @caps represents any media format.
+ * Determines if _caps_ represents any media format.
  *
- * Returns: %TRUE if @caps represents any format.
+ * Returns: [TRUE]() if _caps_ represents any format.
  */
 gboolean
 gst_caps_is_any (const GstCaps * caps)
@@ -1077,11 +1075,11 @@ gst_caps_is_any (const GstCaps * caps)
 
 /**
  * gst_caps_is_empty:
- * @caps: the #GstCaps to test
+ * @caps: the [GstCaps]() to test
  *
- * Determines if @caps represents no media formats.
+ * Determines if _caps_ represents no media formats.
  *
- * Returns: %TRUE if @caps represents no formats.
+ * Returns: [TRUE]() if _caps_ represents no formats.
  */
 gboolean
 gst_caps_is_empty (const GstCaps * caps)
@@ -1103,13 +1101,13 @@ gst_caps_is_fixed_foreach (GQuark field_id, const GValue * value,
 
 /**
  * gst_caps_is_fixed:
- * @caps: the #GstCaps to test
+ * @caps: the [GstCaps]() to test
  *
- * Fixed #GstCaps describe exactly one format, that is, they have exactly
+ * Fixed [GstCaps]() describe exactly one format, that is, they have exactly
  * one structure, and each field in the structure describes a fixed type.
  * Examples of non-fixed types are GST_TYPE_INT_RANGE and GST_TYPE_LIST.
  *
- * Returns: %TRUE if @caps is fixed
+ * Returns: [TRUE]() if _caps_ is fixed
  */
 gboolean
 gst_caps_is_fixed (const GstCaps * caps)
@@ -1133,13 +1131,13 @@ gst_caps_is_fixed (const GstCaps * caps)
 
 /**
  * gst_caps_is_equal_fixed:
- * @caps1: the #GstCaps to test
- * @caps2: the #GstCaps to test
+ * @caps1: the [GstCaps]() to test
+ * @caps2: the [GstCaps]() to test
  *
- * Tests if two #GstCaps are equal.  This function only works on fixed
- * #GstCaps.
+ * Tests if two [GstCaps]() are equal.  This function only works on fixed
+ * [GstCaps]().
  *
- * Returns: %TRUE if the arguments represent the same format
+ * Returns: [TRUE]() if the arguments represent the same format
  */
 gboolean
 gst_caps_is_equal_fixed (const GstCaps * caps1, const GstCaps * caps2)
@@ -1165,14 +1163,14 @@ gst_caps_is_equal_fixed (const GstCaps * caps1, const GstCaps * caps2)
 
 /**
  * gst_caps_is_always_compatible:
- * @caps1: the #GstCaps to test
- * @caps2: the #GstCaps to test
+ * @caps1: the [GstCaps]() to test
+ * @caps2: the [GstCaps]() to test
  *
- * A given #GstCaps structure is always compatible with another if
+ * A given [GstCaps]() structure is always compatible with another if
  * every media format that is in the first is also contained in the
- * second.  That is, @caps1 is a subset of @caps2.
+ * second.  That is, _caps1_ is a subset of _caps2_.
  *
- * Returns: %TRUE if @caps1 is a subset of @caps2.
+ * Returns: [TRUE]() if _caps1_ is a subset of _caps2_.
  */
 gboolean
 gst_caps_is_always_compatible (const GstCaps * caps1, const GstCaps * caps2)
@@ -1185,12 +1183,12 @@ gst_caps_is_always_compatible (const GstCaps * caps1, const GstCaps * caps2)
 
 /**
  * gst_caps_is_subset:
- * @subset: a #GstCaps
- * @superset: a potentially greater #GstCaps
+ * @subset: a [GstCaps]()
+ * @superset: a potentially greater [GstCaps]()
  *
- * Checks if all caps represented by @subset are also represented by @superset.
+ * Checks if all caps represented by _subset_ are also represented by _superset_.
  *
- * Returns: %TRUE if @subset is a subset of @superset
+ * Returns: [TRUE]() if _subset_ is a subset of _superset_
  */
 gboolean
 gst_caps_is_subset (const GstCaps * subset, const GstCaps * superset)
@@ -1239,13 +1237,13 @@ gst_caps_is_subset (const GstCaps * subset, const GstCaps * superset)
 
 /**
  * gst_caps_is_subset_structure:
- * @caps: a #GstCaps
- * @structure: a potential #GstStructure subset of @caps
+ * @caps: a [GstCaps]()
+ * @structure: a potential [GstStructure]() subset of _caps_
  *
- * Checks if @structure is a subset of @caps. See gst_caps_is_subset()
+ * Checks if _structure_ is a subset of _caps_. See [gst_caps_is_subset]()
  * for more information.
  *
- * Returns: %TRUE if @structure is a subset of @caps
+ * Returns: [TRUE]() if _structure_ is a subset of _caps_
  */
 gboolean
 gst_caps_is_subset_structure (const GstCaps * caps,
@@ -1275,15 +1273,14 @@ gst_caps_is_subset_structure (const GstCaps * caps,
 
 /**
  * gst_caps_is_subset_structure_full:
- * @caps: a #GstCaps
- * @structure: a potential #GstStructure subset of @caps
- * @features: (allow-none): a #GstCapsFeatures for @structure
+ * @caps: a [GstCaps]()
+ * @structure: a potential [GstStructure]() subset of _caps_
+ * @features: (allow-none): a [GstCapsFeatures]() for _structure_
  *
- * Checks if @structure is a subset of @caps. See gst_caps_is_subset()
+ * Checks if _structure_ is a subset of _caps_. See [gst_caps_is_subset]()
  * for more information.
  *
- * Returns: %TRUE if @structure is a subset of @caps
- *
+ * Returns: [TRUE]() if _structure_ is a subset of _caps_
  * Since: 1.2
  */
 gboolean
@@ -1323,12 +1320,12 @@ gst_caps_is_subset_structure_full (const GstCaps * caps,
 
 /**
  * gst_caps_is_equal:
- * @caps1: a #GstCaps
- * @caps2: another #GstCaps
+ * @caps1: a [GstCaps]()
+ * @caps2: another [GstCaps]()
  *
  * Checks if the given caps represent the same set of caps.
  *
- * Returns: %TRUE if both caps are equal.
+ * Returns: [TRUE]() if both caps are equal.
  */
 gboolean
 gst_caps_is_equal (const GstCaps * caps1, const GstCaps * caps2)
@@ -1347,12 +1344,12 @@ gst_caps_is_equal (const GstCaps * caps1, const GstCaps * caps2)
 
 /**
  * gst_caps_is_strictly_equal:
- * @caps1: a #GstCaps
- * @caps2: another #GstCaps
+ * @caps1: a [GstCaps]()
+ * @caps2: another [GstCaps]()
  *
  * Checks if the given caps are exactly the same set of caps.
  *
- * Returns: %TRUE if both caps are strictly equal.
+ * Returns: [TRUE]() if both caps are strictly equal.
  */
 gboolean
 gst_caps_is_strictly_equal (const GstCaps * caps1, const GstCaps * caps2)
@@ -1393,13 +1390,13 @@ gst_caps_is_strictly_equal (const GstCaps * caps1, const GstCaps * caps2)
 
 /**
  * gst_caps_can_intersect:
- * @caps1: a #GstCaps to intersect
- * @caps2: a #GstCaps to intersect
+ * @caps1: a [GstCaps]() to intersect
+ * @caps2: a [GstCaps]() to intersect
  *
- * Tries intersecting @caps1 and @caps2 and reports whether the result would not
+ * Tries intersecting _caps1_ and _caps2_ and reports whether the result would not
  * be empty
  *
- * Returns: %TRUE if intersection would be not empty
+ * Returns: [TRUE]() if intersection would be not empty
  */
 gboolean
 gst_caps_can_intersect (const GstCaps * caps1, const GstCaps * caps2)
@@ -1565,16 +1562,16 @@ gst_caps_intersect_zig_zag (GstCaps * caps1, GstCaps * caps2)
 
 /**
  * gst_caps_intersect_first:
- * @caps1: a #GstCaps to intersect
- * @caps2: a #GstCaps to intersect
+ * @caps1: a [GstCaps]() to intersect
+ * @caps2: a [GstCaps]() to intersect
  *
- * Creates a new #GstCaps that contains all the formats that are common
- * to both @caps1 and @caps2.
+ * Creates a new [GstCaps]() that contains all the formats that are common
+ * to both _caps1_ and _caps2_.
  *
- * Unlike @gst_caps_intersect, the returned caps will be ordered in a similar
- * fashion as @caps1.
+ * Unlike _gst_caps_intersect_, the returned caps will be ordered in a similar
+ * fashion as _caps1_.
  *
- * Returns: the new #GstCaps
+ * Returns: the new [GstCaps]()
  */
 static GstCaps *
 gst_caps_intersect_first (GstCaps * caps1, GstCaps * caps2)
@@ -1637,15 +1634,15 @@ gst_caps_intersect_first (GstCaps * caps1, GstCaps * caps2)
 
 /**
  * gst_caps_intersect_full:
- * @caps1: a #GstCaps to intersect
- * @caps2: a #GstCaps to intersect
+ * @caps1: a [GstCaps]() to intersect
+ * @caps2: a [GstCaps]() to intersect
  * @mode: The intersection algorithm/mode to use
  *
- * Creates a new #GstCaps that contains all the formats that are common
- * to both @caps1 and @caps2, the order is defined by the #GstCapsIntersectMode
+ * Creates a new [GstCaps]() that contains all the formats that are common
+ * to both _caps1_ and _caps2_, the order is defined by the [GstCapsIntersectMode]()
  * used.
  *
- * Returns: the new #GstCaps
+ * Returns: the new [GstCaps]()
  */
 GstCaps *
 gst_caps_intersect_full (GstCaps * caps1, GstCaps * caps2,
@@ -1667,13 +1664,13 @@ gst_caps_intersect_full (GstCaps * caps1, GstCaps * caps2,
 
 /**
  * gst_caps_intersect:
- * @caps1: a #GstCaps to intersect
- * @caps2: a #GstCaps to intersect
+ * @caps1: a [GstCaps]() to intersect
+ * @caps2: a [GstCaps]() to intersect
  *
- * Creates a new #GstCaps that contains all the formats that are common
- * to both @caps1 and @caps2. Defaults to %GST_CAPS_INTERSECT_ZIG_ZAG mode.
+ * Creates a new [GstCaps]() that contains all the formats that are common
+ * to both _caps1_ and _caps2_. Defaults to [GST_CAPS_INTERSECT_ZIG_ZAG]() mode.
  *
- * Returns: the new #GstCaps
+ * Returns: the new [GstCaps]()
  */
 GstCaps *
 gst_caps_intersect (GstCaps * caps1, GstCaps * caps2)
@@ -1746,10 +1743,10 @@ gst_caps_structure_subtract (GSList ** into, const GstStructure * minuend,
 
 /**
  * gst_caps_subtract:
- * @minuend: #GstCaps to subtract from
- * @subtrahend: #GstCaps to subtract
+ * @minuend: [GstCaps]() to subtract from
+ * @subtrahend: [GstCaps]() to subtract
  *
- * Subtracts the @subtrahend from the @minuend.
+ * Subtracts the _subtrahend_ from the _minuend_.
  * <note>This function does not work reliably if optional properties for caps
  * are included on one caps and omitted on the other.</note>
  *
@@ -1880,15 +1877,15 @@ gst_caps_normalize_foreach (GQuark field_id, const GValue * value, gpointer ptr)
 
 /**
  * gst_caps_normalize:
- * @caps: (transfer full): a #GstCaps to normalize
+ * @caps: (transfer full): a [GstCaps]() to normalize
  *
- * Returns a #GstCaps that represents the same set of formats as
- * @caps, but contains no lists.  Each list is expanded into separate
- * @GstStructures.
+ * Returns a [GstCaps]() that represents the same set of formats as
+ * _caps_, but contains no lists.  Each list is expanded into separate
+ * _GstStructures_.
  *
- * This function takes ownership of @caps.
+ * This function takes ownership of _caps_.
  *
- * Returns: (transfer full): the normalized #GstCaps
+ * Returns: (transfer full): the normalized [GstCaps]()
  */
 GstCaps *
 gst_caps_normalize (GstCaps * caps)
@@ -2036,14 +2033,14 @@ gst_caps_switch_structures (GstCaps * caps, GstStructure * old,
 
 /**
  * gst_caps_simplify:
- * @caps: (transfer full): a #GstCaps to simplify
+ * @caps: (transfer full): a [GstCaps]() to simplify
  *
- * Converts the given @caps into a representation that represents the
+ * Converts the given _caps_ into a representation that represents the
  * same set of formats, but in a simpler form.  Component structures that are
  * identical are merged.  Component structures that have values that can be
  * merged are also merged.
  *
- * This method does not preserve the original order of @caps.
+ * This method does not preserve the original order of _caps_.
  *
  * Returns: The simplified caps.
  */
@@ -2107,11 +2104,11 @@ gst_caps_simplify (GstCaps * caps)
 
 /**
  * gst_caps_fixate:
- * @caps: (transfer full): a #GstCaps to fixate
+ * @caps: (transfer full): a [GstCaps]() to fixate
  *
- * Modifies the given @caps into a representation with only fixed
+ * Modifies the given _caps_ into a representation with only fixed
  * values. First the caps will be truncated and then the first structure will be
- * fixated with gst_structure_fixate().
+ * fixated with [gst_structure_fixate]().
  *
  * Returns: (transfer full): the fixated caps
  */
@@ -2143,21 +2140,21 @@ gst_caps_fixate (GstCaps * caps)
 
 /**
  * gst_caps_to_string:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  *
- * Converts @caps to a string representation.  This string representation
- * can be converted back to a #GstCaps by gst_caps_from_string().
+ * Converts _caps_ to a string representation.  This string representation
+ * can be converted back to a [GstCaps]() by [gst_caps_from_string]().
  *
  * For debugging purposes its easier to do something like this:
- * |[
+ * ```
  * GST_LOG ("caps are %" GST_PTR_FORMAT, caps);
- * ]|
+ * ```
  * This prints the caps in human readable form.
  *
  * The current implementation of serialization will lead to unexpected results
- * when there are nested #GstCaps / #GstStructure deeper than one level.
+ * when there are nested [GstCaps]() / [GstStructure]() deeper than one level.
  *
- * Returns: (transfer full): a newly allocated string representing @caps.
+ * Returns: (transfer full): a newly allocated string representing _caps_.
  */
 gchar *
 gst_caps_to_string (const GstCaps * caps)
@@ -2325,14 +2322,14 @@ gst_caps_from_string_inplace (GstCaps * caps, const gchar * string)
 
 /**
  * gst_caps_from_string:
- * @string: a string to convert to #GstCaps
+ * @string: a string to convert to [GstCaps]()
  *
- * Converts @caps from a string representation.
+ * Converts _caps_ from a string representation.
  *
  * The current implementation of serialization will lead to unexpected results
- * when there are nested #GstCaps / #GstStructure deeper than one level.
+ * when there are nested [GstCaps]() / [GstStructure]() deeper than one level.
  *
- * Returns: (transfer full): a newly allocated #GstCaps
+ * Returns: (transfer full): a newly allocated [GstCaps]()
  */
 GstCaps *
 gst_caps_from_string (const gchar * string)
@@ -2365,17 +2362,16 @@ gst_caps_transform_to_string (const GValue * src_value, GValue * dest_value)
 
 /**
  * gst_caps_foreach:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  * @func: (scope call): a function to call for each field
  * @user_data: (closure): private data
  *
  * Calls the provided function once for each structure and caps feature in the
- * #GstCaps. The function must not modify the fields.
- * Also see gst_caps_map_in_place() and gst_caps_filter_and_map_in_place().
+ * [GstCaps](). The function must not modify the fields.
+ * Also see [gst_caps_map_in_place]() and [gst_caps_filter_and_map_in_place]().
  *
- * Returns: %TRUE if the supplied function returns %TRUE for each call,
- * %FALSE otherwise.
- *
+ * Returns: [TRUE]() if the supplied function returns [TRUE]() for each call,
+ * [FALSE]() otherwise.
  * Since: 1.6
  */
 gboolean
@@ -2406,17 +2402,16 @@ gst_caps_foreach (const GstCaps * caps, GstCapsForeachFunc func,
 
 /**
  * gst_caps_map_in_place:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  * @func: (scope call): a function to call for each field
  * @user_data: (closure): private data
  *
  * Calls the provided function once for each structure and caps feature in the
- * #GstCaps. In contrast to gst_caps_foreach(), the function may modify but not
+ * [GstCaps](). In contrast to [gst_caps_foreach](), the function may modify but not
  * delete the structures and features. The caps must be mutable.
  *
- * Returns: %TRUE if the supplied function returns %TRUE for each call,
- * %FALSE otherwise.
- *
+ * Returns: [TRUE]() if the supplied function returns [TRUE]() for each call,
+ * [FALSE]() otherwise.
  * Since: 1.6
  */
 gboolean
@@ -2454,14 +2449,14 @@ gst_caps_map_in_place (GstCaps * caps, GstCapsMapFunc func, gpointer user_data)
 
 /**
  * gst_caps_filter_and_map_in_place:
- * @caps: a #GstCaps
+ * @caps: a [GstCaps]()
  * @func: (scope call): a function to call for each field
  * @user_data: (closure): private data
  *
  * Calls the provided function once for each structure and caps feature in the
- * #GstCaps. In contrast to gst_caps_foreach(), the function may modify the
- * structure and features. In contrast to gst_caps_filter_and_map_in_place(),
- * the structure and features are removed from the caps if %FALSE is returned
+ * [GstCaps](). In contrast to [gst_caps_foreach](), the function may modify the
+ * structure and features. In contrast to [gst_caps_filter_and_map_in_place](),
+ * the structure and features are removed from the caps if [FALSE]() is returned
  * from the function.
  * The caps must be mutable.
  *

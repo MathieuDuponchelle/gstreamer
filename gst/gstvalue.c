@@ -20,11 +20,11 @@
 /**
  * SECTION:gstvalue
  * @short_description: GValue implementations specific
- * to GStreamer
  *
+ * to GStreamer
  * GValue implementations specific to GStreamer.
  *
- * Note that operations on the same #GValue from multiple threads may lead to
+ * Note that operations on the same [GValue]() from multiple threads may lead to
  * undefined behaviour.
  */
 
@@ -429,10 +429,10 @@ _gst_value_list_append_and_take_value (GValue * value, GValue * append_value)
 
 /**
  * gst_value_list_append_and_take_value:
- * @value: a #GValue of type #GST_TYPE_LIST
+ * @value: a [GValue]() of type [GST_TYPE_LIST]()
  * @append_value: (transfer full): the value to append
  *
- * Appends @append_value to the GstValueList in @value.
+ * Appends _append_value_ to the GstValueList in _value_.
  *
  * Since: 1.2
  */
@@ -449,10 +449,10 @@ gst_value_list_append_and_take_value (GValue * value, GValue * append_value)
 
 /**
  * gst_value_list_append_value:
- * @value: a #GValue of type #GST_TYPE_LIST
+ * @value: a [GValue]() of type [GST_TYPE_LIST]()
  * @append_value: (transfer none): the value to append
  *
- * Appends @append_value to the GstValueList in @value.
+ * Appends _append_value_ to the GstValueList in _value_.
  */
 void
 gst_value_list_append_value (GValue * value, const GValue * append_value)
@@ -470,10 +470,10 @@ gst_value_list_append_value (GValue * value, const GValue * append_value)
 
 /**
  * gst_value_list_prepend_value:
- * @value: a #GValue of type #GST_TYPE_LIST
+ * @value: a [GValue]() of type [GST_TYPE_LIST]()
  * @prepend_value: the value to prepend
  *
- * Prepends @prepend_value to the GstValueList in @value.
+ * Prepends _prepend_value_ to the GstValueList in _value_.
  */
 void
 gst_value_list_prepend_value (GValue * value, const GValue * prepend_value)
@@ -491,13 +491,13 @@ gst_value_list_prepend_value (GValue * value, const GValue * prepend_value)
 
 /**
  * gst_value_list_concat:
- * @dest: (out caller-allocates): an uninitialized #GValue to take the result
- * @value1: a #GValue
- * @value2: a #GValue
+ * @dest: (out caller-allocates): an uninitialized [GValue]() to take the result
+ * @value1: a [GValue]()
+ * @value2: a [GValue]()
  *
- * Concatenates copies of @value1 and @value2 into a list.  Values that are not
- * of type #GST_TYPE_LIST are treated as if they were lists of length 1.
- * @dest will be initialized to the type #GST_TYPE_LIST.
+ * Concatenates copies of _value1_ and _value2_ into a list.  Values that are not
+ * of type [GST_TYPE_LIST]() are treated as if they were lists of length 1.
+ * _dest_ will be initialized to the type [GST_TYPE_LIST]().
  */
 void
 gst_value_list_concat (GValue * dest, const GValue * value1,
@@ -592,15 +592,15 @@ gst_value_list_concat_and_take_values (GValue * dest, GValue * val1,
 
 /**
  * gst_value_list_merge:
- * @dest: (out caller-allocates): an uninitialized #GValue to take the result
- * @value1: a #GValue
- * @value2: a #GValue
+ * @dest: (out caller-allocates): an uninitialized [GValue]() to take the result
+ * @value1: a [GValue]()
+ * @value2: a [GValue]()
  *
- * Merges copies of @value1 and @value2.  Values that are not
- * of type #GST_TYPE_LIST are treated as if they were lists of length 1.
+ * Merges copies of _value1_ and _value2_.  Values that are not
+ * of type [GST_TYPE_LIST]() are treated as if they were lists of length 1.
  *
- * The result will be put into @dest and will either be a list that will not
- * contain any duplicates, or a non-list type (if @value1 and @value2
+ * The result will be put into _dest_ and will either be a list that will not
+ * contain any duplicates, or a non-list type (if _value1_ and _value2_
  * were equal).
  */
 void
@@ -694,9 +694,9 @@ gst_value_list_merge (GValue * dest, const GValue * value1,
 
 /**
  * gst_value_list_get_size:
- * @value: a #GValue of type #GST_TYPE_LIST
+ * @value: a [GValue]() of type [GST_TYPE_LIST]()
  *
- * Gets the number of values contained in @value.
+ * Gets the number of values contained in _value_.
  *
  * Returns: the number of values
  */
@@ -710,11 +710,11 @@ gst_value_list_get_size (const GValue * value)
 
 /**
  * gst_value_list_get_value:
- * @value: a #GValue of type #GST_TYPE_LIST
+ * @value: a [GValue]() of type [GST_TYPE_LIST]()
  * @index: index of value to get from the list
  *
- * Gets the value that is a member of the list contained in @value and
- * has the index @index.
+ * Gets the value that is a member of the list contained in _value_ and
+ * has the index _index_.
  *
  * Returns: (transfer none): the value at the given index
  */
@@ -730,10 +730,10 @@ gst_value_list_get_value (const GValue * value, guint index)
 
 /**
  * gst_value_array_append_value:
- * @value: a #GValue of type #GST_TYPE_ARRAY
+ * @value: a [GValue]() of type [GST_TYPE_ARRAY]()
  * @append_value: the value to append
  *
- * Appends @append_value to the GstValueArray in @value.
+ * Appends _append_value_ to the GstValueArray in _value_.
  */
 void
 gst_value_array_append_value (GValue * value, const GValue * append_value)
@@ -758,10 +758,10 @@ _gst_value_array_append_and_take_value (GValue * value, GValue * append_value)
 
 /**
  * gst_value_array_append_and_take_value:
- * @value: a #GValue of type #GST_TYPE_ARRAY
+ * @value: a [GValue]() of type [GST_TYPE_ARRAY]()
  * @append_value: (transfer full): the value to append
  *
- * Appends @append_value to the GstValueArray in @value.
+ * Appends _append_value_ to the GstValueArray in _value_.
  *
  * Since: 1.2
  */
@@ -778,10 +778,10 @@ gst_value_array_append_and_take_value (GValue * value, GValue * append_value)
 
 /**
  * gst_value_array_prepend_value:
- * @value: a #GValue of type #GST_TYPE_ARRAY
+ * @value: a [GValue]() of type [GST_TYPE_ARRAY]()
  * @prepend_value: the value to prepend
  *
- * Prepends @prepend_value to the GstValueArray in @value.
+ * Prepends _prepend_value_ to the GstValueArray in _value_.
  */
 void
 gst_value_array_prepend_value (GValue * value, const GValue * prepend_value)
@@ -799,9 +799,9 @@ gst_value_array_prepend_value (GValue * value, const GValue * prepend_value)
 
 /**
  * gst_value_array_get_size:
- * @value: a #GValue of type #GST_TYPE_ARRAY
+ * @value: a [GValue]() of type [GST_TYPE_ARRAY]()
  *
- * Gets the number of values contained in @value.
+ * Gets the number of values contained in _value_.
  *
  * Returns: the number of values
  */
@@ -815,11 +815,11 @@ gst_value_array_get_size (const GValue * value)
 
 /**
  * gst_value_array_get_value:
- * @value: a #GValue of type #GST_TYPE_ARRAY
+ * @value: a [GValue]() of type [GST_TYPE_ARRAY]()
  * @index: index of value to get from the array
  *
- * Gets the value that is a member of the array contained in @value and
- * has the index @index.
+ * Gets the value that is a member of the array contained in _value_ and
+ * has the index _index_.
  *
  * Returns: (transfer none): the value at the given index
  */
@@ -1026,7 +1026,7 @@ gst_value_lcopy_int_range (const GValue * value, guint n_collect_values,
  * @end: the end of the range
  * @step: the step of the range
  *
- * Sets @value to the range specified by @start, @end and @step.
+ * Sets _value_ to the range specified by _start_, _end_ and _step_.
  */
 void
 gst_value_set_int_range_step (GValue * value, gint start, gint end, gint step)
@@ -1051,7 +1051,7 @@ gst_value_set_int_range_step (GValue * value, gint start, gint end, gint step)
  * @start: the start of the range
  * @end: the end of the range
  *
- * Sets @value to the range specified by @start and @end.
+ * Sets _value_ to the range specified by _start_ and _end_.
  */
 void
 gst_value_set_int_range (GValue * value, gint start, gint end)
@@ -1063,7 +1063,7 @@ gst_value_set_int_range (GValue * value, gint start, gint end)
  * gst_value_get_int_range_min:
  * @value: a GValue initialized to GST_TYPE_INT_RANGE
  *
- * Gets the minimum of the range specified by @value.
+ * Gets the minimum of the range specified by _value_.
  *
  * Returns: the minimum of the range
  */
@@ -1079,7 +1079,7 @@ gst_value_get_int_range_min (const GValue * value)
  * gst_value_get_int_range_max:
  * @value: a GValue initialized to GST_TYPE_INT_RANGE
  *
- * Gets the maximum of the range specified by @value.
+ * Gets the maximum of the range specified by _value_.
  *
  * Returns: the maximum of the range
  */
@@ -1095,7 +1095,7 @@ gst_value_get_int_range_max (const GValue * value)
  * gst_value_get_int_range_step:
  * @value: a GValue initialized to GST_TYPE_INT_RANGE
  *
- * Gets the step of the range specified by @value.
+ * Gets the step of the range specified by _value_.
  *
  * Returns: the step of the range
  */
@@ -1280,7 +1280,7 @@ gst_value_lcopy_int64_range (const GValue * value, guint n_collect_values,
  * @end: the end of the range
  * @step: the step of the range
  *
- * Sets @value to the range specified by @start, @end and @step.
+ * Sets _value_ to the range specified by _start_, _end_ and _step_.
  */
 void
 gst_value_set_int64_range_step (GValue * value, gint64 start, gint64 end,
@@ -1303,7 +1303,7 @@ gst_value_set_int64_range_step (GValue * value, gint64 start, gint64 end,
  * @start: the start of the range
  * @end: the end of the range
  *
- * Sets @value to the range specified by @start and @end.
+ * Sets _value_ to the range specified by _start_ and _end_.
  */
 void
 gst_value_set_int64_range (GValue * value, gint64 start, gint64 end)
@@ -1315,7 +1315,7 @@ gst_value_set_int64_range (GValue * value, gint64 start, gint64 end)
  * gst_value_get_int64_range_min:
  * @value: a GValue initialized to GST_TYPE_INT64_RANGE
  *
- * Gets the minimum of the range specified by @value.
+ * Gets the minimum of the range specified by _value_.
  *
  * Returns: the minimum of the range
  */
@@ -1331,7 +1331,7 @@ gst_value_get_int64_range_min (const GValue * value)
  * gst_value_get_int64_range_max:
  * @value: a GValue initialized to GST_TYPE_INT64_RANGE
  *
- * Gets the maximum of the range specified by @value.
+ * Gets the maximum of the range specified by _value_.
  *
  * Returns: the maximum of the range
  */
@@ -1347,7 +1347,7 @@ gst_value_get_int64_range_max (const GValue * value)
  * gst_value_get_int64_range_step:
  * @value: a GValue initialized to GST_TYPE_INT64_RANGE
  *
- * Gets the step of the range specified by @value.
+ * Gets the step of the range specified by _value_.
  *
  * Returns: the step of the range
  */
@@ -1490,7 +1490,7 @@ gst_value_lcopy_double_range (const GValue * value, guint n_collect_values,
  * @start: the start of the range
  * @end: the end of the range
  *
- * Sets @value to the range specified by @start and @end.
+ * Sets _value_ to the range specified by _start_ and _end_.
  */
 void
 gst_value_set_double_range (GValue * value, gdouble start, gdouble end)
@@ -1506,7 +1506,7 @@ gst_value_set_double_range (GValue * value, gdouble start, gdouble end)
  * gst_value_get_double_range_min:
  * @value: a GValue initialized to GST_TYPE_DOUBLE_RANGE
  *
- * Gets the minimum of the range specified by @value.
+ * Gets the minimum of the range specified by _value_.
  *
  * Returns: the minimum of the range
  */
@@ -1522,7 +1522,7 @@ gst_value_get_double_range_min (const GValue * value)
  * gst_value_get_double_range_max:
  * @value: a GValue initialized to GST_TYPE_DOUBLE_RANGE
  *
- * Gets the maximum of the range specified by @value.
+ * Gets the maximum of the range specified by _value_.
  *
  * Returns: the maximum of the range
  */
@@ -1693,7 +1693,7 @@ gst_value_lcopy_fraction_range (const GValue * value, guint n_collect_values,
  * @start: the start of the range (a GST_TYPE_FRACTION GValue)
  * @end: the end of the range (a GST_TYPE_FRACTION GValue)
  *
- * Sets @value to the range specified by @start and @end.
+ * Sets _value_ to the range specified by _start_ and _end_.
  */
 void
 gst_value_set_fraction_range (GValue * value, const GValue * start,
@@ -1724,8 +1724,8 @@ gst_value_set_fraction_range (GValue * value, const GValue * start,
  * @numerator_end: the numerator end of the range
  * @denominator_end: the denominator end of the range
  *
- * Sets @value to the range specified by @numerator_start/@denominator_start
- * and @numerator_end/@denominator_end.
+ * Sets _value_ to the range specified by _numerator_start_/_denominator_start_
+ * and _numerator_end_/_denominator_end_.
  */
 void
 gst_value_set_fraction_range_full (GValue * value,
@@ -1766,7 +1766,7 @@ gst_value_set_fraction_range_full (GValue * value,
  * gst_value_get_fraction_range_min:
  * @value: a GValue initialized to GST_TYPE_FRACTION_RANGE
  *
- * Gets the minimum of the range specified by @value.
+ * Gets the minimum of the range specified by _value_.
  *
  * Returns: the minimum of the range
  */
@@ -1789,7 +1789,7 @@ gst_value_get_fraction_range_min (const GValue * value)
  * gst_value_get_fraction_range_max:
  * @value: a GValue initialized to GST_TYPE_FRACTION_RANGE
  *
- * Gets the maximum of the range specified by @value.
+ * Gets the maximum of the range specified by _value_.
  *
  * Returns: the maximum of the range
  */
@@ -1878,8 +1878,8 @@ gst_value_deserialize_fraction_range (GValue * dest, const gchar * s)
  * @value: a GValue initialized to GST_TYPE_CAPS
  * @caps: (transfer none): the caps to set the value to
  *
- * Sets the contents of @value to @caps. A reference to the
- * provided @caps will be taken by the @value.
+ * Sets the contents of _value_ to _caps_. A reference to the
+ * provided _caps_ will be taken by the _value_.
  */
 void
 gst_value_set_caps (GValue * value, const GstCaps * caps)
@@ -1895,11 +1895,11 @@ gst_value_set_caps (GValue * value, const GstCaps * caps)
  * gst_value_get_caps:
  * @value: a GValue initialized to GST_TYPE_CAPS
  *
- * Gets the contents of @value. The reference count of the returned
- * #GstCaps will not be modified, therefore the caller must take one
- * before getting rid of the @value.
+ * Gets the contents of _value_. The reference count of the returned
+ * [GstCaps]() will not be modified, therefore the caller must take one
+ * before getting rid of the _value_.
  *
- * Returns: (transfer none): the contents of @value
+ * Returns: (transfer none): the contents of _value_
  */
 const GstCaps *
 gst_value_get_caps (const GValue * value)
@@ -2033,7 +2033,7 @@ gst_value_deserialize_segment (GValue * dest, const gchar * s)
  * @value: a GValue initialized to GST_TYPE_STRUCTURE
  * @structure: the structure to set the value to
  *
- * Sets the contents of @value to @structure.  The actual
+ * Sets the contents of _value_ to _structure_.  The actual
  */
 void
 gst_value_set_structure (GValue * value, const GstStructure * structure)
@@ -2049,9 +2049,9 @@ gst_value_set_structure (GValue * value, const GstStructure * structure)
  * gst_value_get_structure:
  * @value: a GValue initialized to GST_TYPE_STRUCTURE
  *
- * Gets the contents of @value.
+ * Gets the contents of _value_.
  *
- * Returns: (transfer none): the contents of @value
+ * Returns: (transfer none): the contents of _value_
  */
 const GstStructure *
 gst_value_get_structure (const GValue * value)
@@ -2115,7 +2115,7 @@ gst_value_compare_structure (const GValue * value1, const GValue * value2)
  * @value: a GValue initialized to GST_TYPE_CAPS_FEATURES
  * @features: the features to set the value to
  *
- * Sets the contents of @value to @features.
+ * Sets the contents of _value_ to _features_.
  */
 void
 gst_value_set_caps_features (GValue * value, const GstCapsFeatures * features)
@@ -2131,9 +2131,9 @@ gst_value_set_caps_features (GValue * value, const GstCapsFeatures * features)
  * gst_value_get_caps_features:
  * @value: a GValue initialized to GST_TYPE_CAPS_FEATURES
  *
- * Gets the contents of @value.
+ * Gets the contents of _value_.
  *
- * Returns: (transfer none): the contents of @value
+ * Returns: (transfer none): the contents of _value_
  */
 const GstCapsFeatures *
 gst_value_get_caps_features (const GValue * value)
@@ -3414,12 +3414,12 @@ gst_value_is_subset_flagset_flagset (const GValue * value1,
 
 /**
  * gst_value_is_subset:
- * @value1: a #GValue
- * @value2: a #GValue
+ * @value1: a [GValue]()
+ * @value2: a [GValue]()
  *
- * Check that @value1 is a subset of @value2.
+ * Check that _value1_ is a subset of _value2_.
  *
- * Return: %TRUE is @value1 is a subset of @value2
+ * Returns: [TRUE]() is _value1_ is a subset of _value2_
  */
 gboolean
 gst_value_is_subset (const GValue * value1, const GValue * value2)
@@ -4617,9 +4617,9 @@ gst_value_can_compare_unchecked (const GValue * value1, const GValue * value2)
  * @value1: a value to compare
  * @value2: another value to compare
  *
- * Determines if @value1 and @value2 can be compared.
+ * Determines if _value1_ and _value2_ can be compared.
  *
- * Returns: %TRUE if the values can be compared
+ * Returns: [TRUE]() if the values can be compared
  */
 gboolean
 gst_value_can_compare (const GValue * value1, const GValue * value2)
@@ -4715,10 +4715,10 @@ _gst_value_compare_nolist (const GValue * value1, const GValue * value2)
  * @value1: a value to compare
  * @value2: another value to compare
  *
- * Compares @value1 and @value2.  If @value1 and @value2 cannot be
+ * Compares _value1_ and _value2_.  If _value1_ and _value2_ cannot be
  * compared, the function returns GST_VALUE_UNORDERED.  Otherwise,
- * if @value1 is greater than @value2, GST_VALUE_GREATER_THAN is returned.
- * If @value1 is less than @value2, GST_VALUE_LESS_THAN is returned.
+ * if _value1_ is greater than _value2_, GST_VALUE_GREATER_THAN is returned.
+ * If _value1_ is less than _value2_, GST_VALUE_LESS_THAN is returned.
  * If the values are equal, GST_VALUE_EQUAL is returned.
  *
  * Returns: comparison result
@@ -4820,15 +4820,15 @@ gst_value_compare_with_func (const GValue * value1, const GValue * value2,
  * @value1: a value to union
  * @value2: another value to union
  *
- * Determines if @value1 and @value2 can be non-trivially unioned.
+ * Determines if _value1_ and _value2_ can be non-trivially unioned.
  * Any two values can be trivially unioned by adding both of them
  * to a GstValueList.  However, certain types have the possibility
  * to be unioned in a simpler way.  For example, an integer range
  * and an integer can be unioned if the integer is a subset of the
  * integer range.  If there is the possibility that two values can
- * be unioned, this function returns %TRUE.
+ * be unioned, this function returns [TRUE]().
  *
- * Returns: %TRUE if there is a function allowing the two values to
+ * Returns: [TRUE]() if there is a function allowing the two values to
  * be unioned.
  */
 gboolean
@@ -4861,9 +4861,9 @@ gst_value_can_union (const GValue * value1, const GValue * value2)
  * @value1: a value to union
  * @value2: another value to union
  *
- * Creates a GValue corresponding to the union of @value1 and @value2.
+ * Creates a GValue corresponding to the union of _value1_ and _value2_.
  *
- * Returns: %TRUE if the union succeeded.
+ * Returns: [TRUE]() if the union succeeded.
  */
 gboolean
 gst_value_union (GValue * dest, const GValue * value1, const GValue * value2)
@@ -4931,7 +4931,7 @@ gst_value_register_union_func (GType type1, GType type2, GstValueUnionFunc func)
  * Two values will produce a valid intersection if they have the same
  * type.
  *
- * Returns: %TRUE if the values can intersect
+ * Returns: [TRUE]() if the values can intersect
  */
 gboolean
 gst_value_can_intersect (const GValue * value1, const GValue * value2)
@@ -4970,19 +4970,19 @@ gst_value_can_intersect (const GValue * value1, const GValue * value2)
 
 /**
  * gst_value_intersect:
- * @dest: (out caller-allocates) (transfer full) (allow-none):
- *   a uninitialized #GValue that will hold the calculated
- *   intersection value. May be %NULL if the resulting set if not
+ * @dest: (out caller-allocates) (transfer full) (allow-none): 
+ *   a uninitialized [GValue]() that will hold the calculated
+ *   intersection value. May be [NULL]() if the resulting set if not
  *   needed.
  * @value1: a value to intersect
  * @value2: another value to intersect
  *
  * Calculates the intersection of two values.  If the values have
  * a non-empty intersection, the value representing the intersection
- * is placed in @dest, unless %NULL.  If the intersection is non-empty,
- * @dest is not modified.
+ * is placed in _dest_, unless [NULL]().  If the intersection is non-empty,
+ * _dest_ is not modified.
  *
- * Returns: %TRUE if the intersection is non-empty
+ * Returns: [TRUE]() if the intersection is non-empty
  */
 gboolean
 gst_value_intersect (GValue * dest, const GValue * value1,
@@ -5066,16 +5066,16 @@ gst_value_register_intersect_func (GType type1, GType type2,
 /**
  * gst_value_subtract:
  * @dest: (out caller-allocates) (allow-none): the destination value
- *     for the result if the subtraction is not empty. May be %NULL,
+ *     for the result if the subtraction is not empty. May be [NULL](),
  *     in which case the resulting set will not be computed, which can
  *     give a fair speedup.
  * @minuend: the value to subtract from
  * @subtrahend: the value to subtract
  *
- * Subtracts @subtrahend from @minuend and stores the result in @dest.
+ * Subtracts _subtrahend_ from _minuend_ and stores the result in _dest_.
  * Note that this means subtraction as in sets, not as in mathematics.
  *
- * Returns: %TRUE if the subtraction is not empty
+ * Returns: [TRUE]() if the subtraction is not empty
  */
 gboolean
 gst_value_subtract (GValue * dest, const GValue * minuend,
@@ -5133,9 +5133,9 @@ gst_value_subtract (GValue * dest, const GValue * minuend,
  * @minuend: the value to subtract from
  * @subtrahend: the value to subtract
  *
- * Checks if it's possible to subtract @subtrahend from @minuend.
+ * Checks if it's possible to subtract _subtrahend_ from _minuend_.
  *
- * Returns: %TRUE if a subtraction is possible
+ * Returns: [TRUE]() if a subtraction is possible
  */
 gboolean
 gst_value_can_subtract (const GValue * minuend, const GValue * subtrahend)
@@ -5196,7 +5196,7 @@ gst_value_register_subtract_func (GType minuend_type, GType subtrahend_type,
  * gst_value_register:
  * @table: structure containing functions to register
  *
- * Registers functions to perform calculations on #GValue items of a given
+ * Registers functions to perform calculations on [GValue]() items of a given
  * type. Each type can only be added once.
  */
 void
@@ -5248,15 +5248,15 @@ gst_value_move (GValue * dest, GValue * src)
 
 /**
  * gst_value_serialize:
- * @value: a #GValue to serialize
+ * @value: a [GValue]() to serialize
  *
- * tries to transform the given @value into a string representation that allows
- * getting back this string later on using gst_value_deserialize().
+ * tries to transform the given _value_ into a string representation that allows
+ * getting back this string later on using [gst_value_deserialize]().
  *
  * Free-function: g_free
  *
- * Returns: (transfer full) (nullable): the serialization for @value
- * or %NULL if none exists
+ * Returns: (transfer full) (nullable): the serialization for _value_
+ * or [NULL]() if none exists
  */
 gchar *
 gst_value_serialize (const GValue * value)
@@ -5300,14 +5300,14 @@ gst_value_serialize (const GValue * value)
 
 /**
  * gst_value_deserialize:
- * @dest: (out caller-allocates): #GValue to fill with contents of
+ * @dest: (out caller-allocates): [GValue]() to fill with contents of
  *     deserialization
  * @src: string to deserialize
  *
  * Tries to deserialize a string into the type specified by the given GValue.
- * If the operation succeeds, %TRUE is returned, %FALSE otherwise.
+ * If the operation succeeds, [TRUE]() is returned, [FALSE]() otherwise.
  *
- * Returns: %TRUE on success
+ * Returns: [TRUE]() on success
  */
 gboolean
 gst_value_deserialize (GValue * dest, const gchar * src)
@@ -5341,7 +5341,7 @@ gst_value_deserialize (GValue * dest, const gchar * src)
 
 /**
  * gst_value_is_fixed:
- * @value: the #GValue to check
+ * @value: the [GValue]() to check
  *
  * Tests if the given GValue, if available in a GstStructure (or any other
  * container) contains a "fixed" (which means: one value) or an "unfixed"
@@ -5386,15 +5386,15 @@ gst_value_is_fixed (const GValue * value)
 
 /**
  * gst_value_fixate:
- * @dest: the #GValue destination
- * @src: the #GValue to fixate
+ * @dest: the [GValue]() destination
+ * @src: the [GValue]() to fixate
  *
- * Fixate @src into a new value @dest.
+ * Fixate _src_ into a new value _dest_.
  * For ranges, the first element is taken. For lists and arrays, the
  * first item is fixated and returned.
- * If @src is already fixed, this function returns %FALSE.
+ * If _src_ is already fixed, this function returns [FALSE]().
  *
- * Returns: %TRUE if @dest contains a fixated version of @src.
+ * Returns: [TRUE]() if _dest_ contains a fixated version of _src_.
  */
 gboolean
 gst_value_fixate (GValue * dest, const GValue * src)
@@ -5530,11 +5530,11 @@ gst_value_lcopy_fraction (const GValue * value, guint n_collect_values,
 
 /**
  * gst_value_set_fraction:
- * @value: a GValue initialized to #GST_TYPE_FRACTION
+ * @value: a GValue initialized to [GST_TYPE_FRACTION]()
  * @numerator: the numerator of the fraction
  * @denominator: the denominator of the fraction
  *
- * Sets @value to the fraction specified by @numerator over @denominator.
+ * Sets _value_ to the fraction specified by _numerator_ over _denominator_.
  * The fraction gets reduced to the smallest numerator and denominator,
  * and if necessary the sign is moved to the numerator.
  */
@@ -5569,9 +5569,9 @@ gst_value_set_fraction (GValue * value, gint numerator, gint denominator)
 
 /**
  * gst_value_get_fraction_numerator:
- * @value: a GValue initialized to #GST_TYPE_FRACTION
+ * @value: a GValue initialized to [GST_TYPE_FRACTION]()
  *
- * Gets the numerator of the fraction specified by @value.
+ * Gets the numerator of the fraction specified by _value_.
  *
  * Returns: the numerator of the fraction.
  */
@@ -5585,9 +5585,9 @@ gst_value_get_fraction_numerator (const GValue * value)
 
 /**
  * gst_value_get_fraction_denominator:
- * @value: a GValue initialized to #GST_TYPE_FRACTION
+ * @value: a GValue initialized to [GST_TYPE_FRACTION]()
  *
- * Gets the denominator of the fraction specified by @value.
+ * Gets the denominator of the fraction specified by _value_.
  *
  * Returns: the denominator of the fraction.
  */
@@ -5601,14 +5601,14 @@ gst_value_get_fraction_denominator (const GValue * value)
 
 /**
  * gst_value_fraction_multiply:
- * @product: a GValue initialized to #GST_TYPE_FRACTION
- * @factor1: a GValue initialized to #GST_TYPE_FRACTION
- * @factor2: a GValue initialized to #GST_TYPE_FRACTION
+ * @product: a GValue initialized to [GST_TYPE_FRACTION]()
+ * @factor1: a GValue initialized to [GST_TYPE_FRACTION]()
+ * @factor2: a GValue initialized to [GST_TYPE_FRACTION]()
  *
- * Multiplies the two #GValue items containing a #GST_TYPE_FRACTION and sets
- * @product to the product of the two fractions.
+ * Multiplies the two [GValue]() items containing a [GST_TYPE_FRACTION]() and sets
+ * _product_ to the product of the two fractions.
  *
- * Returns: %FALSE in case of an error (like integer overflow), %TRUE otherwise.
+ * Returns: [FALSE]() in case of an error (like integer overflow), [TRUE]() otherwise.
  */
 gboolean
 gst_value_fraction_multiply (GValue * product, const GValue * factor1,
@@ -5636,13 +5636,13 @@ gst_value_fraction_multiply (GValue * product, const GValue * factor1,
 
 /**
  * gst_value_fraction_subtract:
- * @dest: a GValue initialized to #GST_TYPE_FRACTION
- * @minuend: a GValue initialized to #GST_TYPE_FRACTION
- * @subtrahend: a GValue initialized to #GST_TYPE_FRACTION
+ * @dest: a GValue initialized to [GST_TYPE_FRACTION]()
+ * @minuend: a GValue initialized to [GST_TYPE_FRACTION]()
+ * @subtrahend: a GValue initialized to [GST_TYPE_FRACTION]()
  *
- * Subtracts the @subtrahend from the @minuend and sets @dest to the result.
+ * Subtracts the _subtrahend_ from the _minuend_ and sets _dest_ to the result.
  *
- * Returns: %FALSE in case of an error (like integer overflow), %TRUE otherwise.
+ * Returns: [FALSE]() in case of an error (like integer overflow), [TRUE]() otherwise.
  */
 gboolean
 gst_value_fraction_subtract (GValue * dest,
@@ -5997,10 +5997,10 @@ gst_value_lcopy_bitmask (const GValue * value, guint n_collect_values,
 
 /**
  * gst_value_set_bitmask:
- * @value: a GValue initialized to #GST_TYPE_BITMASK
+ * @value: a GValue initialized to [GST_TYPE_BITMASK]()
  * @bitmask: the bitmask
  *
- * Sets @value to the bitmask specified by @bitmask.
+ * Sets _value_ to the bitmask specified by _bitmask_.
  */
 void
 gst_value_set_bitmask (GValue * value, guint64 bitmask)
@@ -6012,9 +6012,9 @@ gst_value_set_bitmask (GValue * value, guint64 bitmask)
 
 /**
  * gst_value_get_bitmask:
- * @value: a GValue initialized to #GST_TYPE_BITMASK
+ * @value: a GValue initialized to [GST_TYPE_BITMASK]()
  *
- * Gets the bitmask specified by @value.
+ * Gets the bitmask specified by _value_.
  *
  * Returns: the bitmask.
  */
@@ -6149,12 +6149,12 @@ gst_value_lcopy_flagset (const GValue * value, guint n_collect_values,
 
 /**
  * gst_value_set_flagset:
- * @value: a GValue initialized to %GST_TYPE_FLAG_SET
+ * @value: a GValue initialized to [GST_TYPE_FLAG_SET]()
  * @flags: The value of the flags set or unset
  * @mask: The mask indicate which flags bits must match for comparisons
  *
- * Sets @value to the flags and mask values provided in @flags and @mask.
- * The @flags value indicates the values of flags, the @mask represents
+ * Sets _value_ to the flags and mask values provided in _flags_ and _mask_.
+ * The _flags_ value indicates the values of flags, the _mask_ represents
  * which bits in the flag value have been set, and which are "don't care"
  *
  * Since: 1.6
@@ -6171,12 +6171,11 @@ gst_value_set_flagset (GValue * value, guint flags, guint mask)
 
 /**
  * gst_value_get_flagset_flags:
- * @value: a GValue initialized to #GST_TYPE_FLAG_SET
+ * @value: a GValue initialized to [GST_TYPE_FLAG_SET]()
  *
- * Retrieve the flags field of a GstFlagSet @value.
+ * Retrieve the flags field of a GstFlagSet _value_.
  *
  * Returns: the flags field of the flagset instance.
- *
  * Since: 1.6
  */
 guint
@@ -6189,12 +6188,11 @@ gst_value_get_flagset_flags (const GValue * value)
 
 /**
  * gst_value_get_flagset_mask:
- * @value: a GValue initialized to #GST_TYPE_FLAG_SET
+ * @value: a GValue initialized to [GST_TYPE_FLAG_SET]()
  *
- * Retrieve the mask field of a GstFlagSet @value.
+ * Retrieve the mask field of a GstFlagSet _value_.
  *
  * Returns: the mask field of the flagset instance.
- *
  * Since: 1.6
  */
 guint
@@ -6840,9 +6838,9 @@ gst_flagset_class_init (gpointer g_class, gpointer class_data)
 
 /**
  * gst_flagset_register:
- * @flags_type: a #GType of a #G_TYPE_FLAGS type.
+ * @flags_type: a [GType]() of a [G_TYPE_FLAGS]() type.
  *
- * Create a new sub-class of #GST_TYPE_FLAG_SET
+ * Create a new sub-class of [GST_TYPE_FLAG_SET]()
  * which will pretty-print the human-readable flags
  * when serializing, for easier debugging.
  *

@@ -22,28 +22,28 @@
 /**
  * SECTION:gsttagsetter
  * @short_description: Element interface that allows setting and retrieval
- *                     of media metadata
  *
+ * of media metadata
  * Element interface that allows setting of media metadata.
  *
  * Elements that support changing a stream's metadata will implement this
  * interface. Examples of such elements are 'vorbisenc', 'theoraenc' and
  * 'id3v2mux'.
- * 
+ *
  * If you just want to retrieve metadata in your application then all you
  * need to do is watch for tag messages on your pipeline's bus. This
  * interface is only for setting metadata, not for extracting it. To set tags
  * from the application, find tagsetter elements and set tags using e.g.
- * gst_tag_setter_merge_tags() or gst_tag_setter_add_tags(). Also consider
- * setting the #GstTagMergeMode that is used for tag events that arrive at the
+ * [gst_tag_setter_merge_tags]() or [gst_tag_setter_add_tags](). Also consider
+ * setting the [GstTagMergeMode]() that is used for tag events that arrive at the
  * tagsetter element (default mode is to keep existing tags).
- * The application should do that before the element goes to %GST_STATE_PAUSED.
- * 
- * Elements implementing the #GstTagSetter interface often have to merge
+ * The application should do that before the element goes to [GST_STATE_PAUSED]().
+ *
+ * Elements implementing the [GstTagSetter]() interface often have to merge
  * any tags received from upstream and the tags set by the application via
  * the interface. This can be done like this:
  *
- * |[
+ * ```
  * GstTagMergeMode merge_mode;
  * const GstTagList *application_tags;
  * const GstTagList *event_tags;
@@ -63,7 +63,7 @@
  * result = gst_tag_list_merge (application_tags, event_tags, merge_mode);
  *  
  * GST_LOG_OBJECT (tagsetter, "final tags: %" GST_PTR_FORMAT, result);
- * ]|
+ * ```
  */
 
 #ifdef HAVE_CONFIG_H
@@ -140,7 +140,7 @@ gst_tag_setter_get_data (GstTagSetter * setter)
 
 /**
  * gst_tag_setter_reset_tags:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  *
  * Reset the internal taglist. Elements should call this from within the
  * state-change handler.
@@ -164,7 +164,7 @@ gst_tag_setter_reset_tags (GstTagSetter * setter)
 
 /**
  * gst_tag_setter_merge_tags:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  * @list: a tag list to merge from
  * @mode: the mode to merge with
  *
@@ -194,13 +194,13 @@ gst_tag_setter_merge_tags (GstTagSetter * setter, const GstTagList * list,
 
 /**
  * gst_tag_setter_add_tags:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  * @mode: the mode to use
  * @tag: tag to set
  * @...: more tag / value pairs to set
  *
  * Adds the given tag / value pairs on the setter using the given merge mode.
- * The list must be terminated with %NULL.
+ * The list must be terminated with [NULL]().
  */
 void
 gst_tag_setter_add_tags (GstTagSetter * setter, GstTagMergeMode mode,
@@ -218,13 +218,13 @@ gst_tag_setter_add_tags (GstTagSetter * setter, GstTagMergeMode mode,
 
 /**
  * gst_tag_setter_add_tag_values:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  * @mode: the mode to use
  * @tag: tag to set
  * @...: more tag / GValue pairs to set
  *
  * Adds the given tag / GValue pairs on the setter using the given merge mode.
- * The list must be terminated with %NULL.
+ * The list must be terminated with [NULL]().
  */
 void
 gst_tag_setter_add_tag_values (GstTagSetter * setter, GstTagMergeMode mode,
@@ -242,13 +242,13 @@ gst_tag_setter_add_tag_values (GstTagSetter * setter, GstTagMergeMode mode,
 
 /**
  * gst_tag_setter_add_tag_valist:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  * @mode: the mode to use
  * @tag: tag to set
  * @var_args: tag / value pairs to set
  *
  * Adds the given tag / value pairs on the setter using the given merge mode.
- * The list must be terminated with %NULL.
+ * The list must be terminated with [NULL]().
  */
 void
 gst_tag_setter_add_tag_valist (GstTagSetter * setter, GstTagMergeMode mode,
@@ -272,13 +272,13 @@ gst_tag_setter_add_tag_valist (GstTagSetter * setter, GstTagMergeMode mode,
 
 /**
  * gst_tag_setter_add_tag_valist_values:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  * @mode: the mode to use
  * @tag: tag to set
  * @var_args: tag / GValue pairs to set
  *
  * Adds the given tag / GValue pairs on the setter using the given merge mode.
- * The list must be terminated with %NULL.
+ * The list must be terminated with [NULL]().
  */
 void
 gst_tag_setter_add_tag_valist_values (GstTagSetter * setter,
@@ -303,7 +303,7 @@ gst_tag_setter_add_tag_valist_values (GstTagSetter * setter,
 
 /**
  * gst_tag_setter_add_tag_value:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  * @mode: the mode to use
  * @tag: tag to set
  * @value: GValue to set for the tag
@@ -333,7 +333,7 @@ gst_tag_setter_add_tag_value (GstTagSetter * setter,
 
 /**
  * gst_tag_setter_get_tag_list:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  *
  * Returns the current list of tags the setter uses.  The list should not be
  * modified or freed.
@@ -341,7 +341,7 @@ gst_tag_setter_add_tag_value (GstTagSetter * setter,
  * This function is not thread-safe.
  *
  * Returns: (transfer none) (nullable): a current snapshot of the
- *          taglist used in the setter or %NULL if none is used.
+ *          taglist used in the setter or [NULL]() if none is used.
  */
 const GstTagList *
 gst_tag_setter_get_tag_list (GstTagSetter * setter)
@@ -353,11 +353,11 @@ gst_tag_setter_get_tag_list (GstTagSetter * setter)
 
 /**
  * gst_tag_setter_set_tag_merge_mode:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  * @mode: The mode with which tags are added
  *
  * Sets the given merge mode that is used for adding tags from events to tags
- * specified by this interface. The default is #GST_TAG_MERGE_KEEP, which keeps
+ * specified by this interface. The default is [GST_TAG_MERGE_KEEP](), which keeps
  * the tags set with this interface and discards tags from events.
  */
 void
@@ -377,7 +377,7 @@ gst_tag_setter_set_tag_merge_mode (GstTagSetter * setter, GstTagMergeMode mode)
 
 /**
  * gst_tag_setter_get_tag_merge_mode:
- * @setter: a #GstTagSetter
+ * @setter: a [GstTagSetter]()
  *
  * Queries the mode by which tags inside the setter are overwritten by tags
  * from events

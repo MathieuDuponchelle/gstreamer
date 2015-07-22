@@ -23,9 +23,9 @@
 /**
  * SECTION:gstiterator
  * @short_description: Object to retrieve multiple elements in a threadsafe
- * way.
- * @see_also: #GstElement, #GstBin
+ * @see_also: [GstElement](), [GstBin]()
  *
+ * way.
  * A GstIterator is used to retrieve multiple objects from another object in
  * a threadsafe way.
  *
@@ -33,12 +33,12 @@
  * an iterator.
  *
  * Note that if calling a GstIterator function results in your code receiving
- * a refcounted object (with, say, g_value_get_object()), the refcount for that
+ * a refcounted object (with, say, [g_value_get_object]()), the refcount for that
  * object will not be increased. Your code is responsible for taking a reference
  * if it wants to continue using it later.
  *
  * The basic use pattern of an iterator is as follows:
- * |[
+ * ```
  *   GstIterator *it = _get_iterator(object);
  *   GValue item = G_VALUE_INIT;
  *   done = FALSE;
@@ -63,7 +63,7 @@
  *   }
  *   g_value_unset (&amp;item);
  *   gst_iterator_free (it);
- * ]|
+ * ```
  */
 
 #include "gst_private.h"
@@ -71,11 +71,11 @@
 
 /**
  * gst_iterator_copy:
- * @it: a #GstIterator
+ * @it: a [GstIterator]()
  *
  * Copy the iterator and its state.
  *
- * Returns: a new copy of @it.
+ * Returns: a new copy of _it_.
  */
 GstIterator *
 gst_iterator_copy (const GstIterator * it)
@@ -117,10 +117,10 @@ gst_iterator_init (GstIterator * it,
 }
 
 /**
- * gst_iterator_new: (skip)
+ * gst_iterator_new: (skip):
  * @size: the size of the iterator structure
- * @type: #GType of children
- * @lock: pointer to a #GMutex.
+ * @type: [GType]() of children
+ * @lock: pointer to a [GMutex]().
  * @master_cookie: pointer to a guint32 that is changed when the items in the
  *    iterator changed.
  * @copy: copy function
@@ -132,10 +132,10 @@ gst_iterator_init (GstIterator * it,
  * Create a new iterator. This function is mainly used for objects
  * implementing the next/resync/free function to iterate a data structure.
  *
- * For each item retrieved, the @item function is called with the lock
- * held. The @free function is called when the iterator is freed.
+ * For each item retrieved, the _item_ function is called with the lock
+ * held. The _free_ function is called when the iterator is freed.
  *
- * Returns: the new #GstIterator.
+ * Returns: the new [GstIterator]().
  *
  * MT safe.
  */
@@ -215,29 +215,29 @@ gst_list_iterator_free (GstListIterator * it)
 }
 
 /**
- * gst_iterator_new_list: (skip)
- * @type: #GType of elements
- * @lock: pointer to a #GMutex protecting the list.
+ * gst_iterator_new_list: (skip):
+ * @type: [GType]() of elements
+ * @lock: pointer to a [GMutex]() protecting the list.
  * @master_cookie: pointer to a guint32 that is incremented when the list
  *     is changed.
  * @list: pointer to the list
  * @owner: object owning the list
  * @item: function to call on each item retrieved
  *
- * Create a new iterator designed for iterating @list.
+ * Create a new iterator designed for iterating _list_.
  *
- * The list you iterate is usually part of a data structure @owner and is
- * protected with @lock. 
+ * The list you iterate is usually part of a data structure _owner_ and is
+ * protected with _lock_.
  *
- * The iterator will use @lock to retrieve the next item of the list and it
- * will then call the @item function before releasing @lock again.
+ * The iterator will use _lock_ to retrieve the next item of the list and it
+ * will then call the _item_ function before releasing _lock_ again.
  *
- * When a concurrent update to the list is performed, usually by @owner while
- * holding @lock, @master_cookie will be updated. The iterator implementation
- * will notice the update of the cookie and will return %GST_ITERATOR_RESYNC to
- * the user of the iterator in the next call to gst_iterator_next().
+ * When a concurrent update to the list is performed, usually by _owner_ while
+ * holding _lock_, _master_cookie_ will be updated. The iterator implementation
+ * will notice the update of the cookie and will return [GST_ITERATOR_RESYNC]() to
+ * the user of the iterator in the next call to [gst_iterator_next]().
  *
- * Returns: the new #GstIterator for @list.
+ * Returns: the new [GstIterator]() for _list_.
  *
  * MT safe.
  */
@@ -293,27 +293,27 @@ gst_iterator_pop (GstIterator * it)
 
 /**
  * gst_iterator_next:
- * @it: The #GstIterator to iterate
+ * @it: The [GstIterator]() to iterate
  * @elem: (out caller-allocates): pointer to hold next element
  *
- * Get the next item from the iterator in @elem. 
+ * Get the next item from the iterator in _elem_.
  *
- * Only when this function returns %GST_ITERATOR_OK, @elem will contain a valid
- * value. @elem must have been initialized to the type of the iterator or
- * initialized to zeroes with g_value_unset(). The caller is responsible for
- * unsetting or resetting @elem with g_value_unset() or g_value_reset()
+ * Only when this function returns [GST_ITERATOR_OK](), _elem_ will contain a valid
+ * value. _elem_ must have been initialized to the type of the iterator or
+ * initialized to zeroes with [g_value_unset](). The caller is responsible for
+ * unsetting or resetting _elem_ with [g_value_unset]() or [g_value_reset]()
  * after usage.
  *
- * When this function returns %GST_ITERATOR_DONE, no more elements can be
- * retrieved from @it.
+ * When this function returns [GST_ITERATOR_DONE](), no more elements can be
+ * retrieved from _it_.
  *
- * A return value of %GST_ITERATOR_RESYNC indicates that the element list was
- * concurrently updated. The user of @it should call gst_iterator_resync() to
- * get the newly updated list. 
+ * A return value of [GST_ITERATOR_RESYNC]() indicates that the element list was
+ * concurrently updated. The user of _it_ should call [gst_iterator_resync]() to
+ * get the newly updated list.
  *
- * A return value of %GST_ITERATOR_ERROR indicates an unrecoverable fatal error.
+ * A return value of [GST_ITERATOR_ERROR]() indicates an unrecoverable fatal error.
  *
- * Returns: The result of the iteration. Unset @elem after usage.
+ * Returns: The result of the iteration. Unset _elem_ after usage.
  *
  * MT safe.
  */
@@ -379,12 +379,12 @@ done:
 
 /**
  * gst_iterator_resync:
- * @it: The #GstIterator to resync
+ * @it: The [GstIterator]() to resync
  *
  * Resync the iterator. this function is mostly called
- * after gst_iterator_next() returned %GST_ITERATOR_RESYNC.
+ * after [gst_iterator_next]() returned [GST_ITERATOR_RESYNC]().
  *
- * When an iterator was pushed on @it, it will automatically be popped again
+ * When an iterator was pushed on _it_, it will automatically be popped again
  * with this function.
  *
  * MT safe.
@@ -406,7 +406,7 @@ gst_iterator_resync (GstIterator * it)
 
 /**
  * gst_iterator_free:
- * @it: The #GstIterator to free
+ * @it: The [GstIterator]() to free
  *
  * Free the iterator.
  *
@@ -426,17 +426,17 @@ gst_iterator_free (GstIterator * it)
 
 /**
  * gst_iterator_push:
- * @it: The #GstIterator to use
- * @other: The #GstIterator to push
+ * @it: The [GstIterator]() to use
+ * @other: The [GstIterator]() to push
  *
- * Pushes @other iterator onto @it. All calls performed on @it are
- * forwarded to @other. If @other returns %GST_ITERATOR_DONE, it is
- * popped again and calls are handled by @it again.
+ * Pushes _other_ iterator onto _it_. All calls performed on _it_ are
+ * forwarded to _other_. If _other_ returns [GST_ITERATOR_DONE](), it is
+ * popped again and calls are handled by _it_ again.
  *
  * This function is mainly used by objects implementing the iterator
  * next function to recurse into substructures.
  *
- * When gst_iterator_resync() is called on @it, @other will automatically be
+ * When [gst_iterator_resync]() is called on _it_, _other_ will automatically be
  * popped.
  *
  * MT safe.
@@ -525,19 +525,19 @@ filter_free (GstIteratorFilter * it)
 
 /**
  * gst_iterator_filter:
- * @it: The #GstIterator to filter
+ * @it: The [GstIterator]() to filter
  * @func: (scope call): the compare function to select elements
  * @user_data: (closure): user data passed to the compare function
  *
  * Create a new iterator from an existing iterator. The new iterator
- * will only return those elements that match the given compare function @func.
- * The first parameter that is passed to @func is the #GValue of the current
- * iterator element and the second parameter is @user_data. @func should
+ * will only return those elements that match the given compare function _func_.
+ * The first parameter that is passed to _func_ is the [GValue]() of the current
+ * iterator element and the second parameter is _user_data_. _func_ should
  * return 0 for elements that should be included in the filtered iterator.
  *
- * When this iterator is freed, @it will also be freed.
+ * When this iterator is freed, _it_ will also be freed.
  *
- * Returns: (transfer full): a new #GstIterator.
+ * Returns: (transfer full): a new [GstIterator]().
  *
  * MT safe.
  */
@@ -575,28 +575,28 @@ gst_iterator_filter (GstIterator * it, GCompareFunc func,
 
 /**
  * gst_iterator_fold:
- * @it: The #GstIterator to fold over
+ * @it: The [GstIterator]() to fold over
  * @func: (scope call): the fold function
  * @ret: the seed value passed to the fold function
  * @user_data: (closure): user data passed to the fold function
  *
- * Folds @func over the elements of @iter. That is to say, @func will be called
- * as @func (object, @ret, @user_data) for each object in @it. The normal use
+ * Folds _func_ over the elements of _iter_. That is to say, _func_ will be called
+ * as _func_ (object, _ret_, _user_data_) for each object in _it_. The normal use
  * of this procedure is to accumulate the results of operating on the objects in
- * @ret.
+ * _ret_.
  *
  * This procedure can be used (and is used internally) to implement the
- * gst_iterator_foreach() and gst_iterator_find_custom() operations.
+ * [gst_iterator_foreach]() and [gst_iterator_find_custom]() operations.
  *
- * The fold will proceed as long as @func returns %TRUE. When the iterator has no
- * more arguments, %GST_ITERATOR_DONE will be returned. If @func returns %FALSE,
- * the fold will stop, and %GST_ITERATOR_OK will be returned. Errors or resyncs
- * will cause fold to return %GST_ITERATOR_ERROR or %GST_ITERATOR_RESYNC as
+ * The fold will proceed as long as _func_ returns [TRUE](). When the iterator has no
+ * more arguments, [GST_ITERATOR_DONE]() will be returned. If _func_ returns [FALSE](),
+ * the fold will stop, and [GST_ITERATOR_OK]() will be returned. Errors or resyncs
+ * will cause fold to return [GST_ITERATOR_ERROR]() or [GST_ITERATOR_RESYNC]() as
  * appropriate.
  *
  * The iterator will not be freed.
  *
- * Returns: A #GstIteratorResult, as described above.
+ * Returns: A [GstIteratorResult](), as described above.
  *
  * MT safe.
  */
@@ -645,14 +645,14 @@ foreach_fold_func (const GValue * item, GValue * unused, ForeachFoldData * data)
 
 /**
  * gst_iterator_foreach:
- * @it: The #GstIterator to iterate
+ * @it: The [GstIterator]() to iterate
  * @func: (scope call): the function to call for each element.
  * @user_data: (closure): user data passed to the function
  *
- * Iterate over all element of @it and call the given function @func for
+ * Iterate over all element of _it_ and call the given function _func_ for
  * each element.
  *
- * Returns: the result call to gst_iterator_fold(). The iterator will not be
+ * Returns: the result call to [gst_iterator_fold](). The iterator will not be
  * freed.
  *
  * MT safe.
@@ -692,23 +692,23 @@ find_custom_fold_func (const GValue * item, GValue * ret,
 
 /**
  * gst_iterator_find_custom:
- * @it: The #GstIterator to iterate
+ * @it: The [GstIterator]() to iterate
  * @func: (scope call): the compare function to use
- * @elem: (out): pointer to a #GValue where to store the result
+ * @elem: (out): pointer to a [GValue]() where to store the result
  * @user_data: (closure): user data passed to the compare function
  *
- * Find the first element in @it that matches the compare function @func.
- * @func should return 0 when the element is found. The first parameter
- * to @func will be the current element of the iterator and the
- * second parameter will be @user_data.
- * The result will be stored in @elem if a result is found.
+ * Find the first element in _it_ that matches the compare function _func_.
+ * _func_ should return 0 when the element is found. The first parameter
+ * to _func_ will be the current element of the iterator and the
+ * second parameter will be _user_data_.
+ * The result will be stored in _elem_ if a result is found.
  *
  * The iterator will not be freed.
  *
- * This function will return %FALSE if an error happened to the iterator
+ * This function will return [FALSE]() if an error happened to the iterator
  * or if the element wasn't found.
  *
- * Returns: Returns %TRUE if the element was found, else %FALSE.
+ * Returns: Returns [TRUE]() if the element was found, else [FALSE]().
  *
  * MT safe.
  */
@@ -791,15 +791,15 @@ gst_single_object_iterator_free (GstSingleObjectIterator * it)
 
 /**
  * gst_iterator_new_single:
- * @type: #GType of the passed object
+ * @type: [GType]() of the passed object
  * @object: object that this iterator should return
  *
- * This #GstIterator is a convenient iterator for the common
- * case where a #GstIterator needs to be returned but only
+ * This [GstIterator]() is a convenient iterator for the common
+ * case where a [GstIterator]() needs to be returned but only
  * a single object has to be considered. This happens often
- * for the #GstPadIterIntLinkFunction.
+ * for the [GstPadIterIntLinkFunction]().
  *
- * Returns: the new #GstIterator for @object.
+ * Returns: the new [GstIterator]() for _object_.
  */
 GstIterator *
 gst_iterator_new_single (GType type, const GValue * object)

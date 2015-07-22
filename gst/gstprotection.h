@@ -37,7 +37,7 @@ G_BEGIN_DECLS
 typedef struct _GstProtectionMeta GstProtectionMeta;
 /**
  * GstProtectionMeta:
- * @meta: the parent #GstMeta.
+ * @meta: the parent [GstMeta]().
  * @info: the cryptographic information needed to decrypt the sample.
  *
  * Metadata type that holds information about a sample from a protection-protected

@@ -50,7 +50,7 @@ GType           gst_context_get_type            (void);
  *
  * Convenience macro to increase the reference count of the context.
  *
- * Returns: @context (for convenience when doing assignments)
+ * Returns: _context_ (for convenience when doing assignments)
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstContext * gst_context_ref (GstContext * context);
@@ -86,7 +86,7 @@ gst_context_unref (GstContext * context)
  *
  * Creates a copy of the context. Returns a copy of the context.
  *
- * Returns: (transfer full): a new copy of @context.
+ * Returns: (transfer full): a new copy of _context_.
  *
  * MT safe
  */
@@ -102,7 +102,7 @@ gst_context_copy (const GstContext * context)
 
 /**
  * gst_context_is_writable:
- * @context: a #GstContext
+ * @context: a [GstContext]()
  *
  * Tests if you can safely write into a context's structure or validly
  * modify the seqnum and timestamp fields.
@@ -122,19 +122,19 @@ gst_context_copy (const GstContext * context)
 #define         gst_context_make_writable(context)  GST_CONTEXT_CAST (gst_mini_object_make_writable (GST_MINI_OBJECT_CAST (context)))
 /**
  * gst_context_replace:
- * @old_context: (inout) (transfer full): pointer to a pointer to a #GstContext
+ * @old_context: (inout) (transfer full): pointer to a pointer to a [GstContext]()
  *     to be replaced.
- * @new_context: (allow-none) (transfer none): pointer to a #GstContext that will
- *     replace the context pointed to by @old_context.
+ * @new_context: (allow-none) (transfer none): pointer to a [GstContext]() that will
+ *     replace the context pointed to by _old_context_.
  *
- * Modifies a pointer to a #GstContext to point to a different #GstContext. The
+ * Modifies a pointer to a [GstContext]() to point to a different [GstContext](). The
  * modification is done atomically (so this is useful for ensuring thread safety
  * in some cases), and the reference counts are updated appropriately (the old
  * context is unreffed, the new one is reffed).
  *
- * Either @new_context or the #GstContext pointed to by @old_context may be %NULL.
+ * Either _new_context_ or the [GstContext]() pointed to by _old_context_ may be [NULL]().
  *
- * Returns: %TRUE if @new_context was different from @old_context
+ * Returns: [TRUE]() if _new_context_ was different from _old_context_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gboolean gst_context_replace (GstContext **old_context, GstContext *new_context);

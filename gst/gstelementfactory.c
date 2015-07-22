@@ -24,14 +24,14 @@
 /**
  * SECTION:gstelementfactory
  * @short_description: Create GstElements from a factory
- * @see_also: #GstElement, #GstPlugin, #GstPluginFeature, #GstPadTemplate.
+ * @see_also: [GstElement](), [GstPlugin](), [GstPluginFeature](), [GstPadTemplate]().
  *
- * #GstElementFactory is used to create instances of elements. A
- * GstElementFactory can be added to a #GstPlugin as it is also a
- * #GstPluginFeature.
+ * [GstElementFactory]() is used to create instances of elements. A
+ * GstElementFactory can be added to a [GstPlugin]() as it is also a
+ * [GstPluginFeature]().
  *
- * Use the gst_element_factory_find() and gst_element_factory_create()
- * functions to create element instances or use gst_element_factory_make() as a
+ * Use the [gst_element_factory_find]() and [gst_element_factory_create]()
+ * functions to create element instances or use [gst_element_factory_make]() as a
  * convenient shortcut.
  *
  * The following code example shows you how to create a GstFileSrc element.
@@ -39,7 +39,7 @@
  * <example>
  * <title>Using an element factory</title>
  * <programlisting language="c">
- *   #include &lt;gst/gst.h&gt;
+ *   [include]() &lt;gst/gst.h&gt;
  *
  *   GstElement *src;
  *   GstElementFactory *srcfactory;
@@ -123,8 +123,8 @@ gst_element_factory_finalize (GObject * object)
  * Search for an element factory of the given name. Refs the returned
  * element factory; caller is responsible for unreffing.
  *
- * Returns: (transfer full) (nullable): #GstElementFactory if found,
- * %NULL otherwise
+ * Returns: (transfer full) (nullable): [GstElementFactory]() if found,
+ * [NULL]() otherwise
  */
 GstElementFactory *
 gst_element_factory_find (const gchar * name)
@@ -187,16 +187,16 @@ gst_element_factory_cleanup (GstElementFactory * factory)
 
 /**
  * gst_element_register:
- * @plugin: (allow-none): #GstPlugin to register the element with, or %NULL for
+ * @plugin: (allow-none): [GstPlugin]() to register the element with, or [NULL]() for
  *     a static element.
  * @name: name of elements of this type
  * @rank: rank of element (higher rank means more importance when autoplugging)
  * @type: GType of element to register
  *
  * Create a new elementfactory capable of instantiating objects of the
- * @type and add the factory to @plugin.
+ * _type_ and add the factory to _plugin_.
  *
- * Returns: %TRUE, if the registering succeeded, %FALSE on error
+ * Returns: [TRUE](), if the registering succeeded, [FALSE]() on error
  */
 gboolean
 gst_element_register (GstPlugin * plugin, const gchar * name, guint rank,
@@ -329,14 +329,14 @@ detailserror:
 /**
  * gst_element_factory_create:
  * @factory: factory to instantiate
- * @name: (allow-none): name of new element, or %NULL to automatically create
+ * @name: (allow-none): name of new element, or [NULL]() to automatically create
  *    a unique name
  *
  * Create a new element of the type defined by the given elementfactory.
  * It will be given the name supplied, since all elements require a name as
  * their first argument.
  *
- * Returns: (transfer floating) (nullable): new #GstElement or %NULL
+ * Returns: (transfer floating) (nullable): new [GstElement]() or [NULL]()
  *     if the element couldn't be created
  */
 GstElement *
@@ -415,15 +415,15 @@ no_element:
 /**
  * gst_element_factory_make:
  * @factoryname: a named factory to instantiate
- * @name: (allow-none): name of new element, or %NULL to automatically create
+ * @name: (allow-none): name of new element, or [NULL]() to automatically create
  *    a unique name
  *
  * Create a new element of the type defined by the given element factory.
- * If name is %NULL, then the element will receive a guaranteed unique name,
+ * If name is [NULL](), then the element will receive a guaranteed unique name,
  * consisting of the element factory name and a number.
  * If name is given, it will be given the name supplied.
  *
- * Returns: (transfer floating) (nullable): new #GstElement or %NULL
+ * Returns: (transfer floating) (nullable): new [GstElement]() or [NULL]()
  * if unable to create element
  */
 GstElement *
@@ -478,13 +478,13 @@ __gst_element_factory_add_static_pad_template (GstElementFactory * factory,
 
 /**
  * gst_element_factory_get_element_type:
- * @factory: factory to get managed #GType from
+ * @factory: factory to get managed [GType]() from
  *
- * Get the #GType for elements managed by this factory. The type can
+ * Get the [GType]() for elements managed by this factory. The type can
  * only be retrieved if the element factory is loaded, which can be
- * assured with gst_plugin_feature_load().
+ * assured with [gst_plugin_feature_load]().
  *
- * Returns: the #GType for elements managed by this factory or 0 if
+ * Returns: the [GType]() for elements managed by this factory or 0 if
  * the factory is not loaded.
  */
 GType
@@ -497,13 +497,13 @@ gst_element_factory_get_element_type (GstElementFactory * factory)
 
 /**
  * gst_element_factory_get_metadata:
- * @factory: a #GstElementFactory
+ * @factory: a [GstElementFactory]()
  * @key: a key
  *
- * Get the metadata on @factory with @key.
+ * Get the metadata on _factory_ with _key_.
  *
- * Returns: (nullable): the metadata with @key on @factory or %NULL
- * when there was no metadata with the given @key.
+ * Returns: (nullable): the metadata with _key_ on _factory_ or [NULL]()
+ * when there was no metadata with the given _key_.
  */
 const gchar *
 gst_element_factory_get_metadata (GstElementFactory * factory,
@@ -514,13 +514,13 @@ gst_element_factory_get_metadata (GstElementFactory * factory,
 
 /**
  * gst_element_factory_get_metadata_keys:
- * @factory: a #GstElementFactory
+ * @factory: a [GstElementFactory]()
  *
- * Get the available keys for the metadata on @factory.
+ * Get the available keys for the metadata on _factory_.
  *
- * Returns: (transfer full) (element-type utf8) (array zero-terminated=1) (nullable):
- * a %NULL-terminated array of key strings, or %NULL when there is no
- * metadata. Free with g_strfreev() when no longer needed.
+ * Returns: (transfer full) (element-type utf8) (array zero-terminated=1) (nullable): 
+ * a [NULL]()-terminated array of key strings, or [NULL]() when there is no
+ * metadata. Free with [g_strfreev]() when no longer needed.
  */
 gchar **
 gst_element_factory_get_metadata_keys (GstElementFactory * factory)
@@ -549,7 +549,7 @@ gst_element_factory_get_metadata_keys (GstElementFactory * factory)
 
 /**
  * gst_element_factory_get_num_pad_templates:
- * @factory: a #GstElementFactory
+ * @factory: a [GstElementFactory]()
  *
  * Gets the number of pad_templates in this factory.
  *
@@ -586,9 +586,9 @@ __gst_element_factory_add_interface (GstElementFactory * elementfactory,
 
 /**
  * gst_element_factory_get_static_pad_templates:
- * @factory: a #GstElementFactory
+ * @factory: a [GstElementFactory]()
  *
- * Gets the #GList of #GstStaticPadTemplate for this factory.
+ * Gets the [GList]() of [GstStaticPadTemplate]() for this factory.
  *
  * Returns: (transfer none) (element-type Gst.StaticPadTemplate): the
  *     static pad templates
@@ -603,9 +603,9 @@ gst_element_factory_get_static_pad_templates (GstElementFactory * factory)
 
 /**
  * gst_element_factory_get_uri_type:
- * @factory: a #GstElementFactory
+ * @factory: a [GstElementFactory]()
  *
- * Gets the type of URIs the element supports or #GST_URI_UNKNOWN if none.
+ * Gets the type of URIs the element supports or [GST_URI_UNKNOWN]() if none.
  *
  * Returns: type of URIs this element supports
  */
@@ -619,15 +619,15 @@ gst_element_factory_get_uri_type (GstElementFactory * factory)
 
 /**
  * gst_element_factory_get_uri_protocols:
- * @factory: a #GstElementFactory
+ * @factory: a [GstElementFactory]()
  *
- * Gets a %NULL-terminated array of protocols this element supports or %NULL if
+ * Gets a [NULL]()-terminated array of protocols this element supports or [NULL]() if
  * no protocols are supported. You may not change the contents of the returned
- * array, as it is still owned by the element factory. Use g_strdupv() to
+ * array, as it is still owned by the element factory. Use [g_strdupv]() to
  * make a copy of the protocol string array if you need to.
  *
  * Returns: (transfer none) (array zero-terminated=1): the supported protocols
- *     or %NULL
+ *     or [NULL]()
  */
 const gchar *const *
 gst_element_factory_get_uri_protocols (GstElementFactory * factory)
@@ -639,12 +639,12 @@ gst_element_factory_get_uri_protocols (GstElementFactory * factory)
 
 /**
  * gst_element_factory_has_interface:
- * @factory: a #GstElementFactory
+ * @factory: a [GstElementFactory]()
  * @interfacename: an interface name
  *
- * Check if @factory implements the interface with name @interfacename.
+ * Check if _factory_ implements the interface with name _interfacename_.
  *
- * Returns: %TRUE when @factory implement the interface.
+ * Returns: [TRUE]() when _factory_ implement the interface.
  */
 gboolean
 gst_element_factory_has_interface (GstElementFactory * factory,
@@ -673,12 +673,12 @@ typedef struct
 
 /**
  * gst_element_factory_list_is_type:
- * @factory: a #GstElementFactory
- * @type: a #GstElementFactoryListType
+ * @factory: a [GstElementFactory]()
+ * @type: a [GstElementFactoryListType]()
  *
- * Check if @factory is of the given types.
+ * Check if _factory_ is of the given types.
  *
- * Returns: %TRUE if @factory is of @type.
+ * Returns: [TRUE]() if _factory_ is of _type_.
  */
 gboolean
 gst_element_factory_list_is_type (GstElementFactory * factory,
@@ -776,15 +776,15 @@ element_filter (GstPluginFeature * feature, FilterData * data)
 
 /**
  * gst_element_factory_list_get_elements:
- * @type: a #GstElementFactoryListType
+ * @type: a [GstElementFactoryListType]()
  * @minrank: Minimum rank
  *
- * Get a list of factories that match the given @type. Only elements
- * with a rank greater or equal to @minrank will be returned.
+ * Get a list of factories that match the given _type_. Only elements
+ * with a rank greater or equal to _minrank_ will be returned.
  * The list of factories is returned by decreasing rank.
  *
- * Returns: (transfer full) (element-type Gst.ElementFactory): a #GList of
- *     #GstElementFactory elements. Use gst_plugin_feature_list_free() after
+ * Returns: (transfer full) (element-type Gst.ElementFactory): a [GList]() of
+ *     [GstElementFactory]() elements. Use [gst_plugin_feature_list_free]() after
  *     usage.
  */
 GList *
@@ -810,22 +810,22 @@ gst_element_factory_list_get_elements (GstElementFactoryListType type,
 
 /**
  * gst_element_factory_list_filter:
- * @list: (transfer none) (element-type Gst.ElementFactory): a #GList of
- *     #GstElementFactory to filter
- * @caps: a #GstCaps
- * @direction: a #GstPadDirection to filter on
+ * @list: (transfer none) (element-type Gst.ElementFactory): a [GList]() of
+ *     [GstElementFactory]() to filter
+ * @caps: a [GstCaps]()
+ * @direction: a [GstPadDirection]() to filter on
  * @subsetonly: whether to filter on caps subsets or not.
  *
- * Filter out all the elementfactories in @list that can handle @caps in
+ * Filter out all the elementfactories in _list_ that can handle _caps_ in
  * the given direction.
  *
- * If @subsetonly is %TRUE, then only the elements whose pads templates
- * are a complete superset of @caps will be returned. Else any element
- * whose pad templates caps can intersect with @caps will be returned.
+ * If _subsetonly_ is [TRUE](), then only the elements whose pads templates
+ * are a complete superset of _caps_ will be returned. Else any element
+ * whose pad templates caps can intersect with _caps_ will be returned.
  *
- * Returns: (transfer full) (element-type Gst.ElementFactory): a #GList of
- *     #GstElementFactory elements that match the given requisites.
- *     Use #gst_plugin_feature_list_free after usage.
+ * Returns: (transfer full) (element-type Gst.ElementFactory): a [GList]() of
+ *     [GstElementFactory]() elements that match the given requisites.
+ *     Use [gst_plugin_feature_list_free]() after usage.
  */
 GList *
 gst_element_factory_list_filter (GList * list,

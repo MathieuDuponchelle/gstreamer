@@ -43,14 +43,14 @@ typedef struct _GstQuery GstQuery;
 
 /**
  * GstQueryTypeFlags:
- * @GST_QUERY_TYPE_UPSTREAM:     Set if the query can travel upstream.
- * @GST_QUERY_TYPE_DOWNSTREAM:   Set if the query can travel downstream.
- * @GST_QUERY_TYPE_SERIALIZED:   Set if the query should be serialized with data
+ * @GST_QUERY_TYPE_UPSTREAM: Set if the query can travel upstream.
+ * @GST_QUERY_TYPE_DOWNSTREAM: Set if the query can travel downstream.
+ * @GST_QUERY_TYPE_SERIALIZED: Set if the query should be serialized with data
  *                               flow.
  *
- * #GstQueryTypeFlags indicate the aspects of the different #GstQueryType
- * values. You can get the type flags of a #GstQueryType with the
- * gst_query_type_get_flags() function.
+ * [GstQueryTypeFlags]() indicate the aspects of the different [GstQueryType]()
+ * values. You can get the type flags of a [GstQueryType]() with the
+ * [gst_query_type_get_flags]() function.
  */
 typedef enum {
   GST_QUERY_TYPE_UPSTREAM       = 1 << 0,
@@ -61,7 +61,7 @@ typedef enum {
 /**
  * GST_QUERY_TYPE_BOTH:
  *
- * The same thing as #GST_QUERY_TYPE_UPSTREAM | #GST_QUERY_TYPE_DOWNSTREAM.
+ * The same thing as [GST_QUERY_TYPE_UPSTREAM]() | [GST_QUERY_TYPE_DOWNSTREAM]().
  */
 #define GST_QUERY_TYPE_BOTH \
     (GST_QUERY_TYPE_UPSTREAM | GST_QUERY_TYPE_DOWNSTREAM)
@@ -143,7 +143,7 @@ GST_EXPORT GType _gst_query_type;
  * GST_QUERY_TYPE:
  * @query: the query to query
  *
- * Get the #GstQueryType of the query.
+ * Get the [GstQueryType]() of the query.
  */
 #define GST_QUERY_TYPE(query)  (((GstQuery*)(query))->type)
 
@@ -151,7 +151,7 @@ GST_EXPORT GType _gst_query_type;
  * GST_QUERY_TYPE_NAME:
  * @query: the query to query
  *
- * Get a constant string representation of the #GstQueryType of the query.
+ * Get a constant string representation of the [GstQueryType]() of the query.
  */
 #define GST_QUERY_TYPE_NAME(query) (gst_query_type_get_name(GST_QUERY_TYPE(query)))
 
@@ -180,10 +180,10 @@ GST_EXPORT GType _gst_query_type;
 
 /**
  * GstQuery:
- * @mini_object: The parent #GstMiniObject type
- * @type: the #GstQueryType
+ * @mini_object: The parent [GstMiniObject]() type
+ * @type: the [GstQueryType]()
  *
- * The #GstQuery structure.
+ * The [GstQuery]() structure.
  */
 struct _GstQuery
 {
@@ -204,11 +204,11 @@ GType           gst_query_get_type             (void);
 /* refcounting */
 /**
  * gst_query_ref:
- * @q: a #GstQuery to increase the refcount of.
+ * @q: a [GstQuery]() to increase the refcount of.
  *
  * Increases the refcount of the given query by one.
  *
- * Returns: @q
+ * Returns: _q_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstQuery * gst_query_ref (GstQuery * q);
@@ -222,7 +222,7 @@ gst_query_ref (GstQuery * q)
 
 /**
  * gst_query_unref:
- * @q: a #GstQuery to decrease the refcount of.
+ * @q: a [GstQuery]() to decrease the refcount of.
  *
  * Decreases the refcount of the query. If the refcount reaches 0, the query
  * will be freed.
@@ -240,13 +240,13 @@ gst_query_unref (GstQuery * q)
 /* copy query */
 /**
  * gst_query_copy:
- * @q: a #GstQuery to copy.
+ * @q: a [GstQuery]() to copy.
  *
- * Copies the given query using the copy function of the parent #GstStructure.
+ * Copies the given query using the copy function of the parent [GstStructure]().
  *
  * Free-function: gst_query_unref
  *
- * Returns: (transfer full): a new copy of @q.
+ * Returns: (transfer full): a new copy of _q_.
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstQuery * gst_query_copy (const GstQuery * q);
@@ -260,35 +260,35 @@ gst_query_copy (const GstQuery * q)
 
 /**
  * gst_query_is_writable:
- * @q: a #GstQuery
+ * @q: a [GstQuery]()
  *
  * Tests if you can safely write data into a query's structure.
  */
 #define         gst_query_is_writable(q)     gst_mini_object_is_writable (GST_MINI_OBJECT_CAST (q))
 /**
  * gst_query_make_writable:
- * @q: (transfer full): a #GstQuery to make writable
+ * @q: (transfer full): a [GstQuery]() to make writable
  *
  * Makes a writable query from the given query.
  *
- * Returns: (transfer full): a new writable query (possibly same as @q)
+ * Returns: (transfer full): a new writable query (possibly same as _q_)
  */
 #define         gst_query_make_writable(q)      GST_QUERY_CAST (gst_mini_object_make_writable (GST_MINI_OBJECT_CAST (q)))
 /**
  * gst_query_replace:
  * @old_query: (inout) (transfer full) (nullable): pointer to a pointer to a
- *     #GstQuery to be replaced.
- * @new_query: (allow-none) (transfer none): pointer to a #GstQuery that will
- *     replace the query pointed to by @old_query.
+ *     [GstQuery]() to be replaced.
+ * @new_query: (allow-none) (transfer none): pointer to a [GstQuery]() that will
+ *     replace the query pointed to by _old_query_.
  *
- * Modifies a pointer to a #GstQuery to point to a different #GstQuery. The
+ * Modifies a pointer to a [GstQuery]() to point to a different [GstQuery](). The
  * modification is done atomically (so this is useful for ensuring thread safety
  * in some cases), and the reference counts are updated appropriately (the old
  * query is unreffed, the new one is reffed).
  *
- * Either @new_query or the #GstQuery pointed to by @old_query may be %NULL.
+ * Either _new_query_ or the [GstQuery]() pointed to by _old_query_ may be [NULL]().
  *
- * Returns: %TRUE if @new_query was different from @old_query
+ * Returns: [TRUE]() if _new_query_ was different from _old_query_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC gboolean gst_query_replace (GstQuery **old_query, GstQuery *new_query);

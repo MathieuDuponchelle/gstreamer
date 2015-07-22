@@ -31,11 +31,11 @@
 
 /**
  * SECTION:gstdatetime
- * @title: GstDateTime
  * @short_description: A date, time and timezone structure
+ * @title: GstDateTime
  *
  * Struct to store date, time and timezone information altogether.
- * #GstDateTime is refcounted and immutable.
+ * [GstDateTime]() is refcounted and immutable.
  *
  * Date information is handled using the proleptic Gregorian calendar.
  *
@@ -70,14 +70,14 @@ static void gst_date_time_free (GstDateTime * datetime);
 
 /**
  * gst_date_time_new_from_g_date_time:
- * @dt: (transfer full): the #GDateTime. The new #GstDateTime takes ownership.
+ * @dt: (transfer full): the [GDateTime](). The new [GstDateTime]() takes ownership.
  *
- * Creates a new #GstDateTime from a #GDateTime object.
+ * Creates a new [GstDateTime]() from a [GDateTime]() object.
  *
  * Free-function: gst_date_time_unref
  *
- * Returns: (transfer full) (nullable): a newly created #GstDateTime,
- * or %NULL on error
+ * Returns: (transfer full) (nullable): a newly created [GstDateTime](),
+ * or [NULL]() on error
  */
 GstDateTime *
 gst_date_time_new_from_g_date_time (GDateTime * dt)
@@ -101,12 +101,12 @@ gst_date_time_new_from_g_date_time (GDateTime * dt)
  * gst_date_time_to_g_date_time:
  * @datetime: GstDateTime.
  *
- * Creates a new #GDateTime from a fully defined #GstDateTime object.
+ * Creates a new [GDateTime]() from a fully defined [GstDateTime]() object.
  *
  * Free-function: g_date_time_unref
  *
- * Returns: (transfer full) (nullable): a newly created #GDateTime, or
- * %NULL on error
+ * Returns: (transfer full) (nullable): a newly created [GDateTime](), or
+ * [NULL]() on error
  */
 GDateTime *
 gst_date_time_to_g_date_time (GstDateTime * datetime)
@@ -121,10 +121,12 @@ gst_date_time_to_g_date_time (GstDateTime * datetime)
 
 /**
  * gst_date_time_has_year:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Returns: %TRUE if @datetime<!-- -->'s year field is set (which should always
- *     be the case), otherwise %FALSE
+ *
+ *
+ * Returns: [TRUE]() if _datetime_<!-- -->'s year field is set (which should always
+ *     be the case), otherwise [FALSE]()
  */
 gboolean
 gst_date_time_has_year (const GstDateTime * datetime)
@@ -136,9 +138,11 @@ gst_date_time_has_year (const GstDateTime * datetime)
 
 /**
  * gst_date_time_has_month:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Returns: %TRUE if @datetime<!-- -->'s month field is set, otherwise %FALSE
+ *
+ *
+ * Returns: [TRUE]() if _datetime_<!-- -->'s month field is set, otherwise [FALSE]()
  */
 gboolean
 gst_date_time_has_month (const GstDateTime * datetime)
@@ -150,9 +154,11 @@ gst_date_time_has_month (const GstDateTime * datetime)
 
 /**
  * gst_date_time_has_day:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Returns: %TRUE if @datetime<!-- -->'s day field is set, otherwise %FALSE
+ *
+ *
+ * Returns: [TRUE]() if _datetime_<!-- -->'s day field is set, otherwise [FALSE]()
  */
 gboolean
 gst_date_time_has_day (const GstDateTime * datetime)
@@ -164,10 +170,12 @@ gst_date_time_has_day (const GstDateTime * datetime)
 
 /**
  * gst_date_time_has_time:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Returns: %TRUE if @datetime<!-- -->'s hour and minute fields are set,
- *     otherwise %FALSE
+ *
+ *
+ * Returns: [TRUE]() if _datetime_<!-- -->'s hour and minute fields are set,
+ *     otherwise [FALSE]()
  */
 gboolean
 gst_date_time_has_time (const GstDateTime * datetime)
@@ -179,9 +187,11 @@ gst_date_time_has_time (const GstDateTime * datetime)
 
 /**
  * gst_date_time_has_second:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Returns: %TRUE if @datetime<!-- -->'s second field is set, otherwise %FALSE
+ *
+ *
+ * Returns: [TRUE]() if _datetime_<!-- -->'s second field is set, otherwise [FALSE]()
  */
 gboolean
 gst_date_time_has_second (const GstDateTime * datetime)
@@ -193,12 +203,12 @@ gst_date_time_has_second (const GstDateTime * datetime)
 
 /**
  * gst_date_time_get_year:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Returns the year of this #GstDateTime
+ * Returns the year of this [GstDateTime]()
  * Call gst_date_time_has_year before, to avoid warnings.
  *
- * Return value: The year of this #GstDateTime
+ * Returns: The year of this [GstDateTime]()
  */
 gint
 gst_date_time_get_year (const GstDateTime * datetime)
@@ -210,12 +220,12 @@ gst_date_time_get_year (const GstDateTime * datetime)
 
 /**
  * gst_date_time_get_month:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Returns the month of this #GstDateTime. January is 1, February is 2, etc..
+ * Returns the month of this [GstDateTime](). January is 1, February is 2, etc..
  * Call gst_date_time_has_month before, to avoid warnings.
  *
- * Return value: The month of this #GstDateTime
+ * Returns: The month of this [GstDateTime]()
  */
 gint
 gst_date_time_get_month (const GstDateTime * datetime)
@@ -228,12 +238,12 @@ gst_date_time_get_month (const GstDateTime * datetime)
 
 /**
  * gst_date_time_get_day:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Returns the day of the month of this #GstDateTime.
+ * Returns the day of the month of this [GstDateTime]().
  * Call gst_date_time_has_day before, to avoid warnings.
  *
- * Return value: The day of this #GstDateTime
+ * Returns: The day of this [GstDateTime]()
  */
 gint
 gst_date_time_get_day (const GstDateTime * datetime)
@@ -246,13 +256,13 @@ gst_date_time_get_day (const GstDateTime * datetime)
 
 /**
  * gst_date_time_get_hour:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Retrieves the hour of the day represented by @datetime in the gregorian
+ * Retrieves the hour of the day represented by _datetime_ in the gregorian
  * calendar. The return is in the range of 0 to 23.
  * Call gst_date_time_has_haur before, to avoid warnings.
  *
- * Return value: the hour of the day
+ * Returns: the hour of the day
  */
 gint
 gst_date_time_get_hour (const GstDateTime * datetime)
@@ -265,13 +275,13 @@ gst_date_time_get_hour (const GstDateTime * datetime)
 
 /**
  * gst_date_time_get_minute:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Retrieves the minute of the hour represented by @datetime in the gregorian
+ * Retrieves the minute of the hour represented by _datetime_ in the gregorian
  * calendar.
  * Call gst_date_time_has_minute before, to avoid warnings.
  *
- * Return value: the minute of the hour
+ * Returns: the minute of the hour
  */
 gint
 gst_date_time_get_minute (const GstDateTime * datetime)
@@ -284,13 +294,13 @@ gst_date_time_get_minute (const GstDateTime * datetime)
 
 /**
  * gst_date_time_get_second:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Retrieves the second of the minute represented by @datetime in the gregorian
+ * Retrieves the second of the minute represented by _datetime_ in the gregorian
  * calendar.
  * Call gst_date_time_has_second before, to avoid warnings.
  *
- * Return value: the second represented by @datetime
+ * Returns: the second represented by _datetime_
  */
 gint
 gst_date_time_get_second (const GstDateTime * datetime)
@@ -303,12 +313,12 @@ gst_date_time_get_second (const GstDateTime * datetime)
 
 /**
  * gst_date_time_get_microsecond:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
  * Retrieves the fractional part of the seconds in microseconds represented by
- * @datetime in the gregorian calendar.
+ * _datetime_ in the gregorian calendar.
  *
- * Return value: the microsecond of the second
+ * Returns: the microsecond of the second
  */
 gint
 gst_date_time_get_microsecond (const GstDateTime * datetime)
@@ -321,14 +331,14 @@ gst_date_time_get_microsecond (const GstDateTime * datetime)
 
 /**
  * gst_date_time_get_time_zone_offset:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
  * Retrieves the offset from UTC in hours that the timezone specified
- * by @datetime represents. Timezones ahead (to the east) of UTC have positive
+ * by _datetime_ represents. Timezones ahead (to the east) of UTC have positive
  * values, timezones before (to the west) of UTC have negative values.
- * If @datetime represents UTC time, then the offset is zero.
+ * If _datetime_ represents UTC time, then the offset is zero.
  *
- * Return value: the offset from UTC in hours
+ * Returns: the offset from UTC in hours
  */
 gfloat
 gst_date_time_get_time_zone_offset (const GstDateTime * datetime)
@@ -344,14 +354,14 @@ gst_date_time_get_time_zone_offset (const GstDateTime * datetime)
  * gst_date_time_new_y:
  * @year: the gregorian year
  *
- * Creates a new #GstDateTime using the date and times in the gregorian calendar
+ * Creates a new [GstDateTime]() using the date and times in the gregorian calendar
  * in the local timezone.
  *
- * @year should be from 1 to 9999.
+ * _year_ should be from 1 to 9999.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime
+ * Returns: (transfer full): the newly created [GstDateTime]()
  */
 GstDateTime *
 gst_date_time_new_y (gint year)
@@ -364,17 +374,17 @@ gst_date_time_new_y (gint year)
  * @year: the gregorian year
  * @month: the gregorian month
  *
- * Creates a new #GstDateTime using the date and times in the gregorian calendar
+ * Creates a new [GstDateTime]() using the date and times in the gregorian calendar
  * in the local timezone.
  *
- * @year should be from 1 to 9999, @month should be from 1 to 12.
+ * _year_ should be from 1 to 9999, _month_ should be from 1 to 12.
  *
  * If value is -1 then all over value will be ignored. For example
- * if @month == -1, then #GstDateTime will created only for @year.
+ * if _month_ == -1, then [GstDateTime]() will created only for _year_.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime
+ * Returns: (transfer full): the newly created [GstDateTime]()
  */
 GstDateTime *
 gst_date_time_new_ym (gint year, gint month)
@@ -388,20 +398,20 @@ gst_date_time_new_ym (gint year, gint month)
  * @month: the gregorian month
  * @day: the day of the gregorian month
  *
- * Creates a new #GstDateTime using the date and times in the gregorian calendar
+ * Creates a new [GstDateTime]() using the date and times in the gregorian calendar
  * in the local timezone.
  *
- * @year should be from 1 to 9999, @month should be from 1 to 12, @day from
+ * _year_ should be from 1 to 9999, _month_ should be from 1 to 12, _day_ from
  * 1 to 31.
  *
  * If value is -1 then all over value will be ignored. For example
- * if @month == -1, then #GstDateTime will created only for @year. If
- * @day == -1, then #GstDateTime will created for @year and @month and
+ * if _month_ == -1, then [GstDateTime]() will created only for _year_. If
+ * _day_ == -1, then [GstDateTime]() will created for _year_ and _month_ and
  * so on.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime
+ * Returns: (transfer full): the newly created [GstDateTime]()
  */
 GstDateTime *
 gst_date_time_new_ymd (gint year, gint month, gint day)
@@ -413,12 +423,12 @@ gst_date_time_new_ymd (gint year, gint month, gint day)
  * gst_date_time_new_from_unix_epoch_local_time:
  * @secs: seconds from the Unix epoch
  *
- * Creates a new #GstDateTime using the time since Jan 1, 1970 specified by
- * @secs. The #GstDateTime is in the local timezone.
+ * Creates a new [GstDateTime]() using the time since Jan 1, 1970 specified by
+ * _secs_. The [GstDateTime]() is in the local timezone.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime
+ * Returns: (transfer full): the newly created [GstDateTime]()
  */
 GstDateTime *
 gst_date_time_new_from_unix_epoch_local_time (gint64 secs)
@@ -433,12 +443,12 @@ gst_date_time_new_from_unix_epoch_local_time (gint64 secs)
  * gst_date_time_new_from_unix_epoch_utc:
  * @secs: seconds from the Unix epoch
  *
- * Creates a new #GstDateTime using the time since Jan 1, 1970 specified by
- * @secs. The #GstDateTime is in the UTC timezone.
+ * Creates a new [GstDateTime]() using the time since Jan 1, 1970 specified by
+ * _secs_. The [GstDateTime]() is in the UTC timezone.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime
+ * Returns: (transfer full): the newly created [GstDateTime]()
  */
 GstDateTime *
 gst_date_time_new_from_unix_epoch_utc (gint64 secs)
@@ -480,25 +490,25 @@ gst_date_time_check_fields (gint * year, gint * month, gint * day,
  * @minute: the minute of the hour, or -1
  * @seconds: the second of the minute, or -1
  *
- * Creates a new #GstDateTime using the date and times in the gregorian calendar
+ * Creates a new [GstDateTime]() using the date and times in the gregorian calendar
  * in the local timezone.
  *
- * @year should be from 1 to 9999, @month should be from 1 to 12, @day from
- * 1 to 31, @hour from 0 to 23, @minutes and @seconds from 0 to 59.
+ * _year_ should be from 1 to 9999, _month_ should be from 1 to 12, _day_ from
+ * 1 to 31, _hour_ from 0 to 23, _minutes_ and _seconds_ from 0 to 59.
  *
- * If @month is -1, then the #GstDateTime created will only contain @year,
+ * If _month_ is -1, then the [GstDateTime]() created will only contain _year_,
  * and all other fields will be considered not set.
  *
- * If @day is -1, then the #GstDateTime created will only contain @year and
- * @month and all other fields will be considered not set.
+ * If _day_ is -1, then the [GstDateTime]() created will only contain _year_ and
+ * _month_ and all other fields will be considered not set.
  *
- * If @hour is -1, then the #GstDateTime created will only contain @year and
- * @month and @day, and the time fields will be considered not set. In this
- * case @minute and @seconds should also be -1.
+ * If _hour_ is -1, then the [GstDateTime]() created will only contain _year_ and
+ * _month_ and _day_, and the time fields will be considered not set. In this
+ * case _minute_ and _seconds_ should also be -1.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime
+ * Returns: (transfer full): the newly created [GstDateTime]()
  */
 GstDateTime *
 gst_date_time_new_local_time (gint year, gint month, gint day, gint hour,
@@ -527,12 +537,12 @@ gst_date_time_new_local_time (gint year, gint month, gint day, gint hour,
 /**
  * gst_date_time_new_now_local_time:
  *
- * Creates a new #GstDateTime representing the current date and time.
+ * Creates a new [GstDateTime]() representing the current date and time.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime which should
- *     be freed with gst_date_time_unref().
+ * Returns: (transfer full): the newly created [GstDateTime]() which should
+ *     be freed with [gst_date_time_unref]().
  */
 GstDateTime *
 gst_date_time_new_now_local_time (void)
@@ -543,13 +553,13 @@ gst_date_time_new_now_local_time (void)
 /**
  * gst_date_time_new_now_utc:
  *
- * Creates a new #GstDateTime that represents the current instant at Universal
+ * Creates a new [GstDateTime]() that represents the current instant at Universal
  * coordinated time.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime which should
- *   be freed with gst_date_time_unref().
+ * Returns: (transfer full): the newly created [GstDateTime]() which should
+ *   be freed with [gst_date_time_unref]().
  */
 GstDateTime *
 gst_date_time_new_now_utc (void)
@@ -590,24 +600,24 @@ __gst_date_time_compare (const GstDateTime * dt1, const GstDateTime * dt2)
  * @minute: the minute of the hour
  * @seconds: the second of the minute
  *
- * Creates a new #GstDateTime using the date and times in the gregorian calendar
+ * Creates a new [GstDateTime]() using the date and times in the gregorian calendar
  * in the supplied timezone.
  *
- * @year should be from 1 to 9999, @month should be from 1 to 12, @day from
- * 1 to 31, @hour from 0 to 23, @minutes and @seconds from 0 to 59.
+ * _year_ should be from 1 to 9999, _month_ should be from 1 to 12, _day_ from
+ * 1 to 31, _hour_ from 0 to 23, _minutes_ and _seconds_ from 0 to 59.
  *
- * Note that @tzoffset is a float and was chosen so for being able to handle
+ * Note that _tzoffset_ is a float and was chosen so for being able to handle
  * some fractional timezones, while it still keeps the readability of
  * representing it in hours for most timezones.
  *
  * If value is -1 then all over value will be ignored. For example
- * if @month == -1, then #GstDateTime will created only for @year. If
- * @day == -1, then #GstDateTime will created for @year and @month and
+ * if _month_ == -1, then [GstDateTime]() will created only for _year_. If
+ * _day_ == -1, then [GstDateTime]() will created for _year_ and _month_ and
  * so on.
  *
  * Free-function: gst_date_time_unref
  *
- * Return value: (transfer full): the newly created #GstDateTime
+ * Returns: (transfer full): the newly created [GstDateTime]()
  */
 GstDateTime *
 gst_date_time_new (gfloat tzoffset, gint year, gint month, gint day, gint hour,
@@ -729,8 +739,8 @@ done:
  *
  * Returns: (nullable): a newly allocated string formatted according
  *     to ISO 8601 and only including the datetime fields that are
- *     valid, or %NULL in case there was an error. The string should
- *     be freed with g_free().
+ *     valid, or [NULL]() in case there was an error. The string should
+ *     be freed with [g_free]().
  */
 gchar *
 gst_date_time_to_iso8601_string (GstDateTime * datetime)
@@ -748,12 +758,12 @@ gst_date_time_to_iso8601_string (GstDateTime * datetime)
  * @string: ISO 8601-formatted datetime string.
  *
  * Tries to parse common variants of ISO-8601 datetime strings into a
- * #GstDateTime.
+ * [GstDateTime]().
  *
  * Free-function: gst_date_time_unref
  *
- * Returns: (transfer full) (nullable): a newly created #GstDateTime,
- * or %NULL on error
+ * Returns: (transfer full) (nullable): a newly created [GstDateTime](),
+ * or [NULL]() on error
  */
 GstDateTime *
 gst_date_time_new_from_iso8601_string (const gchar * string)
@@ -890,11 +900,11 @@ gst_date_time_free (GstDateTime * datetime)
 
 /**
  * gst_date_time_ref:
- * @datetime: a #GstDateTime
+ * @datetime: a [GstDateTime]()
  *
- * Atomically increments the reference count of @datetime by one.
+ * Atomically increments the reference count of _datetime_ by one.
  *
- * Return value: (transfer full): the reference @datetime
+ * Returns: (transfer full): the reference _datetime_
  */
 GstDateTime *
 gst_date_time_ref (GstDateTime * datetime)
@@ -904,9 +914,9 @@ gst_date_time_ref (GstDateTime * datetime)
 
 /**
  * gst_date_time_unref:
- * @datetime: (transfer full): a #GstDateTime
+ * @datetime: (transfer full): a [GstDateTime]()
  *
- * Atomically decrements the reference count of @datetime by one.  When the
+ * Atomically decrements the reference count of _datetime_ by one.  When the
  * reference count reaches zero, the structure is freed.
  */
 void

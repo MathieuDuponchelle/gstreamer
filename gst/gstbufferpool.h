@@ -46,7 +46,7 @@ typedef struct _GstBufferPoolClass GstBufferPoolClass;
  * @GST_BUFFER_POOL_ACQUIRE_FLAG_KEY_UNIT: buffer is keyframe
  * @GST_BUFFER_POOL_ACQUIRE_FLAG_DONTWAIT: when the bufferpool is empty, acquire_buffer
  * will by default block until a buffer is released into the pool again. Setting
- * this flag makes acquire_buffer return #GST_FLOW_EOS instead of blocking.
+ * this flag makes acquire_buffer return [GST_FLOW_EOS]() instead of blocking.
  * @GST_BUFFER_POOL_ACQUIRE_FLAG_DISCONT: buffer is discont
  * @GST_BUFFER_POOL_ACQUIRE_FLAG_LAST: last flag, subclasses can use private flags
  *    starting from this value.
@@ -65,15 +65,15 @@ typedef struct _GstBufferPoolAcquireParams GstBufferPoolAcquireParams;
 
 /**
  * GstBufferPoolAcquireParams:
- * @format: the format of @start and @stop
+ * @format: the format of _start_ and _stop_
  * @start: the start position
  * @stop: the stop position
  * @flags: additional flags
  *
- * Parameters passed to the gst_buffer_pool_acquire_buffer() function to control the
+ * Parameters passed to the [gst_buffer_pool_acquire_buffer]() function to control the
  * allocation of the buffer.
  *
- * The default implementation ignores the @start and @stop members but other
+ * The default implementation ignores the _start_ and _stop_ members but other
  * implementations can use this extra information to decide what buffer to
  * return.
  */
@@ -99,7 +99,7 @@ struct _GstBufferPoolAcquireParams {
 /**
  * GstBufferPool:
  *
- * The structure of a #GstBufferPool. Use the associated macros to access the public
+ * The structure of a [GstBufferPool](). Use the associated macros to access the public
  * variables.
  */
 struct _GstBufferPool {
@@ -116,7 +116,7 @@ struct _GstBufferPool {
 
 /**
  * GstBufferPoolClass:
- * @object_class:  Object parent class
+ * @object_class: Object parent class
  * @get_options: get a list of options supported by this pool
  * @set_config: apply the bufferpool configuration. The default configuration
  *              will parse the default config parameters
@@ -131,20 +131,20 @@ struct _GstBufferPool {
  * @alloc_buffer: allocate a buffer. the default implementation allocates
  *        buffers from the configured memory allocator and with the configured
  *        parameters. All metadata that is present on the allocated buffer will
- *        be marked as #GST_META_FLAG_POOLED and #GST_META_FLAG_LOCKED and will
- *        not be removed from the buffer in @reset_buffer. The buffer should
+ *        be marked as [GST_META_FLAG_POOLED]() and [GST_META_FLAG_LOCKED]() and will
+ *        not be removed from the buffer in _reset_buffer_. The buffer should
  *        have the GST_BUFFER_FLAG_TAG_MEMORY cleared.
  * @reset_buffer: reset the buffer to its state when it was freshly allocated.
  *        The default implementation will clear the flags, timestamps and
- *        will remove the metadata without the #GST_META_FLAG_POOLED flag (even
- *        the metadata with #GST_META_FLAG_LOCKED). If the
- *        #GST_BUFFER_FLAG_TAG_MEMORY was set, this function can also try to
- *        restore the memory and clear the #GST_BUFFER_FLAG_TAG_MEMORY again.
+ *        will remove the metadata without the [GST_META_FLAG_POOLED]() flag (even
+ *        the metadata with [GST_META_FLAG_LOCKED]()). If the
+ *        [GST_BUFFER_FLAG_TAG_MEMORY]() was set, this function can also try to
+ *        restore the memory and clear the [GST_BUFFER_FLAG_TAG_MEMORY]() again.
  * @release_buffer: release a buffer back in the pool. The default
  *        implementation will put the buffer back in the queue and notify any
- *        blocking acquire_buffer calls when the #GST_BUFFER_FLAG_TAG_MEMORY
- *        is not set on the buffer. If #GST_BUFFER_FLAG_TAG_MEMORY is set, the 
- *        buffer will be freed with @free_buffer.
+ *        blocking acquire_buffer calls when the [GST_BUFFER_FLAG_TAG_MEMORY]()
+ *        is not set on the buffer. If [GST_BUFFER_FLAG_TAG_MEMORY]() is set, the
+ *        buffer will be freed with _free_buffer_.
  * @free_buffer: free a buffer. The default implementation unrefs the buffer.
  * @flush_start: enter the flushing state. (Since 1.4)
  * @flush_stop: leave the flushign state. (Since 1.4)

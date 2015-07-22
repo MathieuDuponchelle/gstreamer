@@ -23,8 +23,8 @@
 /**
  * SECTION:gst
  * @short_description: Media library supporting arbitrary formats and filter
- *                     graphs.
  *
+ * graphs.
  * GStreamer is a framework for constructing graphs of various filters
  * (termed elements here) that will handle streaming media.  Any discrete
  * (packetizable) media type is supported, with provisions for automatically
@@ -36,7 +36,7 @@
  * editing, serving streams, voice over ip and video calls.
  *
  * The <application>GStreamer</application> library should be initialized with
- * gst_init() before it can be used. You should pass pointers to the main argc
+ * [gst_init]() before it can be used. You should pass pointers to the main argc
  * and argv variables so that GStreamer can process its own command line
  * options, as shown in the following example.
  *
@@ -53,7 +53,7 @@
  * </programlisting>
  * </example>
  *
- * It's allowed to pass two %NULL pointers to gst_init() in case you don't want
+ * It's allowed to pass two [NULL]() pointers to [gst_init]() in case you don't want
  * to pass the command line args to GStreamer.
  *
  * You can also use GOption to initialize your own parameters as shown in
@@ -73,7 +73,7 @@
  *  };
  *  ctx = g_option_context_new ("[ADDITIONAL ARGUMENTS]");
  *  g_option_context_add_main_entries (ctx, options, GETTEXT_PACKAGE);
- *  g_option_context_add_group (ctx, gst_init_get_option_group ());
+ *  g_option_context_add_group (ctx, [gst_init_get_option_group]());
  *  if (!g_option_context_parse (ctx, &amp;argc, &amp;argv, &amp;err)) {
  *    g_print ("Error initializing: &percnt;s\n", GST_STR_NULL (err->message));
  *    exit (1);
@@ -84,12 +84,12 @@
  * </programlisting>
  * </example>
  *
- * Use gst_version() to query the library version at runtime or use the
+ * Use [gst_version]() to query the library version at runtime or use the
  * GST_VERSION_* macros to find the version at compile time. Optionally
- * gst_version_string() returns a printable string.
+ * [gst_version_string]() returns a printable string.
  *
- * The gst_deinit() call is used to clean up all internal resources used
- * by <application>GStreamer</application>. It is mostly used in unit tests 
+ * The [gst_deinit]() call is used to clean up all internal resources used
+ * by <application>GStreamer</application>. It is mostly used in unit tests
  * to check for leaks.
  */
 
@@ -215,15 +215,15 @@ DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 #endif
 
 /**
- * gst_init_get_option_group: (skip)
+ * gst_init_get_option_group: (skip):
  *
- * Returns a #GOptionGroup with GStreamer's argument specifications. The
+ * Returns a [GOptionGroup]() with GStreamer's argument specifications. The
  * group is set up to use standard GOption callbacks, so when using this
  * group in combination with GOption parsing methods, all argument parsing
  * and initialization is automated.
  *
  * This function is useful if you want to integrate GStreamer with other
- * libraries that use GOption (see g_option_context_add_group() ).
+ * libraries that use GOption (see [g_option_context_add_group]() ).
  *
  * If you use this function, you should make sure you initialise the GLib
  * threading system as one of the very first things in your program
@@ -315,16 +315,16 @@ gst_init_get_option_group (void)
  * gst_init_check:
  * @argc: (inout) (allow-none): pointer to application's argc
  * @argv: (inout) (array length=argc) (allow-none): pointer to application's argv
- * @err: pointer to a #GError to which a message will be posted on error
+ * @err: pointer to a [GError]() to which a message will be posted on error
  *
  * Initializes the GStreamer library, setting up internal path lists,
  * registering built-in elements, and loading standard plugins.
  *
- * This function will return %FALSE if GStreamer could not be initialized
+ * This function will return [FALSE]() if GStreamer could not be initialized
  * for some reason.  If you want your program to fail fatally,
- * use gst_init() instead.
+ * use [gst_init]() instead.
  *
- * Returns: %TRUE if GStreamer could be initialized.
+ * Returns: [TRUE]() if GStreamer could be initialized.
  */
 gboolean
 gst_init_check (int *argc, char **argv[], GError ** err)
@@ -374,7 +374,7 @@ gst_init_check (int *argc, char **argv[], GError ** err)
  *
  * Unless the plugin registry is disabled at compile time, the registry will be
  * loaded. By default this will also check if the registry cache needs to be
- * updated and rescan all plugins if needed. See gst_update_registry() for
+ * updated and rescan all plugins if needed. See [gst_update_registry]() for
  * details and section
  * <link linkend="gst-running">Running GStreamer Applications</link>
  * for how to disable automatic registry updates.
@@ -382,7 +382,7 @@ gst_init_check (int *argc, char **argv[], GError ** err)
  * <note><para>
  * This function will terminate your program if it was unable to initialize
  * GStreamer for some reason.  If you want your program to fall back,
- * use gst_init_check() instead.
+ * use [gst_init_check]() instead.
  * </para></note>
  *
  * WARNING: This function does not work in the same way as corresponding
@@ -408,10 +408,10 @@ gst_init (int *argc, char **argv[])
 /**
  * gst_is_initialized:
  *
- * Use this function to check if GStreamer has been initialized with gst_init()
- * or gst_init_check().
+ * Use this function to check if GStreamer has been initialized with [gst_init]()
+ * or [gst_init_check]().
  *
- * Returns: %TRUE if initialization has been done, %FALSE otherwise.
+ * Returns: [TRUE]() if initialization has been done, [FALSE]() otherwise.
  */
 gboolean
 gst_is_initialized (void)
@@ -934,14 +934,14 @@ parse_goption_arg (const gchar * opt,
 /**
  * gst_deinit:
  *
- * Clean up any resources created by GStreamer in gst_init().
+ * Clean up any resources created by GStreamer in [gst_init]().
  *
  * It is normally not needed to call this function in a normal application
  * as the resources will automatically be freed when the program terminates.
  * This function is therefore mostly used by testsuites and other memory
  * profiling tools.
  *
- * After this call GStreamer (including this method) should not be used anymore. 
+ * After this call GStreamer (including this method) should not be used anymore.
  */
 void
 gst_deinit (void)
@@ -1088,7 +1088,7 @@ gst_deinit (void)
  * @major: (out): pointer to a guint to store the major version number
  * @minor: (out): pointer to a guint to store the minor version number
  * @micro: (out): pointer to a guint to store the micro version number
- * @nano:  (out): pointer to a guint to store the nano version number
+ * @nano: (out): pointer to a guint to store the nano version number
  *
  * Gets the version number of the GStreamer library.
  */
@@ -1139,10 +1139,10 @@ gst_version_string (void)
  * is enabled by default when loading plugins.
  *
  * Applications might want to disable this behaviour with the
- * gst_segtrap_set_enabled() function. This is typically done if the application
+ * [gst_segtrap_set_enabled]() function. This is typically done if the application
  * wants to install its own handler without GStreamer interfering.
  *
- * Returns: %TRUE if GStreamer is allowed to install a custom SIGSEGV handler.
+ * Returns: [TRUE]() if GStreamer is allowed to install a custom SIGSEGV handler.
  */
 gboolean
 gst_segtrap_is_enabled (void)
@@ -1156,7 +1156,7 @@ gst_segtrap_is_enabled (void)
  * @enabled: whether a custom SIGSEGV handler should be installed.
  *
  * Applications might want to disable/enable the SIGSEGV handling of
- * the GStreamer core. See gst_segtrap_is_enabled() for more information.
+ * the GStreamer core. See [gst_segtrap_is_enabled]() for more information.
  */
 void
 gst_segtrap_set_enabled (gboolean enabled)

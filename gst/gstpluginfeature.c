@@ -23,9 +23,9 @@
 /**
  * SECTION:gstpluginfeature
  * @short_description: Base class for contents of a GstPlugin
- * @see_also: #GstPlugin
+ * @see_also: [GstPlugin]()
  *
- * This is a base class for anything that can be added to a #GstPlugin.
+ * This is a base class for anything that can be added to a [GstPlugin]().
  */
 
 #include "gst_private.h"
@@ -77,21 +77,21 @@ gst_plugin_feature_finalize (GObject * object)
  * gst_plugin_feature_load:
  * @feature: (transfer none): the plugin feature to check
  *
- * Loads the plugin containing @feature if it's not already loaded. @feature is
+ * Loads the plugin containing _feature_ if it's not already loaded. _feature_ is
  * unaffected; use the return value instead.
  *
  * Normally this function is used like this:
- * |[
+ * ```
  * GstPluginFeature *loaded_feature;
  *
  * loaded_feature = gst_plugin_feature_load (feature);
  * // presumably, we're no longer interested in the potentially-unloaded feature
  * gst_object_unref (feature);
  * feature = loaded_feature;
- * ]|
+ * ```
  *
  * Returns: (transfer full) (nullable): a reference to the loaded
- * feature, or %NULL on error
+ * feature, or [NULL]() on error
  */
 GstPluginFeature *
 gst_plugin_feature_load (GstPluginFeature * feature)
@@ -187,7 +187,7 @@ gst_plugin_feature_get_rank (GstPluginFeature * feature)
  * Get the plugin that provides this feature.
  *
  * Returns: (transfer full) (nullable): the plugin that provides this
- *     feature, or %NULL.  Unref with gst_object_unref() when no
+ *     feature, or [NULL]().  Unref with [gst_object_unref]() when no
  *     longer needed.
  */
 GstPlugin *
@@ -208,9 +208,8 @@ gst_plugin_feature_get_plugin (GstPluginFeature * feature)
  * Get the name of the plugin that provides this feature.
  *
  * Returns: (nullable): the name of the plugin that provides this
- *     feature, or %NULL if the feature is not associated with a
+ *     feature, or [NULL]() if the feature is not associated with a
  *     plugin.
- *
  * Since: 1.2
  */
 const gchar *
@@ -227,9 +226,9 @@ gst_plugin_feature_get_plugin_name (GstPluginFeature * feature)
 /**
  * gst_plugin_feature_list_free:
  * @list: (transfer full) (element-type Gst.PluginFeature): list
- *     of #GstPluginFeature
+ *     of [GstPluginFeature]()
  *
- * Unrefs each member of @list, then frees the list.
+ * Unrefs each member of _list_, then frees the list.
  */
 void
 gst_plugin_feature_list_free (GList * list)
@@ -247,12 +246,12 @@ gst_plugin_feature_list_free (GList * list)
 /**
  * gst_plugin_feature_list_copy:
  * @list: (transfer none) (element-type Gst.PluginFeature): list
- *     of #GstPluginFeature
+ *     of [GstPluginFeature]()
  *
- * Copies the list of features. Caller should call @gst_plugin_feature_list_free
+ * Copies the list of features. Caller should call _gst_plugin_feature_list_free_
  * when done with the list.
  *
- * Returns: (transfer full) (element-type Gst.PluginFeature): a copy of @list,
+ * Returns: (transfer full) (element-type Gst.PluginFeature): a copy of _list_,
  *     with each feature's reference count incremented.
  */
 GList *
@@ -283,10 +282,10 @@ gst_plugin_feature_list_copy (GList * list)
 
 /**
  * gst_plugin_feature_list_debug:
- * @list: (transfer none) (element-type Gst.PluginFeature): a #GList of
+ * @list: (transfer none) (element-type Gst.PluginFeature): a [GList]() of
  *     plugin features
  *
- * Debug the plugin feature names in @list.
+ * Debug the plugin feature names in _list_.
  */
 void
 gst_plugin_feature_list_debug (GList * list)
@@ -310,8 +309,8 @@ gst_plugin_feature_list_debug (GList * list)
  * Checks whether the given plugin feature is at least
  *  the required version
  *
- * Returns: %TRUE if the plugin feature has at least
- *  the required version, otherwise %FALSE.
+ * Returns: [TRUE]() if the plugin feature has at least
+ *  the required version, otherwise [FALSE]().
  */
 gboolean
 gst_plugin_feature_check_version (GstPluginFeature * feature,
@@ -376,11 +375,11 @@ gst_plugin_feature_check_version (GstPluginFeature * feature,
 
 /**
  * gst_plugin_feature_rank_compare_func:
- * @p1: a #GstPluginFeature
- * @p2: a #GstPluginFeature
+ * @p1: a [GstPluginFeature]()
+ * @p2: a [GstPluginFeature]()
  *
- * Compares the two given #GstPluginFeature instances. This function can be
- * used as a #GCompareFunc when sorting by rank and then by name.
+ * Compares the two given [GstPluginFeature]() instances. This function can be
+ * used as a [GCompareFunc]() when sorting by rank and then by name.
  *
  * Returns: negative value if the rank of p1 > the rank of p2 or the ranks are
  * equal but the name of p1 comes before the name of p2; zero if the rank

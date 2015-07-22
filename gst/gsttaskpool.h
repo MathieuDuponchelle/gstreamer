@@ -42,14 +42,14 @@ typedef struct _GstTaskPoolClass GstTaskPoolClass;
  * GstTaskPoolFunction:
  * @user_data: user data for the task function
  *
- * Task function, see gst_task_pool_push().
+ * Task function, see [gst_task_pool_push]().
  */
 typedef void   (*GstTaskPoolFunction)          (void *user_data);
 
 /**
  * GstTaskPool:
  *
- * The #GstTaskPool object.
+ * The [GstTaskPool]() object.
  */
 struct _GstTaskPool {
   GstObject      object;
@@ -68,7 +68,7 @@ struct _GstTaskPool {
  * @push: start a new thread
  * @join: join a thread
  *
- * The #GstTaskPoolClass object.
+ * The [GstTaskPoolClass]() object.
  */
 struct _GstTaskPoolClass {
   GstObjectClass parent_class;

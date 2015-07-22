@@ -20,7 +20,7 @@
 /**
  * SECTION:gsterror
  * @short_description: Categorized error messages
- * @see_also: #GstMessage
+ * @see_also: [GstMessage]()
  *
  * GStreamer elements can throw non-fatal warnings and fatal errors.
  * Higher-level elements and applications can programmatically filter
@@ -31,8 +31,8 @@
  * to mean both (non-fatal) warnings and (fatal) errors; they are treated
  * similarly.
  *
- * Errors from elements are the combination of a #GError and a debug string.
- * The #GError contains:
+ * Errors from elements are the combination of a [GError]() and a debug string.
+ * The [GError]() contains:
  * - a domain type: CORE, LIBRARY, RESOURCE or STREAM
  * - a code: an enum value specific to the domain
  * - a translated, human-readable message
@@ -45,8 +45,8 @@
  *
  * It is the application or compound element using the given element that
  * has more context about the use of the element. Errors can be received by
- * listening to the #GstBus of the element/pipeline for #GstMessage objects with
- * the type %GST_MESSAGE_ERROR or %GST_MESSAGE_WARNING. The thrown errors should
+ * listening to the [GstBus]() of the element/pipeline for [GstMessage]() objects with
+ * the type [GST_MESSAGE_ERROR]() or [GST_MESSAGE_WARNING](). The thrown errors should
  * be inspected, and filtered if appropriate.
  *
  * An application is expected to, by default, present the user with a
@@ -56,7 +56,7 @@
  *
  * A compound element is expected to forward errors by default higher up
  * the hierarchy; this is done by default in the same way as for other types
- * of #GstMessage.
+ * of [GstMessage]().
  *
  * When applications or compound elements trigger errors that they can
  * recover from, they can filter out these errors and take appropriate action.
@@ -64,7 +64,7 @@
  * that indicates all XVideo ports are taken, the application can attempt
  * to use another sink instead.
  *
- * Elements throw errors using the #GST_ELEMENT_ERROR convenience macro:
+ * Elements throw errors using the [GST_ELEMENT_ERROR]() convenience macro:
  *
  * <example>
  * <title>Throwing an error</title>
@@ -80,7 +80,7 @@
  *     currently provided should be enough.  If you find your type of error
  *     does not fit the current codes, you should use FAILED.</para></listitem>
  *   <listitem><para>Don't provide a message if the default one suffices.
- *     this keeps messages more uniform.  Use (%NULL) - not forgetting the
+ *     this keeps messages more uniform.  Use ([NULL]()) - not forgetting the
  *     parentheses.</para></listitem>
  *   <listitem><para>If you do supply a custom message, it should be
  *     marked for translation.  The message should start with a capital
@@ -89,9 +89,9 @@
  *     A user interface will present this message as the first thing a user
  *     sees.  Details, technical info, ... should go in the debug string.
  *   </para></listitem>
- *   <listitem><para>The debug string can be as you like.  Again, use (%NULL)
+ *   <listitem><para>The debug string can be as you like.  Again, use ([NULL]())
  *     if there's nothing to add - file and line number will still be
- *     passed.  #GST_ERROR_SYSTEM can be used as a shortcut to give
+ *     passed.  [GST_ERROR_SYSTEM]() can be used as a shortcut to give
  *     debug information on a system call error.</para></listitem>
  * </itemizedlist>
  */

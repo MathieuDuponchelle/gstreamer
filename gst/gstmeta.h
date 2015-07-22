@@ -51,31 +51,31 @@ typedef enum {
 
 /**
  * GST_META_FLAGS:
- * @meta: a #GstMeta.
+ * @meta: a [GstMeta]().
  *
- * A flags word containing #GstMetaFlags flags set on @meta
+ * A flags word containing [GstMetaFlags]() flags set on _meta_
  */
 #define GST_META_FLAGS(meta)  (GST_META_CAST (meta)->flags)
 /**
  * GST_META_FLAG_IS_SET:
- * @meta: a #GstMeta.
- * @flag: the #GstMetaFlags to check.
+ * @meta: a [GstMeta]().
+ * @flag: the [GstMetaFlags]() to check.
  *
  * Gives the status of a specific flag on a metadata.
  */
 #define GST_META_FLAG_IS_SET(meta,flag)        !!(GST_META_FLAGS (meta) & (flag))
 /**
  * GST_META_FLAG_SET:
- * @meta: a #GstMeta.
- * @flag: the #GstMetaFlags to set.
+ * @meta: a [GstMeta]().
+ * @flag: the [GstMetaFlags]() to set.
  *
  * Sets a metadata flag on a metadata.
  */
 #define GST_META_FLAG_SET(meta,flag)           (GST_META_FLAGS (meta) |= (flag))
 /**
  * GST_META_FLAG_UNSET:
- * @meta: a #GstMeta.
- * @flag: the #GstMetaFlags to clear.
+ * @meta: a [GstMeta]().
+ * @flag: the [GstMetaFlags]() to clear.
  *
  * Clears a metadata flag.
  */
@@ -93,7 +93,7 @@ typedef enum {
 /**
  * GstMeta:
  * @flags: extra flags for the metadata
- * @info: pointer to the #GstMetaInfo
+ * @info: pointer to the [GstMetaInfo]()
  *
  * Base structure for metadata. Custom metadata will put this structure
  * as the first member of their structure.
@@ -105,20 +105,20 @@ struct _GstMeta {
 
 /**
  * GstMetaInitFunction:
- * @meta: a #GstMeta
+ * @meta: a [GstMeta]()
  * @params: parameters passed to the init function
- * @buffer: a #GstBuffer
+ * @buffer: a [GstBuffer]()
  *
- * Function called when @meta is initialized in @buffer.
+ * Function called when _meta_ is initialized in _buffer_.
  */
 typedef gboolean (*GstMetaInitFunction) (GstMeta *meta, gpointer params, GstBuffer *buffer);
 
 /**
  * GstMetaFreeFunction:
- * @meta: a #GstMeta
- * @buffer: a #GstBuffer
+ * @meta: a [GstMeta]()
+ * @buffer: a [GstBuffer]()
  *
- * Function called when @meta is freed in @buffer.
+ * Function called when _meta_ is freed in _buffer_.
  */
 typedef void (*GstMetaFreeFunction)     (GstMeta *meta, GstBuffer *buffer);
 
@@ -139,11 +139,11 @@ GST_EXPORT GQuark _gst_meta_transform_copy;
 
 /**
  * GstMetaTransformCopy:
- * @region: %TRUE if only region is copied
- * @offset: the offset to copy, 0 if @region is %FALSE, otherwise > 0
- * @size: the size to copy, -1 or the buffer size when @region is %FALSE
+ * @region: [TRUE]() if only region is copied
+ * @offset: the offset to copy, 0 if _region_ is [FALSE](), otherwise > 0
+ * @size: the size to copy, -1 or the buffer size when _region_ is [FALSE]()
  *
- * Extra data passed to a "gst-copy" transform #GstMetaTransformFunction.
+ * Extra data passed to a "gst-copy" transform [GstMetaTransformFunction]().
  */
 typedef struct {
   gboolean region;
@@ -153,21 +153,21 @@ typedef struct {
 
 /**
  * GstMetaTransformFunction:
- * @transbuf: a #GstBuffer
- * @meta: a #GstMeta
- * @buffer: a #GstBuffer
+ * @transbuf: a [GstBuffer]()
+ * @meta: a [GstMeta]()
+ * @buffer: a [GstBuffer]()
  * @type: the transform type
  * @data: transform specific data.
  *
- * Function called for each @meta in @buffer as a result of performing a
- * transformation on @transbuf. Additional @type specific transform data
- * is passed to the function as @data.
+ * Function called for each _meta_ in _buffer_ as a result of performing a
+ * transformation on _transbuf_. Additional _type_ specific transform data
+ * is passed to the function as _data_.
  *
- * Implementations should check the @type of the transform and parse
- * additional type specific fields in @data that should be used to update
- * the metadata on @transbuf.
+ * Implementations should check the _type_ of the transform and parse
+ * additional type specific fields in _data_ that should be used to update
+ * the metadata on _transbuf_.
  *
- * Returns: %TRUE if the transform could be performed
+ * Returns: [TRUE]() if the transform could be performed
  */
 typedef gboolean (*GstMetaTransformFunction) (GstBuffer *transbuf,
                                               GstMeta *meta, GstBuffer *buffer,
@@ -182,7 +182,7 @@ typedef gboolean (*GstMetaTransformFunction) (GstBuffer *transbuf,
  * @free_func: function for freeing the metadata
  * @transform_func: function for transforming the metadata
  *
- * The #GstMetaInfo provides information about a specific metadata
+ * The [GstMetaInfo]() provides information about a specific metadata
  * structure.
  */
 struct _GstMetaInfo {

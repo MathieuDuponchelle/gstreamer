@@ -60,7 +60,7 @@ typedef enum {
 /**
  * GstSystemClock:
  *
- * The default implementation of a #GstClock that uses the system time.
+ * The default implementation of a [GstClock]() that uses the system time.
  */
 struct _GstSystemClock {
   GstClock       clock;

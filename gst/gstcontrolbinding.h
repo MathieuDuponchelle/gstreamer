@@ -53,9 +53,9 @@ typedef void (* GstControlBindingConvert) (GstControlBinding *binding, gdouble s
 /**
  * GstControlBinding:
  * @name: name of the property of this binding
- * @pspec: #GParamSpec for this property
+ * @pspec: [GParamSpec]() for this property
  *
- * The instance structure of #GstControlBinding.
+ * The instance structure of [GstControlBinding]().
  */
 struct _GstControlBinding {
   GstObject parent;
@@ -81,7 +81,7 @@ struct _GstControlBinding {
  * @get_g_value_array: implementation to fetch a series of control-values
  *                     as g_values
  *
- * The class structure of #GstControlBinding.
+ * The class structure of [GstControlBinding]().
  */
 
 struct _GstControlBindingClass

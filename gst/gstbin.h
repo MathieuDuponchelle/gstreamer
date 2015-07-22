@@ -46,8 +46,8 @@ G_BEGIN_DECLS
  * Derived classes can use this as first value in a list of flags.
  *
  * GstBinFlags are a set of flags specific to bins. Most are set/used
- * internally. They can be checked using the GST_OBJECT_FLAG_IS_SET () macro,
- * and (un)set using GST_OBJECT_FLAG_SET () and GST_OBJECT_FLAG_UNSET ().
+ * internally. They can be checked using the [GST_OBJECT_FLAG_IS_SET]() macro,
+ * and (un)set using [GST_OBJECT_FLAG_SET]() and [GST_OBJECT_FLAG_UNSET]().
  */
 typedef enum {
   GST_BIN_FLAG_NO_RESYNC	= (GST_ELEMENT_FLAG_LAST << 0),
@@ -57,9 +57,9 @@ typedef enum {
 
 /**
  * GST_BIN_IS_NO_RESYNC:
- * @bin: A #GstBin
+ * @bin: A [GstBin]()
  *
- * Check if @bin will resync its state change when elements are added and
+ * Check if _bin_ will resync its state change when elements are added and
  * removed.
  *
  * Since: 1.0.5
@@ -72,21 +72,21 @@ typedef struct _GstBinPrivate GstBinPrivate;
 
 /**
  * GST_BIN_NUMCHILDREN:
- * @bin: a #GstBin
+ * @bin: a [GstBin]()
  *
  * Gets the number of children in a bin.
  */
 #define GST_BIN_NUMCHILDREN(bin)	(GST_BIN_CAST(bin)->numchildren)
 /**
  * GST_BIN_CHILDREN:
- * @bin: a #GstBin
+ * @bin: a [GstBin]()
  *
  * Gets the list with children in a bin.
  */
 #define GST_BIN_CHILDREN(bin)		(GST_BIN_CAST(bin)->children)
 /**
  * GST_BIN_CHILDREN_COOKIE:
- * @bin: a #GstBin
+ * @bin: a [GstBin]()
  *
  * Gets the children cookie that watches the children list.
  */
@@ -96,14 +96,14 @@ typedef struct _GstBinPrivate GstBinPrivate;
  * GstBin:
  * @numchildren: the number of children in this bin
  * @children: (element-type Gst.Element): the list of children in this bin
- * @children_cookie: updated whenever @children changes
+ * @children_cookie: updated whenever _children_ changes
  * @child_bus: internal bus for handling child messages
  * @messages: (element-type Gst.Message): queued and cached messages
  * @polling: the bin is currently calculating its state
  * @state_dirty: the bin needs to recalculate its state (deprecated)
  * @clock_dirty: the bin needs to select a new clock
  * @provided_clock: the last clock selected
- * @clock_provider: the element that provided @provided_clock
+ * @clock_provider: the element that provided _provided_clock_
  *
  * The GstBin base class. Subclasses can access these fields provided
  * the LOCK is taken.
@@ -141,12 +141,12 @@ struct _GstBin {
  * @remove_element: method to remove an element from a bin
  * @handle_message: method to handle a message from the children
  *
- * Subclasses can override the @add_element and @remove_element to
+ * Subclasses can override the _add_element_ and _remove_element_ to
  * update the list of children in the bin.
  *
- * The @handle_message method can be overridden to implement custom
- * message handling.  @handle_message takes ownership of the message, just like
- * #gst_element_post_message.
+ * The _handle_message_ method can be overridden to implement custom
+ * message handling.  _handle_message_ takes ownership of the message, just like
+ * [gst_element_post_message]().
  */
 struct _GstBinClass {
   GstElementClass parent_class;

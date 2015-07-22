@@ -42,8 +42,8 @@ G_BEGIN_DECLS
  * @GST_DEBUG_GRAPH_SHOW_VERBOSE: show all details regardless of how large or
  *                                verbose they make the resulting output
  *
- * Available details for pipeline graphs produced by GST_DEBUG_BIN_TO_DOT_FILE()
- * and GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS().
+ * Available details for pipeline graphs produced by [GST_DEBUG_BIN_TO_DOT_FILE]()
+ * and [GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS]().
  */
 typedef enum {
   GST_DEBUG_GRAPH_SHOW_MEDIA_TYPE         = (1<<0),
@@ -67,8 +67,8 @@ void gst_debug_bin_to_dot_file_with_ts (GstBin *bin, GstDebugGraphDetails detail
 /**
  * GST_DEBUG_BIN_TO_DOT_FILE:
  * @bin: the top-level pipeline that should be analyzed
- * @details: details to show in the graph, e.g. #GST_DEBUG_GRAPH_SHOW_ALL or
- *    one or more other #GstDebugGraphDetails flags.
+ * @details: details to show in the graph, e.g. [GST_DEBUG_GRAPH_SHOW_ALL]() or
+ *    one or more other [GstDebugGraphDetails]() flags.
  * @file_name: output base filename (e.g. "myplayer")
  *
  * To aid debugging applications one can use this method to write out the whole
@@ -87,11 +87,11 @@ void gst_debug_bin_to_dot_file_with_ts (GstBin *bin, GstDebugGraphDetails detail
 /**
  * GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS:
  * @bin: the top-level pipeline that should be analyzed
- * @details: details to show in the graph, e.g. #GST_DEBUG_GRAPH_SHOW_ALL or
- *    one or more other #GstDebugGraphDetails flags.
+ * @details: details to show in the graph, e.g. [GST_DEBUG_GRAPH_SHOW_ALL]() or
+ *    one or more other [GstDebugGraphDetails]() flags.
  * @file_name: output base filename (e.g. "myplayer")
  *
- * This works like GST_DEBUG_BIN_TO_DOT_FILE(), but adds the current timestamp
+ * This works like [GST_DEBUG_BIN_TO_DOT_FILE](), but adds the current timestamp
  * to the filename, so that it can be used to take multiple snapshots.
  */
 #define GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(bin, details, file_name) gst_debug_bin_to_dot_file_with_ts (bin, details, file_name)

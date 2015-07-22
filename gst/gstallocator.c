@@ -22,18 +22,18 @@
 /**
  * SECTION:gstallocator
  * @short_description: allocate memory blocks
- * @see_also: #GstMemory
+ * @see_also: [GstMemory]()
  *
- * Memory is usually created by allocators with a gst_allocator_alloc()
- * method call. When %NULL is used as the allocator, the default allocator will
+ * Memory is usually created by allocators with a [gst_allocator_alloc]()
+ * method call. When [NULL]() is used as the allocator, the default allocator will
  * be used.
  *
- * New allocators can be registered with gst_allocator_register().
+ * New allocators can be registered with [gst_allocator_register]().
  * Allocators are identified by name and can be retrieved with
- * gst_allocator_find(). gst_allocator_set_default() can be used to change the
+ * [gst_allocator_find](). [gst_allocator_set_default]() can be used to change the
  * default allocator.
  *
- * New memory can be created with gst_memory_new_wrapped() that wraps the memory
+ * New memory can be created with [gst_memory_new_wrapped]() that wraps the memory
  * allocated elsewhere.
  */
 
@@ -144,9 +144,9 @@ G_DEFINE_BOXED_TYPE (GstAllocationParams, gst_allocation_params,
 
 /**
  * gst_allocation_params_init:
- * @params: a #GstAllocationParams
+ * @params: a [GstAllocationParams]()
  *
- * Initialize @params to its default values
+ * Initialize _params_ to its default values
  */
 void
 gst_allocation_params_init (GstAllocationParams * params)
@@ -158,14 +158,14 @@ gst_allocation_params_init (GstAllocationParams * params)
 
 /**
  * gst_allocation_params_copy:
- * @params: (transfer none): a #GstAllocationParams
+ * @params: (transfer none): a [GstAllocationParams]()
  *
- * Create a copy of @params.
+ * Create a copy of _params_.
  *
  * Free-function: gst_allocation_params_free
  *
- * Returns: (transfer full): a new ##GstAllocationParams, free with
- * gst_allocation_params_free().
+ * Returns: (transfer full): a new #[GstAllocationParams](), free with
+ * [gst_allocation_params_free]().
  */
 GstAllocationParams *
 gst_allocation_params_copy (const GstAllocationParams * params)
@@ -182,9 +182,9 @@ gst_allocation_params_copy (const GstAllocationParams * params)
 
 /**
  * gst_allocation_params_free:
- * @params: (in) (transfer full): a #GstAllocationParams
+ * @params: (in) (transfer full): a [GstAllocationParams]()
  *
- * Free @params
+ * Free _params_
  */
 void
 gst_allocation_params_free (GstAllocationParams * params)
@@ -195,10 +195,10 @@ gst_allocation_params_free (GstAllocationParams * params)
 /**
  * gst_allocator_register:
  * @name: the name of the allocator
- * @allocator: (transfer full): #GstAllocator
+ * @allocator: (transfer full): [GstAllocator]()
  *
- * Registers the memory @allocator with @name. This function takes ownership of
- * @allocator.
+ * Registers the memory _allocator_ with _name_. This function takes ownership of
+ * _allocator_.
  */
 void
 gst_allocator_register (const gchar * name, GstAllocator * allocator)
@@ -218,11 +218,11 @@ gst_allocator_register (const gchar * name, GstAllocator * allocator)
  * gst_allocator_find:
  * @name: (allow-none): the name of the allocator
  *
- * Find a previously registered allocator with @name. When @name is %NULL, the
+ * Find a previously registered allocator with _name_. When _name_ is [NULL](), the
  * default allocator will be returned.
  *
- * Returns: (transfer full) (nullable): a #GstAllocator or %NULL when
- * the allocator with @name was not registered. Use gst_object_unref()
+ * Returns: (transfer full) (nullable): a [GstAllocator]() or [NULL]() when
+ * the allocator with _name_ was not registered. Use [gst_object_unref]()
  * to release the allocator after usage.
  */
 GstAllocator *
@@ -245,9 +245,9 @@ gst_allocator_find (const gchar * name)
 
 /**
  * gst_allocator_set_default:
- * @allocator: (transfer full): a #GstAllocator
+ * @allocator: (transfer full): a [GstAllocator]()
  *
- * Set the default allocator. This function takes ownership of @allocator.
+ * Set the default allocator. This function takes ownership of _allocator_.
  */
 void
 gst_allocator_set_default (GstAllocator * allocator)
@@ -267,27 +267,27 @@ gst_allocator_set_default (GstAllocator * allocator)
 
 /**
  * gst_allocator_alloc:
- * @allocator: (transfer none) (allow-none): a #GstAllocator to use
+ * @allocator: (transfer none) (allow-none): a [GstAllocator]() to use
  * @size: size of the visible memory area
  * @params: (transfer none) (allow-none): optional parameters
  *
- * Use @allocator to allocate a new memory block with memory that is at least
- * @size big.
+ * Use _allocator_ to allocate a new memory block with memory that is at least
+ * _size_ big.
  *
- * The optional @params can specify the prefix and padding for the memory. If
- * %NULL is passed, no flags, no extra prefix/padding and a default alignment is
+ * The optional _params_ can specify the prefix and padding for the memory. If
+ * [NULL]() is passed, no flags, no extra prefix/padding and a default alignment is
  * used.
  *
  * The prefix/padding will be filled with 0 if flags contains
- * #GST_MEMORY_FLAG_ZERO_PREFIXED and #GST_MEMORY_FLAG_ZERO_PADDED respectively.
+ * [GST_MEMORY_FLAG_ZERO_PREFIXED]() and [GST_MEMORY_FLAG_ZERO_PADDED]() respectively.
  *
- * When @allocator is %NULL, the default allocator will be used.
+ * When _allocator_ is [NULL](), the default allocator will be used.
  *
- * The alignment in @params is given as a bitmask so that @align + 1 equals
+ * The alignment in _params_ is given as a bitmask so that _align_ + 1 equals
  * the amount of bytes to align to. For example, to align to 8 bytes,
  * use an alignment of 7.
  *
- * Returns: (transfer full): a new #GstMemory.
+ * Returns: (transfer full): a new [GstMemory]().
  */
 GstMemory *
 gst_allocator_alloc (GstAllocator * allocator, gsize size,
@@ -317,10 +317,10 @@ gst_allocator_alloc (GstAllocator * allocator, gsize size,
 
 /**
  * gst_allocator_free:
- * @allocator: (transfer none): a #GstAllocator to use
+ * @allocator: (transfer none): a [GstAllocator]() to use
  * @memory: (transfer full): the memory to free
  *
- * Free @memory that was previously allocated with gst_allocator_alloc().
+ * Free _memory_ that was previously allocated with [gst_allocator_alloc]().
  */
 void
 gst_allocator_free (GstAllocator * allocator, GstMemory * memory)
@@ -594,21 +594,21 @@ _priv_gst_allocator_initialize (void)
 
 /**
  * gst_memory_new_wrapped:
- * @flags: #GstMemoryFlags
+ * @flags: [GstMemoryFlags]()
  * @data: (array length=size) (element-type guint8) (transfer none): data to
  *   wrap
- * @maxsize: allocated size of @data
- * @offset: offset in @data
+ * @maxsize: allocated size of _data_
+ * @offset: offset in _data_
  * @size: size of valid data
  * @user_data: (allow-none): user_data
- * @notify: (allow-none) (scope async) (closure user_data): called with @user_data when the memory is freed
+ * @notify: (allow-none) (scope async) (closure user_data): called with _user_data_ when the memory is freed
  *
- * Allocate a new memory block that wraps the given @data.
+ * Allocate a new memory block that wraps the given _data_.
  *
- * The prefix/padding must be filled with 0 if @flags contains
- * #GST_MEMORY_FLAG_ZERO_PREFIXED and #GST_MEMORY_FLAG_ZERO_PADDED respectively.
+ * The prefix/padding must be filled with 0 if _flags_ contains
+ * [GST_MEMORY_FLAG_ZERO_PREFIXED]() and [GST_MEMORY_FLAG_ZERO_PADDED]() respectively.
  *
- * Returns: (transfer full): a new #GstMemory.
+ * Returns: (transfer full): a new [GstMemory]().
  */
 GstMemory *
 gst_memory_new_wrapped (GstMemoryFlags flags, gpointer data,

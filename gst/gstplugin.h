@@ -86,15 +86,15 @@ typedef enum
 
 /**
  * GstPluginDependencyFlags:
- * @GST_PLUGIN_DEPENDENCY_FLAG_NONE : no special flags
- * @GST_PLUGIN_DEPENDENCY_FLAG_RECURSE : recurse into subdirectories
- * @GST_PLUGIN_DEPENDENCY_FLAG_PATHS_ARE_DEFAULT_ONLY : use paths
+ * @GST_PLUGIN_DEPENDENCY_FLAG_NONE: no special flags
+ * @GST_PLUGIN_DEPENDENCY_FLAG_RECURSE: recurse into subdirectories
+ * @GST_PLUGIN_DEPENDENCY_FLAG_PATHS_ARE_DEFAULT_ONLY: use paths
  *         argument only if none of the environment variables is set
- * @GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_SUFFIX : interpret
+ * @GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_SUFFIX: interpret
  *         filename argument as filter suffix and check all matching files in
  *         the directory
  *
- * Flags used in connection with gst_plugin_add_dependency().
+ * Flags used in connection with [gst_plugin_add_dependency]().
  */
 typedef enum {
   GST_PLUGIN_DEPENDENCY_FLAG_NONE = 0,
@@ -110,9 +110,9 @@ typedef enum {
  * A plugin should provide a pointer to a function of this type in the
  * plugin_desc struct.
  * This function will be called by the loader at startup. One would then
- * register each #GstPluginFeature.
+ * register each [GstPluginFeature]().
  *
- * Returns: %TRUE if plugin initialised successfully
+ * Returns: [TRUE]() if plugin initialised successfully
  */
 /* FIXME 0.11: Make return void */
 typedef gboolean (*GstPluginInitFunc) (GstPlugin *plugin);
@@ -122,13 +122,13 @@ typedef gboolean (*GstPluginInitFunc) (GstPlugin *plugin);
  * @plugin: The plugin object
  * @user_data: extra data
  *
- * A plugin should provide a pointer to a function of either #GstPluginInitFunc
+ * A plugin should provide a pointer to a function of either [GstPluginInitFunc]()
  * or this type in the plugin_desc struct.
  * The function will be called by the loader at startup. One would then
- * register each #GstPluginFeature. This version allows
+ * register each [GstPluginFeature](). This version allows
  * user data to be passed to init function (useful for bindings).
  *
- * Returns: %TRUE if plugin initialised successfully
+ * Returns: [TRUE]() if plugin initialised successfully
  */
 /* FIXME 0.11: Merge with GstPluginInitFunc */
 typedef gboolean (*GstPluginInitFullFunc) (GstPlugin *plugin, gpointer user_data);
@@ -146,7 +146,7 @@ typedef gboolean (*GstPluginInitFullFunc) (GstPlugin *plugin, gpointer user_data
  * @package: shipped package plugin belongs to
  * @origin: URL to provider of plugin
  * @release_datetime: (allow-none): date time string in ISO 8601
- *     format (or rather, a subset thereof), or %NULL. Allowed are the
+ *     format (or rather, a subset thereof), or [NULL](). Allowed are the
  *     following formats: "YYYY-MM-DD" and "YYY-MM-DDTHH:MMZ" (with
  *     'T' a separator and 'Z' indicating UTC/Zulu time). This field
  *     should be set via the GST_PACKAGE_RELEASE_DATETIME
@@ -155,7 +155,7 @@ typedef gboolean (*GstPluginInitFullFunc) (GstPlugin *plugin, gpointer user_data
  * A plugin should export a variable of this type called plugin_desc. The plugin
  * loader will use the data provided there to initialize the plugin.
  *
- * The @licence parameter must be one of: LGPL, GPL, QPL, GPL/QPL, MPL,
+ * The _licence_ parameter must be one of: LGPL, GPL, QPL, GPL/QPL, MPL,
  * BSD, MIT/X11, Proprietary, unknown.
  */
 struct _GstPluginDesc {
@@ -233,14 +233,14 @@ struct _GstPluginDesc {
  * plugin. One would use this macro to export a plugin, so that it can be used
  * by other applications.
  *
- * The macro uses a define named PACKAGE for the #GstPluginDesc,source field.
+ * The macro uses a define named PACKAGE for the [GstPluginDesc](),source field.
  * When using autoconf, this is usually set automatically via the AC_INIT
  * macro, and set in config.h. If you are not using autoconf, you will need to
  * define PACKAGE yourself and set it to a short mnemonic string identifying
  * your application/package, e.g. 'someapp' or 'my-plugins-foo.
  *
  * If defined, the GST_PACKAGE_RELEASE_DATETIME will also be used for the
- * #GstPluginDesc,release_datetime field.
+ * [GstPluginDesc](),release_datetime field.
  */
 #ifdef GST_PLUGIN_BUILD_STATIC
 #define GST_PLUGIN_DEFINE(major,minor,name,description,init,version,license,package,origin)	\
@@ -287,12 +287,12 @@ G_END_DECLS
 /**
  * GstPluginFilter:
  * @plugin: the plugin to check
- * @user_data: the user_data that has been passed on e.g. gst_registry_plugin_filter()
+ * @user_data: the user_data that has been passed on e.g. [gst_registry_plugin_filter]()
  *
- * A function that can be used with e.g. gst_registry_plugin_filter()
+ * A function that can be used with e.g. [gst_registry_plugin_filter]()
  * to get a list of plugins that match certain criteria.
  *
- * Returns: %TRUE for a positive match, %FALSE otherwise
+ * Returns: [TRUE]() for a positive match, [FALSE]() otherwise
  */
 typedef gboolean        (*GstPluginFilter)              (GstPlugin *plugin,
                                                          gpointer user_data);

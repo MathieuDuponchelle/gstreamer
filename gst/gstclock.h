@@ -45,7 +45,7 @@ typedef guint64 GstClockTime;
 /**
  * GST_TYPE_CLOCK_TIME:
  *
- * The #GType of a #GstClockTime.
+ * The [GType]() of a [GstClockTime]().
  */
 #define GST_TYPE_CLOCK_TIME G_TYPE_UINT64
 
@@ -63,7 +63,7 @@ typedef gint64 GstClockTimeDiff;
 typedef gpointer GstClockID;
 
 /**
- * GST_CLOCK_TIME_NONE: (value 18446744073709551615) (type GstClockTime)
+ * GST_CLOCK_TIME_NONE: (value 18446744073709551615) (type GstClockTime):
  *
  * Constant to define an undefined clock time.
  */
@@ -72,12 +72,12 @@ typedef gpointer GstClockID;
  * GST_CLOCK_TIME_IS_VALID:
  * @time: clock time to validate
  *
- * Tests if a given #GstClockTime represents a valid defined time.
+ * Tests if a given [GstClockTime]() represents a valid defined time.
  */
 #define GST_CLOCK_TIME_IS_VALID(time)   (((GstClockTime)(time)) != GST_CLOCK_TIME_NONE)
 
 /**
- * GST_CLOCK_STIME_NONE: (value -9223372036854775808) (type GstClockTimeDiff)
+ * GST_CLOCK_STIME_NONE: (value -9223372036854775808) (type GstClockTimeDiff):
  *
  * Constant to define an undefined clock time.
  */
@@ -86,7 +86,7 @@ typedef gpointer GstClockID;
  * GST_CLOCK_STIME_IS_VALID:
  * @time: signed clock time to validate
  *
- * Tests if a given #GstClockTimeDiff of #gint64 represents a valid defined time.
+ * Tests if a given [GstClockTimeDiff]() of [gint64]() represents a valid defined time.
  *
  * Since: 1.6
  */
@@ -94,25 +94,25 @@ typedef gpointer GstClockID;
 
 /* FIXME: still need to explicitly force types on the defines below */
 /**
- * GST_SECOND: (value 1000000000) (type GstClockTime)
+ * GST_SECOND: (value 1000000000) (type GstClockTime):
  *
  * Constant that defines one GStreamer second.
  */
 #define GST_SECOND  (G_USEC_PER_SEC * G_GINT64_CONSTANT (1000))
 /**
- * GST_MSECOND: (value 1000000) (type GstClockTime)
+ * GST_MSECOND: (value 1000000) (type GstClockTime):
  *
  * Constant that defines one GStreamer millisecond.
  */
 #define GST_MSECOND (GST_SECOND / G_GINT64_CONSTANT (1000))
 /**
- * GST_USECOND: (value 1000) (type GstClockTime)
+ * GST_USECOND: (value 1000) (type GstClockTime):
  *
  * Constant that defines one GStreamer microsecond.
  */
 #define GST_USECOND (GST_SECOND / G_GINT64_CONSTANT (1000000))
 /**
- * GST_NSECOND: (value 1) (type GstClockTime)
+ * GST_NSECOND: (value 1) (type GstClockTime):
  *
  * Constant that defines one GStreamer nanosecond
  */
@@ -123,28 +123,28 @@ typedef gpointer GstClockID;
  * GST_TIME_AS_SECONDS:
  * @time: the time
  *
- * Convert a #GstClockTime to seconds.
+ * Convert a [GstClockTime]() to seconds.
  */
 #define GST_TIME_AS_SECONDS(time)  ((time) / GST_SECOND)
 /**
  * GST_TIME_AS_MSECONDS:
  * @time: the time
  *
- * Convert a #GstClockTime to milliseconds (1/1000 of a second).
+ * Convert a [GstClockTime]() to milliseconds (1/1000 of a second).
  */
 #define GST_TIME_AS_MSECONDS(time) ((time) / G_GINT64_CONSTANT (1000000))
 /**
  * GST_TIME_AS_USECONDS:
  * @time: the time
  *
- * Convert a #GstClockTime to microseconds (1/1000000 of a second).
+ * Convert a [GstClockTime]() to microseconds (1/1000000 of a second).
  */
 #define GST_TIME_AS_USECONDS(time) ((time) / G_GINT64_CONSTANT (1000))
 /**
  * GST_TIME_AS_NSECONDS:
  * @time: the time
  *
- * Convert a #GstClockTime to nanoseconds (1/1000000000 of a second).
+ * Convert a [GstClockTime]() to nanoseconds (1/1000000000 of a second).
  */
 #define GST_TIME_AS_NSECONDS(time) (time)
 
@@ -153,8 +153,8 @@ typedef gpointer GstClockID;
  * @s: the first time
  * @e: the second time
  *
- * Calculate a difference between two clock times as a #GstClockTimeDiff.
- * The difference is calculated as @e - @s.
+ * Calculate a difference between two clock times as a [GstClockTimeDiff]().
+ * The difference is calculated as _e_ - _s_.
  */
 #define GST_CLOCK_DIFF(s, e)            (GstClockTimeDiff)((e) - (s))
 
@@ -162,16 +162,16 @@ typedef gpointer GstClockID;
  * GST_TIMEVAL_TO_TIME:
  * @tv: the timeval to convert
  *
- * Convert a #GTimeVal to a #GstClockTime.
+ * Convert a [GTimeVal]() to a [GstClockTime]().
  */
 #define GST_TIMEVAL_TO_TIME(tv)         (GstClockTime)((tv).tv_sec * GST_SECOND + (tv).tv_usec * GST_USECOND)
 
 /**
  * GST_TIME_TO_TIMEVAL:
- * @t: The #GstClockTime to convert
+ * @t: The [GstClockTime]() to convert
  * @tv: The target timeval
  *
- * Convert a #GstClockTime to a #GTimeVal
+ * Convert a [GstClockTime]() to a [GTimeVal]()
  *
  * <note>on 32-bit systems, a timeval has a range of only 2^32 - 1 seconds,
  * which is about 68 years.  Expect trouble if you want to schedule stuff
@@ -191,15 +191,15 @@ G_STMT_START {                                                  \
  * GST_TIMESPEC_TO_TIME:
  * @ts: the timespec to convert
  *
- * Convert a struct timespec (see man pselect) to a #GstClockTime.
+ * Convert a struct timespec (see man pselect) to a [GstClockTime]().
  */
 #define GST_TIMESPEC_TO_TIME(ts)        (GstClockTime)((ts).tv_sec * GST_SECOND + (ts).tv_nsec * GST_NSECOND)
 /**
  * GST_TIME_TO_TIMESPEC:
- * @t: The #GstClockTime to convert
+ * @t: The [GstClockTime]() to convert
  * @ts: The target timespec
  *
- * Convert a #GstClockTime to a struct timespec (see man pselect)
+ * Convert a [GstClockTime]() to a struct timespec (see man pselect)
  */
 #define GST_TIME_TO_TIMESPEC(t,ts)                                \
 G_STMT_START {                                                    \
@@ -214,20 +214,20 @@ G_STMT_START {                                                    \
  * GST_TIME_FORMAT:
  *
  * A string that can be used in printf-like format strings to display a
- * #GstClockTime value in h:m:s format.  Use GST_TIME_ARGS() to construct
+ * [GstClockTime]() value in h:m:s format.  Use [GST_TIME_ARGS]() to construct
  * the matching arguments.
  *
  * Example:
- * |[
+ * ```
  * printf("%" GST_TIME_FORMAT "\n", GST_TIME_ARGS(ts));
- * ]|
+ * ```
  */
 #define GST_TIME_FORMAT "u:%02u:%02u.%09u"
 /**
  * GST_TIME_ARGS:
- * @t: a #GstClockTime
+ * @t: a [GstClockTime]()
  *
- * Format @t for the #GST_TIME_FORMAT format string. Note: @t will be
+ * Format _t_ for the [GST_TIME_FORMAT]() format string. Note: _t_ will be
  * evaluated more than once.
  */
 #define GST_TIME_ARGS(t) \
@@ -243,22 +243,22 @@ G_STMT_START {                                                    \
  * GST_STIME_FORMAT:
  *
  * A string that can be used in printf-like format strings to display a signed
- * #GstClockTimeDiff or #gint64 value in h:m:s format.  Use GST_TIME_ARGS() to
+ * [GstClockTimeDiff]() or [gint64]() value in h:m:s format.  Use [GST_TIME_ARGS]() to
  * construct the matching arguments.
  *
  * Example:
- * |[
+ * ```
  * printf("%" GST_STIME_FORMAT "\n", GST_STIME_ARGS(ts));
- * ]|
+ * ```
  *
  * Since: 1.6
  */
 #define GST_STIME_FORMAT "c%" GST_TIME_FORMAT
 /**
  * GST_STIME_ARGS:
- * @t: a #GstClockTimeDiff or #gint64
+ * @t: a [GstClockTimeDiff]() or [gint64]()
  *
- * Format @t for the #GST_STIME_FORMAT format string. Note: @t will be
+ * Format _t_ for the [GST_STIME_FORMAT]() format string. Note: _t_ will be
  * evaluated more than once.
  *
  * Since: 1.6
@@ -276,12 +276,12 @@ typedef struct _GstClockPrivate GstClockPrivate;
  * GstClockCallback:
  * @clock: The clock that triggered the callback
  * @time: The time it was triggered
- * @id: The #GstClockID that expired
- * @user_data: user data passed in the gst_clock_id_wait_async() function
+ * @id: The [GstClockID]() that expired
+ * @user_data: user data passed in the [gst_clock_id_wait_async]() function
  *
  * The function prototype of the callback.
  *
- * Returns: %TRUE or %FALSE (currently unused)
+ * Returns: [TRUE]() or [FALSE]() (currently unused)
  */
 typedef gboolean        (*GstClockCallback)     (GstClock *clock, GstClockTime time,
                                                  GstClockID id, gpointer user_data);
@@ -424,15 +424,15 @@ typedef enum {
  * GST_CLOCK_FLAGS:
  * @clock: the clock to query
  *
- * Gets the #GstClockFlags clock flags.
+ * Gets the [GstClockFlags]() clock flags.
  */
 #define GST_CLOCK_FLAGS(clock)  GST_OBJECT_FLAGS(clock)
 
 /**
  * GstClock:
  *
- * #GstClock base structure. The values of this structure are
- * protected for subclasses, use the methods to use the #GstClock.
+ * [GstClock]() base structure. The values of this structure are
+ * protected for subclasses, use the methods to use the [GstClock]().
  */
 struct _GstClock {
   GstObject      object;
@@ -450,10 +450,10 @@ struct _GstClock {
  *                     be acceptable. The new resolution should be returned.
  * @get_resolution: get the resolution of the clock.
  * @get_internal_time: get the internal unadjusted time of the clock.
- *        implement @wait_jitter instead.
- * @wait: perform a blocking wait on the given #GstClockEntry and return
+ *        implement _wait_jitter_ instead.
+ * @wait: perform a blocking wait on the given [GstClockEntry]() and return
  *               the jitter.
- * @wait_async: perform an asynchronous wait for the given #GstClockEntry.
+ * @wait_async: perform an asynchronous wait for the given [GstClockEntry]().
  * @unschedule: unblock a blocking or async wait operation.
  *
  * GStreamer clock class. Override the vmethods to implement the clock

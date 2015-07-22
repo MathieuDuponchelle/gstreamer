@@ -22,14 +22,14 @@
  * @short_description: Functions and classes to support encrypted streams.
  *
  * The GstProtectionMeta class enables the information needed to decrypt a
- * #GstBuffer to be attached to that buffer.
+ * [GstBuffer]() to be attached to that buffer.
  *
  * Typically, a demuxer element would attach GstProtectionMeta objects
  * to the buffers that it pushes downstream. The demuxer would parse the
  * protection information for a video/audio frame from its input data and use
- * this information to populate the #GstStructure @info field,
+ * this information to populate the [GstStructure]() _info_ field,
  * which is then encapsulated in a GstProtectionMeta object and attached to
- * the corresponding output buffer using the gst_buffer_add_protection_meta()
+ * the corresponding output buffer using the [gst_buffer_add_protection_meta]()
  * function. The information in this attached GstProtectionMeta would be
  * used by a downstream decrypter element to recover the original unencrypted
  * frame.
@@ -124,17 +124,16 @@ gst_protection_meta_get_info (void)
 
 /**
  * gst_buffer_add_protection_meta:
- * @buffer: #GstBuffer holding an encrypted sample, to which protection
+ * @buffer: [GstBuffer]() holding an encrypted sample, to which protection
  *     metadata should be added.
- * @info: (transfer full): a #GstStructure holding cryptographic
- *     information relating to the sample contained in @buffer. This
- *     function takes ownership of @info.
+ * @info: (transfer full): a [GstStructure]() holding cryptographic
+ *     information relating to the sample contained in _buffer_. This
+ *     function takes ownership of _info_.
  *
- * Attaches protection metadata to a #GstBuffer.
+ * Attaches protection metadata to a [GstBuffer]().
  *
- * Returns: (transfer none): a pointer to the added #GstProtectionMeta if successful; %NULL if
+ * Returns: (transfer none): a pointer to the added [GstProtectionMeta]() if successful; [NULL]() if
  * unsuccessful.
- *
  * Since: 1.6
  */
 GstProtectionMeta *
@@ -164,10 +163,9 @@ gst_buffer_add_protection_meta (GstBuffer * buffer, GstStructure * info)
  * an element that supports one of the supplied UUIDs. If more than one
  * element matches, the system ID of the highest ranked element is selected.
  *
- * Returns: (transfer none): One of the strings from @system_identifiers that
+ * Returns: (transfer none): One of the strings from _system_identifiers_ that
  * indicates the highest ranked element that implements the protection system
- * indicated by that system ID, or %NULL if no element has been found.
- *
+ * indicated by that system ID, or [NULL]() if no element has been found.
  * Since: 1.6
  */
 const gchar *

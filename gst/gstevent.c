@@ -24,20 +24,20 @@
 /**
  * SECTION:gstevent
  * @short_description: Structure describing events that are passed up and down
- *                     a pipeline
- * @see_also: #GstPad, #GstElement
+ * @see_also: [GstPad](), [GstElement]()
  *
+ * a pipeline
  * The event class provides factory methods to construct events for sending
  * and functions to query (parse) received events.
  *
  * Events are usually created with gst_event_new_*() which takes event-type
  * specific parameters as arguments.
- * To send an event application will usually use gst_element_send_event() and
- * elements will use gst_pad_send_event() or gst_pad_push_event().
- * The event should be unreffed with gst_event_unref() if it has not been sent.
+ * To send an event application will usually use [gst_element_send_event]() and
+ * elements will use [gst_pad_send_event]() or [gst_pad_push_event]().
+ * The event should be unreffed with [gst_event_unref]() if it has not been sent.
  *
  * Events that have been received can be parsed with their respective
- * gst_event_parse_*() functions. It is valid to pass %NULL for unwanted details.
+ * gst_event_parse_*() functions. It is valid to pass [NULL]() for unwanted details.
  *
  * Events are passed between elements in parallel to the data stream. Some events
  * are serialized with buffers, others are not. Some events only travel downstream,
@@ -49,16 +49,16 @@
  *
  * Most of the event API is used inside plugins. Applications usually only
  * construct and use seek events.
- * To do that gst_event_new_seek() is used to create a seek event. It takes
+ * To do that [gst_event_new_seek]() is used to create a seek event. It takes
  * the needed parameters to specify seeking time and mode.
- * |[
+ * ```
  *   GstEvent *event;
  *   gboolean result;
  *   ...
  *   // construct a seek event to play the media from second 2 to 5, flush
  *   // the pipeline to decrease latency.
- *   event = gst_event_new_seek (1.0, 
- *      GST_FORMAT_TIME, 
+ *   event = gst_event_new_seek (1.0,
+ *      GST_FORMAT_TIME,
  *      GST_SEEK_FLAG_FLUSH,
  *      GST_SEEK_TYPE_SET, 2 * GST_SECOND,
  *      GST_SEEK_TYPE_SET, 5 * GST_SECOND);
@@ -67,7 +67,7 @@
  *   if (!result)
  *     g_warning ("seek failed");
  *   ...
- * ]|
+ * ```
  */
 
 
@@ -191,11 +191,11 @@ gst_event_type_to_quark (GstEventType type)
 
 /**
  * gst_event_type_get_flags:
- * @type: a #GstEventType
+ * @type: a [GstEventType]()
  *
- * Gets the #GstEventTypeFlags associated with @type.
+ * Gets the [GstEventTypeFlags]() associated with _type_.
  *
- * Returns: a #GstEventTypeFlags.
+ * Returns: a [GstEventTypeFlags]().
  */
 GstEventTypeFlags
 gst_event_type_get_flags (GstEventType type)
@@ -282,7 +282,7 @@ gst_event_init (GstEventImpl * event, GstEventType type)
  * handled by other event-specific functions to pass an event to another
  * element.
  *
- * Make sure to allocate an event type with the #GST_EVENT_MAKE_TYPE macro,
+ * Make sure to allocate an event type with the [GST_EVENT_MAKE_TYPE]() macro,
  * assigning a free number and filling in the correct direction and
  * serialization flags.
  *
@@ -325,7 +325,7 @@ had_parent:
 
 /**
  * gst_event_get_structure:
- * @event: The #GstEvent.
+ * @event: The [GstEvent]().
  *
  * Access the structure of the event.
  *
@@ -345,15 +345,15 @@ gst_event_get_structure (GstEvent * event)
 
 /**
  * gst_event_writable_structure:
- * @event: The #GstEvent.
+ * @event: The [GstEvent]().
  *
  * Get a writable version of the structure.
  *
  * Returns: (transfer none): The structure of the event. The structure
  * is still owned by the event, which means that you should not free
  * it and that the pointer becomes invalid when you free the event.
- * This function checks if @event is writable and will never return
- * %NULL.
+ * This function checks if _event_ is writable and will never return
+ * [NULL]().
  *
  * MT safe.
  */
@@ -379,13 +379,13 @@ gst_event_writable_structure (GstEvent * event)
 
 /**
  * gst_event_has_name:
- * @event: The #GstEvent.
+ * @event: The [GstEvent]().
  * @name: name to check
  *
- * Checks if @event has the given @name. This function is usually used to
+ * Checks if _event_ has the given _name_. This function is usually used to
  * check the name of a custom event.
  *
- * Returns: %TRUE if @name matches the name of the event structure.
+ * Returns: [TRUE]() if _name_ matches the name of the event structure.
  */
 gboolean
 gst_event_has_name (GstEvent * event, const gchar * name)
@@ -400,12 +400,12 @@ gst_event_has_name (GstEvent * event, const gchar * name)
 
 /**
  * gst_event_get_seqnum:
- * @event: A #GstEvent.
+ * @event: A [GstEvent]().
  *
  * Retrieve the sequence number of a event.
  *
  * Events have ever-incrementing sequence numbers, which may also be set
- * explicitly via gst_event_set_seqnum(). Sequence numbers are typically used to
+ * explicitly via [gst_event_set_seqnum](). Sequence numbers are typically used to
  * indicate that a event corresponds to some other set of events or messages,
  * for example an EOS event corresponding to a SEEK event. It is considered good
  * practice to make this correspondence when possible, though it is not
@@ -429,13 +429,13 @@ gst_event_get_seqnum (GstEvent * event)
 
 /**
  * gst_event_set_seqnum:
- * @event: A #GstEvent.
+ * @event: A [GstEvent]().
  * @seqnum: A sequence number.
  *
  * Set the sequence number of a event.
  *
  * This function might be called by the creator of a event to indicate that the
- * event relates to other events or messages. See gst_event_get_seqnum() for
+ * event relates to other events or messages. See [gst_event_get_seqnum]() for
  * more information.
  *
  * MT safe.
@@ -450,12 +450,12 @@ gst_event_set_seqnum (GstEvent * event, guint32 seqnum)
 
 /**
  * gst_event_get_running_time_offset:
- * @event: A #GstEvent.
+ * @event: A [GstEvent]().
  *
  * Retrieve the accumulated running time offset of the event.
  *
- * Events passing through #GstPads that have a running time
- * offset set via gst_pad_set_offset() will get their offset
+ * Events passing through [GstPads]() that have a running time
+ * offset set via [gst_pad_set_offset]() will get their offset
  * adjusted according to the pad's offset.
  *
  * If the event contains any information that related to the
@@ -465,7 +465,6 @@ gst_event_set_seqnum (GstEvent * event, guint32 seqnum)
  * Returns: The event's running time offset
  *
  * MT safe.
- *
  * Since: 1.4
  */
 gint64
@@ -478,11 +477,11 @@ gst_event_get_running_time_offset (GstEvent * event)
 
 /**
  * gst_event_set_running_time_offset:
- * @event: A #GstEvent.
+ * @event: A [GstEvent]().
  * @offset: A the new running time offset
  *
  * Set the running time offset of a event. See
- * gst_event_get_running_time_offset() for more information.
+ * [gst_event_get_running_time_offset]() for more information.
  *
  * MT safe.
  *
@@ -503,10 +502,10 @@ gst_event_set_running_time_offset (GstEvent * event, gint64 offset)
  * upstream and downstream and travels out-of-bounds with the dataflow.
  *
  * It marks pads as being flushing and will make them return
- * #GST_FLOW_FLUSHING when used for data flow with gst_pad_push(),
- * gst_pad_chain(), gst_pad_get_range() and gst_pad_pull_range().
- * Any event (except a #GST_EVENT_FLUSH_STOP) received
- * on a flushing pad will return %FALSE immediately.
+ * [GST_FLOW_FLUSHING]() when used for data flow with [gst_pad_push](),
+ * [gst_pad_chain](), [gst_pad_get_range]() and [gst_pad_pull_range]().
+ * Any event (except a [GST_EVENT_FLUSH_STOP]()) received
+ * on a flushing pad will return [FALSE]() immediately.
  *
  * Elements should unlock any blocking functions and exit their streaming
  * functions as fast as possible when this event is received.
@@ -558,7 +557,7 @@ gst_event_new_flush_stop (gboolean reset_time)
  * @event: The event to parse
  * @reset_time: (out): if time should be reset
  *
- * Parse the FLUSH_STOP event and retrieve the @reset_time member.
+ * Parse the FLUSH_STOP event and retrieve the _reset_time_ member.
  */
 void
 gst_event_parse_flush_stop (GstEvent * event, gboolean * reset_time)
@@ -580,11 +579,11 @@ gst_event_parse_flush_stop (GstEvent * event, gboolean * reset_time)
  *
  * Create a new EOS event. The eos event can only travel downstream
  * synchronized with the buffer flow. Elements that receive the EOS
- * event on a pad can return #GST_FLOW_EOS as a #GstFlowReturn
+ * event on a pad can return [GST_FLOW_EOS]() as a [GstFlowReturn]()
  * when data after the EOS event arrives.
  *
  * The EOS event will travel down to the sink elements in the pipeline
- * which will then post the #GST_MESSAGE_EOS on the bus after they have
+ * which will then post the [GST_MESSAGE_EOS]() on the bus after they have
  * finished playing any buffered data.
  *
  * When all sinks have posted an EOS message, an EOS message is
@@ -635,11 +634,11 @@ gst_event_new_gap (GstClockTime timestamp, GstClockTime duration)
 
 /**
  * gst_event_parse_gap:
- * @event: a #GstEvent of type #GST_EVENT_GAP
+ * @event: a [GstEvent]() of type [GST_EVENT_GAP]()
  * @timestamp: (out) (allow-none): location where to store the
- *     start time (pts) of the gap, or %NULL
+ *     start time (pts) of the gap, or [NULL]()
  * @duration: (out) (allow-none): location where to store the duration of
- *     the gap, or %NULL
+ *     the gap, or [NULL]()
  *
  * Extract timestamp and duration from a new GAP event.
  */
@@ -660,9 +659,9 @@ gst_event_parse_gap (GstEvent * event, GstClockTime * timestamp,
 
 /**
  * gst_event_new_caps:
- * @caps: (transfer none): a #GstCaps
+ * @caps: (transfer none): a [GstCaps]()
  *
- * Create a new CAPS event for @caps. The caps event can only travel downstream
+ * Create a new CAPS event for _caps_. The caps event can only travel downstream
  * synchronized with the buffer flow and contains the format of the buffers
  * that will follow after the event.
  *
@@ -690,7 +689,7 @@ gst_event_new_caps (GstCaps * caps)
  * @event: The event to parse
  * @caps: (out) (transfer none): A pointer to the caps
  *
- * Get the caps from @event. The caps remains valid as long as @event remains
+ * Get the caps from _event_. The caps remains valid as long as _event_ remains
  * valid.
  */
 void
@@ -710,35 +709,35 @@ gst_event_parse_caps (GstEvent * event, GstCaps ** caps)
 
 /**
  * gst_event_new_segment:
- * @segment: (transfer none): a #GstSegment
+ * @segment: (transfer none): a [GstSegment]()
  *
- * Create a new SEGMENT event for @segment. The segment event can only travel
+ * Create a new SEGMENT event for _segment_. The segment event can only travel
  * downstream synchronized with the buffer flow and contains timing information
  * and playback properties for the buffers that will follow.
  *
  * The segment event marks the range of buffers to be processed. All
  * data not within the segment range is not to be processed. This can be
  * used intelligently by plugins to apply more efficient methods of skipping
- * unneeded data. The valid range is expressed with the @start and @stop
+ * unneeded data. The valid range is expressed with the _start_ and _stop_
  * values.
  *
  * The time value of the segment is used in conjunction with the start
  * value to convert the buffer timestamps into the stream time. This is
  * usually done in sinks to report the current stream_time.
- * @time represents the stream_time of a buffer carrying a timestamp of
- * @start. @time cannot be -1.
+ * _time_ represents the stream_time of a buffer carrying a timestamp of
+ * _start_. _time_ cannot be -1.
  *
- * @start cannot be -1, @stop can be -1. If there
- * is a valid @stop given, it must be greater or equal the @start, including
- * when the indicated playback @rate is < 0.
+ * _start_ cannot be -1, _stop_ can be -1. If there
+ * is a valid _stop_ given, it must be greater or equal the _start_, including
+ * when the indicated playback _rate_ is < 0.
  *
- * The @applied_rate value provides information about any rate adjustment that
+ * The _applied_rate_ value provides information about any rate adjustment that
  * has already been made to the timestamps and content on the buffers of the
- * stream. (@rate * @applied_rate) should always equal the rate that has been
+ * stream. (_rate_ * _applied_rate_) should always equal the rate that has been
  * requested for playback. For example, if an element has an input segment
- * with intended playback @rate of 2.0 and applied_rate of 1.0, it can adjust
+ * with intended playback _rate_ of 2.0 and applied_rate of 1.0, it can adjust
  * incoming timestamps and buffer content by half and output a segment event
- * with @rate of 1.0 and @applied_rate of 2.0
+ * with _rate_ of 1.0 and _applied_rate_ of 2.0
  *
  * After a segment event, the buffer stream time is calculated with:
  *
@@ -769,10 +768,10 @@ gst_event_new_segment (const GstSegment * segment)
 /**
  * gst_event_parse_segment:
  * @event: The event to parse
- * @segment: (out) (transfer none): a pointer to a #GstSegment
+ * @segment: (out) (transfer none): a pointer to a [GstSegment]()
  *
- * Parses a segment @event and stores the result in the given @segment location.
- * @segment remains valid only until the @event is freed. Don't modify the segment
+ * Parses a segment _event_ and stores the result in the given _segment_ location.
+ * _segment_ remains valid only until the _event_ is freed. Don't modify the segment
  * and make a copy if you want to modify it or store it for later use.
  */
 void
@@ -793,10 +792,10 @@ gst_event_parse_segment (GstEvent * event, const GstSegment ** segment)
 /**
  * gst_event_copy_segment:
  * @event: The event to parse
- * @segment: a pointer to a #GstSegment
+ * @segment: a pointer to a [GstSegment]()
  *
- * Parses a segment @event and copies the #GstSegment into the location
- * given by @segment.
+ * Parses a segment _event_ and copies the [GstSegment]() into the location
+ * given by _segment_.
  */
 void
 gst_event_copy_segment (GstEvent * event, GstSegment * segment)
@@ -817,7 +816,7 @@ gst_event_copy_segment (GstEvent * event, GstSegment * segment)
  * @taglist: (transfer full): metadata list. The event will take ownership
  *     of the taglist.
  *
- * Generates a metadata tag event from the given @taglist.
+ * Generates a metadata tag event from the given _taglist_.
  *
  * The scope of the taglist specifies if the taglist applies to the
  * complete medium or only to this specific stream. As the tag event
@@ -825,7 +824,7 @@ gst_event_copy_segment (GstEvent * event, GstSegment * segment)
  * upstream with a given scope with their own tags with the same
  * scope and create a new tag event from it.
  *
- * Returns: (transfer full): a new #GstEvent
+ * Returns: (transfer full): a new [GstEvent]()
  */
 GstEvent *
 gst_event_new_tag (GstTagList * taglist)
@@ -848,9 +847,9 @@ gst_event_new_tag (GstTagList * taglist)
  * @event: a tag event
  * @taglist: (out) (transfer none): pointer to metadata list
  *
- * Parses a tag @event and stores the results in the given @taglist location.
+ * Parses a tag _event_ and stores the results in the given _taglist_ location.
  * No reference to the taglist will be returned, it remains valid only until
- * the @event is freed. Don't modify or free the taglist, make a copy if you
+ * the _event_ is freed. Don't modify or free the taglist, make a copy if you
  * want to modify it or store it for later use.
  */
 void
@@ -879,9 +878,9 @@ gst_event_parse_tag (GstEvent * event, GstTagList ** taglist)
  * Create a new buffersize event. The event is sent downstream and notifies
  * elements that they should provide a buffer of the specified dimensions.
  *
- * When the @async flag is set, a thread boundary is preferred.
+ * When the _async_ flag is set, a thread boundary is preferred.
  *
- * Returns: (transfer full): a new #GstEvent
+ * Returns: (transfer full): a new [GstEvent]()
  */
 GstEvent *
 gst_event_new_buffer_size (GstFormat format, gint64 minsize,
@@ -957,37 +956,37 @@ gst_event_parse_buffer_size (GstEvent * event, GstFormat * format,
  * throttling. Typically sinks generate these events for each buffer
  * they receive.
  *
- * @type indicates the reason for the QoS event. #GST_QOS_TYPE_OVERFLOW is
+ * _type_ indicates the reason for the QoS event. [GST_QOS_TYPE_OVERFLOW]() is
  * used when a buffer arrived in time or when the sink cannot keep up with
- * the upstream datarate. #GST_QOS_TYPE_UNDERFLOW is when the sink is not
- * receiving buffers fast enough and thus has to drop late buffers. 
- * #GST_QOS_TYPE_THROTTLE is used when the datarate is artificially limited
+ * the upstream datarate. [GST_QOS_TYPE_UNDERFLOW]() is when the sink is not
+ * receiving buffers fast enough and thus has to drop late buffers.
+ * [GST_QOS_TYPE_THROTTLE]() is used when the datarate is artificially limited
  * by the application, for example to reduce power consumption.
  *
- * @proportion indicates the real-time performance of the streaming in the
+ * _proportion_ indicates the real-time performance of the streaming in the
  * element that generated the QoS event (usually the sink). The value is
  * generally computed based on more long term statistics about the streams
  * timestamps compared to the clock.
  * A value < 1.0 indicates that the upstream element is producing data faster
  * than real-time. A value > 1.0 indicates that the upstream element is not
- * producing data fast enough. 1.0 is the ideal @proportion value. The
+ * producing data fast enough. 1.0 is the ideal _proportion_ value. The
  * proportion value can safely be used to lower or increase the quality of
  * the element.
  *
- * @diff is the difference against the clock in running time of the last
+ * _diff_ is the difference against the clock in running time of the last
  * buffer that caused the element to generate the QOS event. A negative value
- * means that the buffer with @timestamp arrived in time. A positive value
- * indicates how late the buffer with @timestamp was. When throttling is
- * enabled, @diff will be set to the requested throttling interval.
+ * means that the buffer with _timestamp_ arrived in time. A positive value
+ * indicates how late the buffer with _timestamp_ was. When throttling is
+ * enabled, _diff_ will be set to the requested throttling interval.
  *
- * @timestamp is the timestamp of the last buffer that cause the element
+ * _timestamp_ is the timestamp of the last buffer that cause the element
  * to generate the QOS event. It is expressed in running time and thus an ever
  * increasing value.
  *
- * The upstream element can use the @diff and @timestamp values to decide
- * whether to process more buffers. For positive @diff, all buffers with
- * timestamp <= @timestamp + @diff will certainly arrive late in the sink
- * as well. A (negative) @diff value so that @timestamp + @diff would yield a
+ * The upstream element can use the _diff_ and _timestamp_ values to decide
+ * whether to process more buffers. For positive _diff_, all buffers with
+ * timestamp <= _timestamp_ + _diff_ will certainly arrive late in the sink
+ * as well. A (negative) _diff_ value so that _timestamp_ + _diff_ would yield a
  * result smaller than 0 is not allowed.
  *
  * The application can use general event probes to intercept the QoS
@@ -1029,9 +1028,9 @@ gst_event_new_qos (GstQOSType type, gdouble proportion,
  * @timestamp: (out): A pointer to store the timestamp in
  *
  * Get the type, proportion, diff and timestamp in the qos event. See
- * gst_event_new_qos() for more information about the different QoS values.
+ * [gst_event_new_qos]() for more information about the different QoS values.
  *
- * @timestamp will be adjusted for any pad offsets of pads it was passing through.
+ * _timestamp_ will be adjusted for any pad offsets of pads it was passing through.
  */
 void
 gst_event_parse_qos (GstEvent * event, GstQOSType * type,
@@ -1081,35 +1080,35 @@ gst_event_parse_qos (GstEvent * event, GstQOSType * type,
  *
  * Allocate a new seek event with the given parameters.
  *
- * The seek event configures playback of the pipeline between @start to @stop
- * at the speed given in @rate, also called a playback segment.
- * The @start and @stop values are expressed in @format.
+ * The seek event configures playback of the pipeline between _start_ to _stop_
+ * at the speed given in _rate_, also called a playback segment.
+ * The _start_ and _stop_ values are expressed in _format_.
  *
- * A @rate of 1.0 means normal playback rate, 2.0 means double speed.
+ * A _rate_ of 1.0 means normal playback rate, 2.0 means double speed.
  * Negatives values means backwards playback. A value of 0.0 for the
  * rate is not allowed and should be accomplished instead by PAUSING the
  * pipeline.
  *
  * A pipeline has a default playback segment configured with a start
  * position of 0, a stop position of -1 and a rate of 1.0. The currently
- * configured playback segment can be queried with #GST_QUERY_SEGMENT. 
+ * configured playback segment can be queried with [GST_QUERY_SEGMENT]().
  *
- * @start_type and @stop_type specify how to adjust the currently configured 
+ * _start_type_ and _stop_type_ specify how to adjust the currently configured
  * start and stop fields in playback segment. Adjustments can be made relative
- * or absolute to the last configured values. A type of #GST_SEEK_TYPE_NONE
+ * or absolute to the last configured values. A type of [GST_SEEK_TYPE_NONE]()
  * means that the position should not be updated.
  *
- * When the rate is positive and @start has been updated, playback will start
- * from the newly configured start position. 
+ * When the rate is positive and _start_ has been updated, playback will start
+ * from the newly configured start position.
  *
  * For negative rates, playback will start from the newly configured stop
  * position (if any). If the stop position is updated, it must be different from
- * -1 (#GST_CLOCK_TIME_NONE) for negative rates.
+ * -1 ([GST_CLOCK_TIME_NONE]()) for negative rates.
  *
  * It is not possible to seek relative to the current playback position, to do
  * this, PAUSE the pipeline, query the current playback position with
- * #GST_QUERY_POSITION and update the playback segment current position with a
- * #GST_SEEK_TYPE_SET to the desired position.
+ * [GST_QUERY_POSITION]() and update the playback segment current position with a
+ * [GST_SEEK_TYPE_SET]() to the desired position.
  *
  * Returns: (transfer full): a new seek event.
  */
@@ -1156,13 +1155,13 @@ gst_event_new_seek (gdouble rate, GstFormat format, GstSeekFlags flags,
  * @event: a seek event
  * @rate: (out): result location for the rate
  * @format: (out): result location for the stream format
- * @flags:  (out): result location for the #GstSeekFlags
- * @start_type: (out): result location for the #GstSeekType of the start position
- * @start: (out): result location for the start position expressed in @format
- * @stop_type:  (out): result location for the #GstSeekType of the stop position
- * @stop: (out): result location for the stop position expressed in @format
+ * @flags: (out): result location for the [GstSeekFlags]()
+ * @start_type: (out): result location for the [GstSeekType]() of the start position
+ * @start: (out): result location for the start position expressed in _format_
+ * @stop_type: (out): result location for the [GstSeekType]() of the stop position
+ * @stop: (out): result location for the stop position expressed in _format_
  *
- * Parses a seek @event and stores the results in the given result locations.
+ * Parses a seek _event_ and stores the results in the given result locations.
  */
 void
 gst_event_parse_seek (GstEvent * event, gdouble * rate,
@@ -1212,7 +1211,7 @@ gst_event_parse_seek (GstEvent * event, gdouble * rate,
  *
  * Create a new navigation event from the given description.
  *
- * Returns: (transfer full): a new #GstEvent
+ * Returns: (transfer full): a new [GstEvent]()
  */
 GstEvent *
 gst_event_new_navigation (GstStructure * structure)
@@ -1227,13 +1226,13 @@ gst_event_new_navigation (GstStructure * structure)
  * @latency: the new latency value
  *
  * Create a new latency event. The event is sent upstream from the sinks and
- * notifies elements that they should add an additional @latency to the
+ * notifies elements that they should add an additional _latency_ to the
  * running time before synchronising against the clock.
  *
  * The latency is mostly used in live sinks and is always expressed in
  * the time format.
  *
- * Returns: (transfer full): a new #GstEvent
+ * Returns: (transfer full): a new [GstEvent]()
  */
 GstEvent *
 gst_event_new_latency (GstClockTime latency)
@@ -1272,27 +1271,27 @@ gst_event_parse_latency (GstEvent * event, GstClockTime * latency)
 
 /**
  * gst_event_new_step:
- * @format: the format of @amount
+ * @format: the format of _amount_
  * @amount: the amount of data to step
  * @rate: the step rate
  * @flush: flushing steps
  * @intermediate: intermediate steps
  *
  * Create a new step event. The purpose of the step event is to instruct a sink
- * to skip @amount (expressed in @format) of media. It can be used to implement
+ * to skip _amount_ (expressed in _format_) of media. It can be used to implement
  * stepping through the video frame by frame or for doing fast trick modes.
  *
  * A rate of <= 0.0 is not allowed. Pause the pipeline, for the effect of rate
  * = 0.0 or first reverse the direction of playback using a seek event to get
  * the same effect as rate < 0.0.
  *
- * The @flush flag will clear any pending data in the pipeline before starting
+ * The _flush_ flag will clear any pending data in the pipeline before starting
  * the step operation.
  *
- * The @intermediate flag instructs the pipeline that this step operation is
+ * The _intermediate_ flag instructs the pipeline that this step operation is
  * part of a larger step operation.
  *
- * Returns: (transfer full): a new #GstEvent
+ * Returns: (transfer full): a new [GstEvent]()
  */
 GstEvent *
 gst_event_new_step (GstFormat format, guint64 amount, gdouble rate,
@@ -1358,13 +1357,13 @@ gst_event_parse_step (GstEvent * event, GstFormat * format, guint64 * amount,
 
 /**
  * gst_event_new_reconfigure:
-
+ *
  * Create a new reconfigure event. The purpose of the reconfigure event is
  * to travel upstream and make elements renegotiate their caps or reconfigure
  * their buffer pools. This is useful when changing properties on elements
  * or changing the topology of the pipeline.
  *
- * Returns: (transfer full): a new #GstEvent
+ * Returns: (transfer full): a new [GstEvent]()
  */
 GstEvent *
 gst_event_new_reconfigure (void)
@@ -1381,15 +1380,15 @@ gst_event_new_reconfigure (void)
 /**
  * gst_event_new_sink_message:
  * @name: a name for the event
- * @msg: (transfer none): the #GstMessage to be posted
+ * @msg: (transfer none): the [GstMessage]() to be posted
  *
  * Create a new sink-message event. The purpose of the sink-message event is
  * to instruct a sink to post the message contained in the event synchronized
  * with the stream.
  *
- * @name is used to store multiple sticky events on one pad.
+ * _name_ is used to store multiple sticky events on one pad.
  *
- * Returns: (transfer full): a new #GstEvent
+ * Returns: (transfer full): a new [GstEvent]()
  */
 /* FIXME 2.0: take ownership of msg for consistency? */
 GstEvent *
@@ -1412,9 +1411,9 @@ gst_event_new_sink_message (const gchar * name, GstMessage * msg)
 /**
  * gst_event_parse_sink_message:
  * @event: The event to query
- * @msg: (out) (transfer full): a pointer to store the #GstMessage in.
+ * @msg: (out) (transfer full): a pointer to store the [GstMessage]() in.
  *
- * Parse the sink-message event. Unref @msg after usage.
+ * Parse the sink-message event. Unref _msg_ after usage.
  */
 void
 gst_event_parse_sink_message (GstEvent * event, GstMessage ** msg)
@@ -1446,12 +1445,12 @@ gst_event_parse_sink_message (GstEvent * event, GstMessage ** msg)
  * combining multiple streams must ensure that this event is only forwarded
  * downstream once and not for every single input stream.
  *
- * The @stream_id should be a unique string that consists of the upstream
+ * The _stream_id_ should be a unique string that consists of the upstream
  * stream-id, / as separator and a unique stream-id for this specific
  * stream. A new stream-id should only be created for a stream if the upstream
  * stream is split into (potentially) multiple new streams, e.g. in a demuxer,
  * but not for every single element in the pipeline.
- * gst_pad_create_stream_id() or gst_pad_create_stream_id_printf() can be
+ * [gst_pad_create_stream_id]() or [gst_pad_create_stream_id_printf]() can be
  * used to create a stream-id.
  *
  * Returns: (transfer full): the new STREAM_START event.
@@ -1475,9 +1474,9 @@ gst_event_new_stream_start (const gchar * stream_id)
  * @event: a stream-start event.
  * @stream_id: (out) (transfer none): pointer to store the stream-id
  *
- * Parse a stream-id @event and store the result in the given @stream_id
- * location. The string stored in @stream_id must not be modified and will
- * remain valid only until @event gets freed. Make a copy if you want to
+ * Parse a stream-id _event_ and store the result in the given _stream_id_
+ * location. The string stored in _stream_id_ must not be modified and will
+ * remain valid only until _event_ gets freed. Make a copy if you want to
  * modify it or store it for later use.
  */
 void
@@ -1501,6 +1500,8 @@ gst_event_parse_stream_start (GstEvent * event, const gchar ** stream_id)
  * @event: a stream-start event
  * @flags: the stream flags to set
  *
+ *
+ *
  * Since: 1.2
  */
 void
@@ -1518,6 +1519,8 @@ gst_event_set_stream_flags (GstEvent * event, GstStreamFlags flags)
  * gst_event_parse_stream_flags:
  * @event: a stream-start event
  * @flags: (out): address of variable where to store the stream flags
+ *
+ *
  *
  * Since: 1.2
  */
@@ -1544,7 +1547,7 @@ gst_event_parse_stream_flags (GstEvent * event, GstStreamFlags * flags)
  * each time the stream is started, resulting in different group ids
  * each time a file is played for example.
  *
- * Use gst_util_group_id_next() to get a new group id.
+ * Use [gst_util_group_id_next]() to get a new group id.
  *
  * Since: 1.2
  */
@@ -1564,9 +1567,10 @@ gst_event_set_group_id (GstEvent * event, guint group_id)
  * @event: a stream-start event
  * @group_id: (out): address of variable where to store the group id
  *
- * Returns: %TRUE if a group id was set on the event and could be parsed,
- *   %FALSE otherwise.
  *
+ *
+ * Returns: [TRUE]() if a group id was set on the event and could be parsed,
+ *   [FALSE]() otherwise.
  * Since: 1.2
  */
 gboolean
@@ -1586,13 +1590,13 @@ gst_event_parse_group_id (GstEvent * event, guint * group_id)
 
 /**
  * gst_event_new_toc:
- * @toc: (transfer none): #GstToc structure.
- * @updated: whether @toc was updated or not.
+ * @toc: (transfer none): [GstToc]() structure.
+ * @updated: whether _toc_ was updated or not.
  *
- * Generate a TOC event from the given @toc. The purpose of the TOC event is to
+ * Generate a TOC event from the given _toc_. The purpose of the TOC event is to
  * inform elements that some kind of the TOC was found.
  *
- * Returns: (transfer full): a new #GstEvent.
+ * Returns: (transfer full): a new [GstEvent]().
  */
 GstEvent *
 gst_event_new_toc (GstToc * toc, gboolean updated)
@@ -1621,10 +1625,10 @@ gst_event_new_toc (GstToc * toc, gboolean updated)
 /**
  * gst_event_parse_toc:
  * @event: a TOC event.
- * @toc: (out) (transfer full): pointer to #GstToc structure.
+ * @toc: (out) (transfer full): pointer to [GstToc]() structure.
  * @updated: (out): pointer to store TOC updated flag.
  *
- * Parse a TOC @event and store the results in the given @toc and @updated locations.
+ * Parse a TOC _event_ and store the results in the given _toc_ and _updated_ locations.
  */
 void
 gst_event_parse_toc (GstEvent * event, GstToc ** toc, gboolean * updated)
@@ -1646,11 +1650,11 @@ gst_event_parse_toc (GstEvent * event, GstToc ** toc, gboolean * updated)
  * gst_event_new_toc_select:
  * @uid: UID in the TOC to start playback from.
  *
- * Generate a TOC select event with the given @uid. The purpose of the
+ * Generate a TOC select event with the given _uid_. The purpose of the
  * TOC select event is to start playback based on the TOC's entry with the
- * given @uid.
+ * given _uid_.
  *
- * Returns: a new #GstEvent.
+ * Returns: a new [GstEvent]().
  */
 GstEvent *
 gst_event_new_toc_select (const gchar * uid)
@@ -1672,7 +1676,7 @@ gst_event_new_toc_select (const gchar * uid)
  * @event: a TOC select event.
  * @uid: (out) (transfer full) (allow-none): storage for the selection UID.
  *
- * Parse a TOC select @event and store the results in the given @uid location.
+ * Parse a TOC select _event_ and store the results in the given _uid_ location.
  */
 void
 gst_event_parse_toc_select (GstEvent * event, gchar ** uid)
@@ -1695,14 +1699,14 @@ gst_event_parse_toc_select (GstEvent * event, gchar ** uid)
  * gst_event_new_protection:
  * @system_id: (transfer none): a string holding a UUID that uniquely
  * identifies a protection system.
- * @data: (transfer none): a #GstBuffer holding protection system specific
+ * @data: (transfer none): a [GstBuffer]() holding protection system specific
  * information. The reference count of the buffer will be incremented by one.
  * @origin: a string indicating where the protection
  * information carried in the event was extracted from. The allowed values
  * of this string will depend upon the protection scheme.
  *
  * Creates a new event containing information specific to a particular
- * protection system (uniquely identified by @system_id), by which that
+ * protection system (uniquely identified by _system_id_), by which that
  * protection system can acquire key(s) to decrypt a protected stream.
  *
  * In order for a decryption element to decrypt media
@@ -1714,26 +1718,25 @@ gst_event_parse_toc_select (GstEvent * event, gchar ** uid)
  * elements that use it.
  *
  * Events containing protection system specific information are created using
- * #gst_event_new_protection, and they can be parsed by downstream elements
- * using #gst_event_parse_protection.
+ * [gst_event_new_protection](), and they can be parsed by downstream elements
+ * using [gst_event_parse_protection]().
  *
  * In Common Encryption, protection system specific information may be located
  * within ISOBMFF files, both in movie (moov) boxes and movie fragment (moof)
  * boxes; it may also be contained in ContentProtection elements within MPEG
- * DASH MPDs. The events created by #gst_event_new_protection contain data
+ * DASH MPDs. The events created by [gst_event_new_protection]() contain data
  * identifying from which of these locations the encapsulated protection system
  * specific information originated. This origin information is required as
  * some protection systems use different encodings depending upon where the
  * information originates.
  *
- * The events returned by gst_event_new_protection() are implemented
+ * The events returned by [gst_event_new_protection]() are implemented
  * in such a way as to ensure that the most recently-pushed protection info
- * event of a particular @origin and @system_id will
+ * event of a particular _origin_ and _system_id_ will
  * be stuck to the output pad of the sending element.
  *
- * Returns: a #GST_EVENT_PROTECTION event, if successful; %NULL
+ * Returns: a [GST_EVENT_PROTECTION]() event, if successful; [NULL]()
  * if unsuccessful.
- *
  * Since: 1.6
  */
 GstEvent *
@@ -1765,18 +1768,18 @@ gst_event_new_protection (const gchar * system_id,
 
 /**
  * gst_event_parse_protection:
- * @event: a #GST_EVENT_PROTECTION event.
+ * @event: a [GST_EVENT_PROTECTION]() event.
  * @system_id: (out) (allow-none) (transfer none): pointer to store the UUID
  * string uniquely identifying a content protection system.
- * @data: (out) (allow-none) (transfer none): pointer to store a #GstBuffer
+ * @data: (out) (allow-none) (transfer none): pointer to store a [GstBuffer]()
  * holding protection system specific information.
  * @origin: (allow-none) (transfer none): pointer to store a value that
- * indicates where the protection information carried by @event was extracted
+ * indicates where the protection information carried by _event_ was extracted
  * from.
  *
  * Parses an event containing protection system specific information and stores
- * the results in @system_id, @data and @origin. The data stored in @system_id,
- * @origin and @data are valid until @event is released.
+ * the results in _system_id_, _data_ and _origin_. The data stored in _system_id_,
+ * _origin_ and _data_ are valid until _event_ is released.
  *
  * Since: 1.6
  */
@@ -1812,7 +1815,7 @@ gst_event_parse_protection (GstEvent * event, const gchar ** system_id,
  * Create a new segment-done event. This event is sent by elements that
  * finish playback of a segment as a result of a segment seek.
  *
- * Returns: (transfer full): a new #GstEvent
+ * Returns: (transfer full): a new [GstEvent]()
  */
 GstEvent *
 gst_event_new_segment_done (GstFormat format, gint64 position)
@@ -1833,12 +1836,11 @@ gst_event_new_segment_done (GstFormat format, gint64 position)
 
 /**
  * gst_event_parse_segment_done:
- * @event: A valid #GstEvent of type GST_EVENT_SEGMENT_DONE.
- * @format: (out) (allow-none): Result location for the format, or %NULL
- * @position: (out) (allow-none): Result location for the position, or %NULL
+ * @event: A valid [GstEvent]() of type GST_EVENT_SEGMENT_DONE.
+ * @format: (out) (allow-none): Result location for the format, or [NULL]()
+ * @position: (out) (allow-none): Result location for the position, or [NULL]()
  *
  * Extracts the position and format from the segment done message.
- *
  */
 void
 gst_event_parse_segment_done (GstEvent * event, GstFormat * format,

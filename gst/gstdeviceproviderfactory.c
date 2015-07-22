@@ -24,15 +24,15 @@
 /**
  * SECTION:gstdeviceproviderfactory
  * @short_description: Create GstDeviceProviders from a factory
- * @see_also: #GstDeviceProvider, #GstPlugin, #GstPluginFeature, #GstPadTemplate.
+ * @see_also: [GstDeviceProvider](), [GstPlugin](), [GstPluginFeature](), [GstPadTemplate]().
  *
- * #GstDeviceProviderFactory is used to create instances of device providers. A
- * GstDeviceProviderfactory can be added to a #GstPlugin as it is also a
- * #GstPluginFeature.
+ * [GstDeviceProviderFactory]() is used to create instances of device providers. A
+ * GstDeviceProviderfactory can be added to a [GstPlugin]() as it is also a
+ * [GstPluginFeature]().
  *
- * Use the gst_device_provider_factory_find() and
- * gst_device_provider_factory_get() functions to create device
- * provider instances or use gst_device_provider_factory_get_by_name() as a
+ * Use the [gst_device_provider_factory_find]() and
+ * [gst_device_provider_factory_get]() functions to create device
+ * provider instances or use [gst_device_provider_factory_get_by_name]() as a
  * convenient shortcut.
  *
  * Since: 1.4
@@ -106,9 +106,8 @@ gst_device_provider_factory_finalize (GObject * object)
  * Search for an device provider factory of the given name. Refs the returned
  * device provider factory; caller is responsible for unreffing.
  *
- * Returns: (transfer full) (nullable): #GstDeviceProviderFactory if
- * found, %NULL otherwise
- *
+ * Returns: (transfer full) (nullable): [GstDeviceProviderFactory]() if
+ * found, [NULL]() otherwise
  * Since: 1.4
  */
 GstDeviceProviderFactory *
@@ -153,17 +152,16 @@ gst_device_provider_factory_cleanup (GstDeviceProviderFactory * factory)
 
 /**
  * gst_device_provider_register:
- * @plugin: (allow-none): #GstPlugin to register the device provider with, or %NULL for
+ * @plugin: (allow-none): [GstPlugin]() to register the device provider with, or [NULL]() for
  *     a static device provider.
  * @name: name of device providers of this type
  * @rank: rank of device provider (higher rank means more importance when autoplugging)
  * @type: GType of device provider to register
  *
  * Create a new device providerfactory capable of instantiating objects of the
- * @type and add the factory to @plugin.
+ * _type_ and add the factory to _plugin_.
  *
- * Returns: %TRUE, if the registering succeeded, %FALSE on error
- *
+ * Returns: [TRUE](), if the registering succeeded, [FALSE]() on error
  * Since: 1.4
  */
 gboolean
@@ -246,9 +244,8 @@ detailserror:
  * Returns the device provider of the type defined by the given device
  * providerfactory.
  *
- * Returns: (transfer full) (nullable): the #GstDeviceProvider or %NULL
+ * Returns: (transfer full) (nullable): the [GstDeviceProvider]() or [NULL]()
  * if the device provider couldn't be created
- *
  * Since: 1.4
  */
 GstDeviceProvider *
@@ -338,9 +335,8 @@ no_device_provider:
  * Returns the device provider of the type defined by the given device
  * provider factory.
  *
- * Returns: (transfer full) (nullable): a #GstDeviceProvider or %NULL
+ * Returns: (transfer full) (nullable): a [GstDeviceProvider]() or [NULL]()
  * if unable to create device provider
- *
  * Since: 1.4
  */
 GstDeviceProvider *
@@ -382,14 +378,13 @@ create_failed:
 
 /**
  * gst_device_provider_factory_get_device_provider_type:
- * @factory: factory to get managed #GType from
+ * @factory: factory to get managed [GType]() from
  *
- * Get the #GType for device providers managed by this factory. The type can
+ * Get the [GType]() for device providers managed by this factory. The type can
  * only be retrieved if the device provider factory is loaded, which can be
- * assured with gst_plugin_feature_load().
+ * assured with [gst_plugin_feature_load]().
  *
- * Returns: the #GType for device providers managed by this factory.
- *
+ * Returns: the [GType]() for device providers managed by this factory.
  * Since: 1.4
  */
 GType
@@ -404,14 +399,13 @@ gst_device_provider_factory_get_device_provider_type (GstDeviceProviderFactory *
 
 /**
  * gst_device_provider_factory_get_metadata:
- * @factory: a #GstDeviceProviderFactory
+ * @factory: a [GstDeviceProviderFactory]()
  * @key: a key
  *
- * Get the metadata on @factory with @key.
+ * Get the metadata on _factory_ with _key_.
  *
- * Returns: (nullable): the metadata with @key on @factory or %NULL
- * when there was no metadata with the given @key.
- *
+ * Returns: (nullable): the metadata with _key_ on _factory_ or [NULL]()
+ * when there was no metadata with the given _key_.
  * Since: 1.4
  */
 const gchar *
@@ -423,14 +417,13 @@ gst_device_provider_factory_get_metadata (GstDeviceProviderFactory * factory,
 
 /**
  * gst_device_provider_factory_get_metadata_keys:
- * @factory: a #GstDeviceProviderFactory
+ * @factory: a [GstDeviceProviderFactory]()
  *
- * Get the available keys for the metadata on @factory.
+ * Get the available keys for the metadata on _factory_.
  *
- * Returns: (transfer full) (element-type utf8) (array zero-terminated=1) (nullable):
- * a %NULL-terminated array of key strings, or %NULL when there is no
- * metadata. Free with g_strfreev() when no longer needed.
- *
+ * Returns: (transfer full) (element-type utf8) (array zero-terminated=1) (nullable): 
+ * a [NULL]()-terminated array of key strings, or [NULL]() when there is no
+ * metadata. Free with [g_strfreev]() when no longer needed.
  * Since: 1.4
  */
 gchar **
@@ -461,14 +454,13 @@ gst_device_provider_factory_get_metadata_keys (GstDeviceProviderFactory *
 
 /**
  * gst_device_provider_factory_has_classesv:
- * @factory: a #GstDeviceProviderFactory
- * @classes: (array zero-terminated=1) (allow-none): a %NULL terminated array
+ * @factory: a [GstDeviceProviderFactory]()
+ * @classes: (array zero-terminated=1) (allow-none): a [NULL]() terminated array
  *   of classes to match, only match if all classes are matched
  *
- * Check if @factory matches all of the given classes
+ * Check if _factory_ matches all of the given classes
  *
- * Returns: %TRUE if @factory matches.
- *
+ * Returns: [TRUE]() if _factory_ matches.
  * Since: 1.4
  */
 gboolean
@@ -512,14 +504,13 @@ gst_device_provider_factory_has_classesv (GstDeviceProviderFactory * factory,
 
 /**
  * gst_device_provider_factory_has_classes:
- * @factory: a #GstDeviceProviderFactory
+ * @factory: a [GstDeviceProviderFactory]()
  * @classes: (allow-none): a "/" separate list of classes to match, only match
  *     if all classes are matched
  *
- * Check if @factory matches all of the given @classes
+ * Check if _factory_ matches all of the given _classes_
  *
- * Returns: %TRUE if @factory matches or if @classes is %NULL.
- *
+ * Returns: [TRUE]() if _factory_ matches or if _classes_ is [NULL]().
  * Since: 1.4
  */
 gboolean
@@ -555,13 +546,12 @@ device_provider_filter (GstPluginFeature * feature, GstRank * minrank)
  * gst_device_provider_factory_list_get_device_providers:
  * @minrank: Minimum rank
  *
- * Get a list of factories with a rank greater or equal to @minrank.
+ * Get a list of factories with a rank greater or equal to _minrank_.
  * The list of factories is returned by decreasing rank.
  *
- * Returns: (transfer full) (element-type Gst.DeviceProviderFactory):
- * a #GList of #GstDeviceProviderFactory device providers. Use
- * gst_plugin_feature_list_free() after usage.
- *
+ * Returns: (transfer full) (element-type Gst.DeviceProviderFactory): 
+ * a [GList]() of [GstDeviceProviderFactory]() device providers. Use
+ * [gst_plugin_feature_list_free]() after usage.
  * Since: 1.4
  */
 GList *

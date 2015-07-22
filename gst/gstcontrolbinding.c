@@ -24,7 +24,7 @@
  * @short_description: attachment for control source sources
  *
  * A base class for value mapping objects that attaches control sources to gobject
- * properties. Such an object is taking one or more #GstControlSource instances,
+ * properties. Such an object is taking one or more [GstControlSource]() instances,
  * combines them and maps the resulting value to the type and value range of the
  * bound property.
  */
@@ -221,14 +221,14 @@ gst_control_binding_get_property (GObject * object, guint prop_id,
  * @timestamp: the time that should be processed
  * @last_sync: the last time this was called
  *
- * Sets the property of the @object, according to the #GstControlSources that
+ * Sets the property of the _object_, according to the [GstControlSources]() that
  * handle them and for the given timestamp.
  *
  * If this function fails, it is most likely the application developers fault.
  * Most probably the control sources are not setup correctly.
  *
- * Returns: %TRUE if the controller value could be applied to the object
- * property, %FALSE otherwise
+ * Returns: [TRUE]() if the controller value could be applied to the object
+ * property, [FALSE]() otherwise
  */
 gboolean
 gst_control_binding_sync_values (GstControlBinding * binding,
@@ -260,7 +260,7 @@ gst_control_binding_sync_values (GstControlBinding * binding,
  * Gets the value for the given controlled property at the requested time.
  *
  * Returns: (nullable): the GValue of the property at the given time,
- * or %NULL if the property isn't controlled.
+ * or [NULL]() if the property isn't controlled.
  */
 GValue *
 gst_control_binding_get_value (GstControlBinding * binding,
@@ -283,7 +283,7 @@ gst_control_binding_get_value (GstControlBinding * binding,
 }
 
 /**
- * gst_control_binding_get_value_array: (skip)
+ * gst_control_binding_get_value_array: (skip):
  * @binding: the control binding
  * @timestamp: the time that should be processed
  * @interval: the time spacing between subsequent values
@@ -291,17 +291,17 @@ gst_control_binding_get_value (GstControlBinding * binding,
  * @values: (array length=n_values): array to put control-values in
  *
  * Gets a number of values for the given controlled property starting at the
- * requested time. The array @values need to hold enough space for @n_values of
+ * requested time. The array _values_ need to hold enough space for _n_values_ of
  * the same type as the objects property's type.
  *
  * This function is useful if one wants to e.g. draw a graph of the control
  * curve or apply a control curve sample by sample.
  *
- * The values are unboxed and ready to be used. The similar function 
- * gst_control_binding_get_g_value_array() returns the array as #GValues and is
+ * The values are unboxed and ready to be used. The similar function
+ * [gst_control_binding_get_g_value_array]() returns the array as [GValues]() and is
  * more suitable for bindings.
  *
- * Returns: %TRUE if the given array could be filled, %FALSE otherwise
+ * Returns: [TRUE]() if the given array could be filled, [FALSE]() otherwise
  */
 gboolean
 gst_control_binding_get_value_array (GstControlBinding * binding,
@@ -349,14 +349,14 @@ gst_control_binding_get_value_array (GstControlBinding * binding,
  * @n_values: the number of values
  * @values: (array length=n_values): array to put control-values in
  *
- * Gets a number of #GValues for the given controlled property starting at the
- * requested time. The array @values need to hold enough space for @n_values of
- * #GValue.
+ * Gets a number of [GValues]() for the given controlled property starting at the
+ * requested time. The array _values_ need to hold enough space for _n_values_ of
+ * [GValue]().
  *
  * This function is useful if one wants to e.g. draw a graph of the control
  * curve or apply a control curve sample by sample.
  *
- * Returns: %TRUE if the given array could be filled, %FALSE otherwise
+ * Returns: [TRUE]() if the given array could be filled, [FALSE]() otherwise
  */
 gboolean
 gst_control_binding_get_g_value_array (GstControlBinding * binding,
@@ -446,7 +446,7 @@ gst_control_binding_get_g_value_array (GstControlBinding * binding,
  * or not.
  *
  * This function is used to disable a control binding for some time, i.e.
- * gst_object_sync_values() will do nothing.
+ * [gst_object_sync_values]() will do nothing.
  */
 void
 gst_control_binding_set_disabled (GstControlBinding * binding,
@@ -462,7 +462,7 @@ gst_control_binding_set_disabled (GstControlBinding * binding,
  *
  * Check if the control binding is disabled.
  *
- * Returns: %TRUE if the binding is inactive
+ * Returns: [TRUE]() if the binding is inactive
  */
 gboolean
 gst_control_binding_is_disabled (GstControlBinding * binding)

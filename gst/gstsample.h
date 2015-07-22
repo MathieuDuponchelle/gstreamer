@@ -41,7 +41,7 @@ GST_EXPORT GType _gst_sample_type;
 /**
  * GstSample:
  *
- * The opaque structure of a #GstSample. A sample contains a typed memory
+ * The opaque structure of a [GstSample](). A sample contains a typed memory
  * block and the associated timing information. It is mainly used to
  * exchange buffers with an application.
  */
@@ -65,11 +65,11 @@ void                 gst_sample_set_buffer_list (GstSample *sample, GstBufferLis
 /* refcounting */
 /**
  * gst_sample_ref:
- * @sample: a #GstSample
+ * @sample: a [GstSample]()
  *
  * Increases the refcount of the given sample by one.
  *
- * Returns: (transfer full): @sample
+ * Returns: (transfer full): _sample_
  */
 #ifdef _FOOL_GTK_DOC_
 G_INLINE_FUNC GstSample * gst_sample_ref (GstSample * sample);
@@ -84,7 +84,7 @@ gst_sample_ref (GstSample * sample)
 
 /**
  * gst_sample_unref:
- * @sample: (transfer full): a #GstSample
+ * @sample: (transfer full): a [GstSample]()
  *
  * Decreases the refcount of the sample. If the refcount reaches 0, the
  * sample will be freed.
@@ -102,13 +102,12 @@ gst_sample_unref (GstSample * sample)
 /* copy sample */
 /**
  * gst_sample_copy:
- * @buf: a #GstSample.
+ * @buf: a [GstSample]().
  *
  * Create a copy of the given sample. This will also make a newly allocated
  * copy of the data the source sample contains.
  *
- * Returns: (transfer full): a new copy of @buf.
- *
+ * Returns: (transfer full): a new copy of _buf_.
  * Since: 1.2
  */
 #ifdef _FOOL_GTK_DOC_
@@ -123,27 +122,27 @@ gst_sample_copy (const GstSample * buf)
 
 /**
  * gst_value_set_sample:
- * @v: a #GValue to receive the data
- * @b: (transfer none): a #GstSample to assign to the GstValue
+ * @v: a [GValue]() to receive the data
+ * @b: (transfer none): a [GstSample]() to assign to the GstValue
  *
- * Sets @b as the value of @v.  Caller retains reference to sample.
+ * Sets _b_ as the value of _v_.  Caller retains reference to sample.
  */
 #define         gst_value_set_sample(v,b)       g_value_set_boxed((v),(b))
 /**
  * gst_value_take_sample:
- * @v: a #GValue to receive the data
- * @b: (transfer full): a #GstSample to assign to the GstValue
+ * @v: a [GValue]() to receive the data
+ * @b: (transfer full): a [GstSample]() to assign to the GstValue
  *
- * Sets @b as the value of @v.  Caller gives away reference to sample.
+ * Sets _b_ as the value of _v_.  Caller gives away reference to sample.
  */
 #define         gst_value_take_sample(v,b)      g_value_take_boxed(v,(b))
 /**
  * gst_value_get_sample:
- * @v: a #GValue to query
+ * @v: a [GValue]() to query
  *
- * Receives a #GstSample as the value of @v. Does not return a reference to
+ * Receives a [GstSample]() as the value of _v_. Does not return a reference to
  * the sample, so the pointer is only valid for as long as the caller owns
- * a reference to @v.
+ * a reference to _v_.
  *
  * Returns: (transfer none): sample
  */

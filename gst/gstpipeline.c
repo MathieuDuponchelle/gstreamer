@@ -23,45 +23,45 @@
 /**
  * SECTION:gstpipeline
  * @short_description: Top-level bin with clocking and bus management
-                       functionality.
- * @see_also: #GstElement, #GstBin, #GstClock, #GstBus
+ * @see_also: [GstElement](), [GstBin](), [GstClock](), [GstBus]()
  *
- * A #GstPipeline is a special #GstBin used as the toplevel container for
- * the filter graph. The #GstPipeline will manage the selection and
- * distribution of a global #GstClock as well as provide a #GstBus to the
+ * functionality.
+ * A [GstPipeline]() is a special [GstBin]() used as the toplevel container for
+ * the filter graph. The [GstPipeline]() will manage the selection and
+ * distribution of a global [GstClock]() as well as provide a [GstBus]() to the
  * application.
  *
- * gst_pipeline_new() is used to create a pipeline. when you are done with
- * the pipeline, use gst_object_unref() to free its resources including all
- * added #GstElement objects (if not otherwise referenced).
+ * [gst_pipeline_new]() is used to create a pipeline. when you are done with
+ * the pipeline, use [gst_object_unref]() to free its resources including all
+ * added [GstElement]() objects (if not otherwise referenced).
  *
- * Elements are added and removed from the pipeline using the #GstBin
- * methods like gst_bin_add() and gst_bin_remove() (see #GstBin).
+ * Elements are added and removed from the pipeline using the [GstBin]()
+ * methods like [gst_bin_add]() and [gst_bin_remove]() (see [GstBin]()).
  *
- * Before changing the state of the #GstPipeline (see #GstElement) a #GstBus
- * can be retrieved with gst_pipeline_get_bus(). This bus can then be
- * used to receive #GstMessage from the elements in the pipeline.
+ * Before changing the state of the [GstPipeline]() (see [GstElement]()) a [GstBus]()
+ * can be retrieved with [gst_pipeline_get_bus](). This bus can then be
+ * used to receive [GstMessage]() from the elements in the pipeline.
  *
- * By default, a #GstPipeline will automatically flush the pending #GstBus
+ * By default, a [GstPipeline]() will automatically flush the pending [GstBus]()
  * messages when going to the NULL state to ensure that no circular
- * references exist when no messages are read from the #GstBus. This
- * behaviour can be changed with gst_pipeline_set_auto_flush_bus().
+ * references exist when no messages are read from the [GstBus](). This
+ * behaviour can be changed with [gst_pipeline_set_auto_flush_bus]().
  *
- * When the #GstPipeline performs the PAUSED to PLAYING state change it will
+ * When the [GstPipeline]() performs the PAUSED to PLAYING state change it will
  * select a clock for the elements. The clock selection algorithm will by
  * default select a clock provided by an element that is most upstream
  * (closest to the source). For live pipelines (ones that return
- * #GST_STATE_CHANGE_NO_PREROLL from the gst_element_set_state() call) this
+ * [GST_STATE_CHANGE_NO_PREROLL]() from the [gst_element_set_state]() call) this
  * will select the clock provided by the live source. For normal pipelines
  * this will select a clock provided by the sinks (most likely the audio
- * sink). If no element provides a clock, a default #GstSystemClock is used.
+ * sink). If no element provides a clock, a default [GstSystemClock]() is used.
  *
- * The clock selection can be controlled with the gst_pipeline_use_clock()
+ * The clock selection can be controlled with the [gst_pipeline_use_clock]()
  * method, which will enforce a given clock on the pipeline. With
- * gst_pipeline_auto_clock() the default clock selection algorithm can be
+ * [gst_pipeline_auto_clock]() the default clock selection algorithm can be
  * restored.
  *
- * A #GstPipeline maintains a running time for the elements. The running
+ * A [GstPipeline]() maintains a running time for the elements. The running
  * time is defined as the difference between the current clock time and
  * the base time. When the pipeline goes to READY or a flushing seek is
  * performed on it, the running time is reset to 0. When the pipeline is
@@ -70,7 +70,7 @@
  * to PLAYING again. The effect is that the running time (as the difference
  * between the clock time and the base time) will count how much time was spent
  * in the PLAYING state. This default behaviour can be changed with the
- * gst_element_set_start_time() method.
+ * [gst_element_set_start_time]() method.
  */
 
 #include "gst_private.h"
@@ -162,8 +162,8 @@ gst_pipeline_class_init (GstPipelineClass * klass)
    *
    * The expected delay needed for elements to spin up to the
    * PLAYING state expressed in nanoseconds.
-   * see gst_pipeline_set_delay() for more information on this option.
-   **/
+   * see [gst_pipeline_set_delay]() for more information on this option.
+   */
   g_object_class_install_property (gobject_class, PROP_DELAY,
       g_param_spec_uint64 ("delay", "Delay",
           "Expected delay needed for elements "
@@ -175,8 +175,8 @@ gst_pipeline_class_init (GstPipelineClass * klass)
    *
    * Whether or not to automatically flush all messages on the
    * pipeline's bus when going from READY to NULL state. Please see
-   * gst_pipeline_set_auto_flush_bus() for more information on this option.
-   **/
+   * [gst_pipeline_set_auto_flush_bus]() for more information on this option.
+   */
   g_object_class_install_property (gobject_class, PROP_AUTO_FLUSH_BUS,
       g_param_spec_boolean ("auto-flush-bus", "Auto Flush Bus",
           "Whether to automatically flush the pipeline's bus when going "
@@ -186,10 +186,10 @@ gst_pipeline_class_init (GstPipelineClass * klass)
   /**
    * GstPipeline:latency:
    *
-   * Latency to configure on the pipeline. See gst_pipeline_set_latency().
+   * Latency to configure on the pipeline. See [gst_pipeline_set_latency]().
    *
    * Since: 1.6
-   **/
+   */
   g_object_class_install_property (gobject_class, PROP_LATENCY,
       g_param_spec_uint64 ("latency", "Latency",
           "Latency to configure on the pipeline", 0, G_MAXUINT64,
@@ -670,12 +670,12 @@ gst_pipeline_do_latency (GstBin * bin)
 
 /**
  * gst_pipeline_get_bus:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  *
- * Gets the #GstBus of @pipeline. The bus allows applications to receive
- * #GstMessage packets.
+ * Gets the [GstBus]() of _pipeline_. The bus allows applications to receive
+ * [GstMessage]() packets.
  *
- * Returns: (transfer full): a #GstBus, unref after usage.
+ * Returns: (transfer full): a [GstBus](), unref after usage.
  *
  * MT safe.
  */
@@ -722,17 +722,17 @@ gst_pipeline_provide_clock_func (GstElement * element)
 }
 
 /**
- * gst_pipeline_get_clock: (skip)
- * @pipeline: a #GstPipeline
+ * gst_pipeline_get_clock: (skip):
+ * @pipeline: a [GstPipeline]()
  *
- * Gets the current clock used by @pipeline. Users of object
- * oriented languages should use gst_pipeline_get_pipeline_clock()
- * to avoid confusion with gst_element_get_clock() which has a different behavior.
+ * Gets the current clock used by _pipeline_. Users of object
+ * oriented languages should use [gst_pipeline_get_pipeline_clock]()
+ * to avoid confusion with [gst_element_get_clock]() which has a different behavior.
  *
- * Unlike gst_element_get_clock(), this function will always return a
+ * Unlike [gst_element_get_clock](), this function will always return a
  * clock, even if the pipeline is not in the PLAYING state.
  *
- * Returns: (transfer full): a #GstClock, unref after usage.
+ * Returns: (transfer full): a [GstClock](), unref after usage.
  */
 GstClock *
 gst_pipeline_get_clock (GstPipeline * pipeline)
@@ -742,15 +742,14 @@ gst_pipeline_get_clock (GstPipeline * pipeline)
 
 /**
  * gst_pipeline_get_pipeline_clock:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  *
- * Gets the current clock used by @pipeline.
+ * Gets the current clock used by _pipeline_.
  *
- * Unlike gst_element_get_clock(), this function will always return a
+ * Unlike [gst_element_get_clock](), this function will always return a
  * clock, even if the pipeline is not in the PLAYING state.
  *
- * Returns: (transfer full): a #GstClock, unref after usage.
- *
+ * Returns: (transfer full): a [GstClock](), unref after usage.
  * Since: 1.6
  */
 GstClock *
@@ -764,14 +763,14 @@ gst_pipeline_get_pipeline_clock (GstPipeline * pipeline)
 
 /**
  * gst_pipeline_use_clock:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  * @clock: (transfer none) (allow-none): the clock to use
  *
- * Force @pipeline to use the given @clock. The pipeline will
+ * Force _pipeline_ to use the given _clock_. The pipeline will
  * always use the given clock even if new clock providers are added
  * to this pipeline.
  *
- * If @clock is %NULL all clocking will be disabled which will make
+ * If _clock_ is [NULL]() all clocking will be disabled which will make
  * the pipeline run as fast as possible.
  *
  * MT safe.
@@ -795,14 +794,14 @@ gst_pipeline_use_clock (GstPipeline * pipeline, GstClock * clock)
 }
 
 /**
- * gst_pipeline_set_clock: (skip)
- * @pipeline: a #GstPipeline
+ * gst_pipeline_set_clock: (skip):
+ * @pipeline: a [GstPipeline]()
  * @clock: (transfer none): the clock to set
  *
- * Set the clock for @pipeline. The clock will be distributed
+ * Set the clock for _pipeline_. The clock will be distributed
  * to all the elements managed by the pipeline.
  *
- * Returns: %TRUE if the clock could be set on the pipeline. %FALSE if
+ * Returns: [TRUE]() if the clock could be set on the pipeline. [FALSE]() if
  *   some element did not accept the clock.
  *
  * MT safe.
@@ -820,13 +819,13 @@ gst_pipeline_set_clock (GstPipeline * pipeline, GstClock * clock)
 
 /**
  * gst_pipeline_auto_clock:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  *
- * Let @pipeline select a clock automatically. This is the default
+ * Let _pipeline_ select a clock automatically. This is the default
  * behaviour.
  *
  * Use this function if you previous forced a fixed clock with
- * gst_pipeline_use_clock() and want to restore the default
+ * [gst_pipeline_use_clock]() and want to restore the default
  * pipeline clock selection algorithm.
  *
  * MT safe.
@@ -851,14 +850,14 @@ gst_pipeline_auto_clock (GstPipeline * pipeline)
 
 /**
  * gst_pipeline_set_delay:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  * @delay: the delay
  *
  * Set the expected delay needed for all elements to perform the
- * PAUSED to PLAYING state change. @delay will be added to the
- * base time of the elements so that they wait an additional @delay
+ * PAUSED to PLAYING state change. _delay_ will be added to the
+ * base time of the elements so that they wait an additional _delay_
  * amount of time before starting to process buffers and cannot be
- * #GST_CLOCK_TIME_NONE.
+ * [GST_CLOCK_TIME_NONE]().
  *
  * This option is used for tuning purposes and should normally not be
  * used.
@@ -878,9 +877,9 @@ gst_pipeline_set_delay (GstPipeline * pipeline, GstClockTime delay)
 
 /**
  * gst_pipeline_get_delay:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  *
- * Get the configured delay (see gst_pipeline_set_delay()).
+ * Get the configured delay (see [gst_pipeline_set_delay]()).
  *
  * Returns: The configured delay.
  *
@@ -902,7 +901,7 @@ gst_pipeline_get_delay (GstPipeline * pipeline)
 
 /**
  * gst_pipeline_set_auto_flush_bus:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  * @auto_flush: whether or not to automatically flush the bus when
  * the pipeline goes from READY to NULL state
  *
@@ -933,9 +932,9 @@ gst_pipeline_set_auto_flush_bus (GstPipeline * pipeline, gboolean auto_flush)
 
 /**
  * gst_pipeline_get_auto_flush_bus:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  *
- * Check if @pipeline will automatically flush messages when going to
+ * Check if _pipeline_ will automatically flush messages when going to
  * the NULL state.
  *
  * Returns: whether the pipeline will automatically flush its bus when
@@ -959,7 +958,7 @@ gst_pipeline_get_auto_flush_bus (GstPipeline * pipeline)
 
 /**
  * gst_pipeline_set_latency:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  * @latency: latency to configure
  *
  * Sets the latency that should be configured on the pipeline. Setting
@@ -990,13 +989,12 @@ gst_pipeline_set_latency (GstPipeline * pipeline, GstClockTime latency)
 
 /**
  * gst_pipeline_get_latency:
- * @pipeline: a #GstPipeline
+ * @pipeline: a [GstPipeline]()
  *
  * Gets the latency that should be configured on the pipeline. See
- * gst_pipeline_set_latency().
+ * [gst_pipeline_set_latency]().
  *
  * Returns: Latency to configure on the pipeline or GST_CLOCK_TIME_NONE
- *
  * Since: 1.6
  */
 

@@ -22,33 +22,33 @@
 /**
  * SECTION:gsttoc
  * @short_description: Generic table of contents support
- * @see_also: #GstStructure, #GstEvent, #GstMessage, #GstQuery
+ * @see_also: [GstStructure](), [GstEvent](), [GstMessage](), [GstQuery]()
  *
- * #GstToc functions are used to create/free #GstToc and #GstTocEntry structures.
- * Also they are used to convert #GstToc into #GstStructure and vice versa.
+ * [GstToc]() functions are used to create/free [GstToc]() and [GstTocEntry]() structures.
+ * Also they are used to convert [GstToc]() into [GstStructure]() and vice versa.
  *
- * #GstToc lets you to inform other elements in pipeline or application that playing
+ * [GstToc]() lets you to inform other elements in pipeline or application that playing
  * source has some kind of table of contents (TOC). These may be chapters, editions,
  * angles or other types. For example: DVD chapters, Matroska chapters or cue sheet
  * TOC. Such TOC will be useful for applications to display instead of just a
  * playlist.
  *
- * Using TOC is very easy. Firstly, create #GstToc structure which represents root
+ * Using TOC is very easy. Firstly, create [GstToc]() structure which represents root
  * contents of the source. You can also attach TOC-specific tags to it. Then fill
- * it with #GstTocEntry entries by appending them to the #GstToc using
- * gst_toc_append_entry(), and appending subentries to a #GstTocEntry using
- * gst_toc_entry_append_sub_entry().
+ * it with [GstTocEntry]() entries by appending them to the [GstToc]() using
+ * [gst_toc_append_entry](), and appending subentries to a [GstTocEntry]() using
+ * [gst_toc_entry_append_sub_entry]().
  *
  * Note that root level of the TOC can contain only either editions or chapters. You
  * should not mix them together at the same level. Otherwise you will get serialization
  * /deserialization errors. Make sure that no one of the entries has negative start and
  *  stop values.
  *
- * Use gst_event_new_toc() to create a new TOC #GstEvent, and gst_event_parse_toc() to
- * parse received TOC event. Use gst_event_new_toc_select() to create a new TOC select #GstEvent,
- * and gst_event_parse_toc_select() to parse received TOC select event. The same rule for
- * the #GstMessage: gst_message_new_toc() to create new TOC #GstMessage, and
- * gst_message_parse_toc() to parse received TOC message.
+ * Use [gst_event_new_toc]() to create a new TOC [GstEvent](), and [gst_event_parse_toc]() to
+ * parse received TOC event. Use [gst_event_new_toc_select]() to create a new TOC select [GstEvent](),
+ * and [gst_event_parse_toc_select]() to parse received TOC select event. The same rule for
+ * the [GstMessage](): [gst_message_new_toc]() to create new TOC [GstMessage](), and
+ * [gst_message_parse_toc]() to parse received TOC message.
  *
  * TOCs can have global scope or current scope. Global scope TOCs contain
  * all entries that can possibly be selected using a toc select event, and
@@ -126,10 +126,10 @@ GST_DEFINE_MINI_OBJECT_TYPE (GstTocEntry, gst_toc_entry);
  * gst_toc_new:
  * @scope: scope of this TOC
  *
- * Create a new #GstToc structure.
+ * Create a new [GstToc]() structure.
  *
- * Returns: (transfer full): newly allocated #GstToc structure, free it
- *     with gst_toc_unref().
+ * Returns: (transfer full): newly allocated [GstToc]() structure, free it
+ *     with [gst_toc_unref]().
  */
 GstToc *
 gst_toc_new (GstTocScope scope)
@@ -153,9 +153,11 @@ gst_toc_new (GstTocScope scope)
 
 /**
  * gst_toc_get_scope:
- * @toc: a #GstToc instance
+ * @toc: a [GstToc]() instance
  *
- * Returns: scope of @toc
+ *
+ *
+ * Returns: scope of _toc_
  */
 GstTocScope
 gst_toc_get_scope (const GstToc * toc)
@@ -167,10 +169,10 @@ gst_toc_get_scope (const GstToc * toc)
 
 /**
  * gst_toc_set_tags:
- * @toc: A #GstToc instance
- * @tags: (allow-none) (transfer full): A #GstTagList or %NULL
+ * @toc: A [GstToc]() instance
+ * @tags: (allow-none) (transfer full): A [GstTagList]() or [NULL]()
  *
- * Set a #GstTagList with tags for the complete @toc.
+ * Set a [GstTagList]() with tags for the complete _toc_.
  */
 void
 gst_toc_set_tags (GstToc * toc, GstTagList * tags)
@@ -185,11 +187,11 @@ gst_toc_set_tags (GstToc * toc, GstTagList * tags)
 
 /**
  * gst_toc_merge_tags:
- * @toc: A #GstToc instance
- * @tags: (allow-none): A #GstTagList or %NULL
- * @mode: A #GstTagMergeMode
+ * @toc: A [GstToc]() instance
+ * @tags: (allow-none): A [GstTagList]() or [NULL]()
+ * @mode: A [GstTagMergeMode]()
  *
- * Merge @tags into the existing tags of @toc using @mode.
+ * Merge _tags_ into the existing tags of _toc_ using _mode_.
  */
 void
 gst_toc_merge_tags (GstToc * toc, GstTagList * tags, GstTagMergeMode mode)
@@ -208,11 +210,11 @@ gst_toc_merge_tags (GstToc * toc, GstTagList * tags, GstTagMergeMode mode)
 
 /**
  * gst_toc_get_tags:
- * @toc: A #GstToc instance
+ * @toc: A [GstToc]() instance
  *
- * Gets the tags for @toc.
+ * Gets the tags for _toc_.
  *
- * Returns: (transfer none): A #GstTagList for @entry
+ * Returns: (transfer none): A [GstTagList]() for _entry_
  */
 GstTagList *
 gst_toc_get_tags (const GstToc * toc)
@@ -224,10 +226,10 @@ gst_toc_get_tags (const GstToc * toc)
 
 /**
  * gst_toc_append_entry:
- * @toc: A #GstToc instance
- * @entry: (transfer full): A #GstTocEntry
+ * @toc: A [GstToc]() instance
+ * @entry: (transfer full): A [GstTocEntry]()
  *
- * Appends the #GstTocEntry @entry to @toc.
+ * Appends the [GstTocEntry]() _entry_ to _toc_.
  */
 void
 gst_toc_append_entry (GstToc * toc, GstTocEntry * entry)
@@ -249,11 +251,11 @@ gst_toc_append_entry (GstToc * toc, GstTocEntry * entry)
 
 /**
  * gst_toc_get_entries:
- * @toc: A #GstToc instance
+ * @toc: A [GstToc]() instance
  *
- * Gets the list of #GstTocEntry of @toc.
+ * Gets the list of [GstTocEntry]() of _toc_.
  *
- * Returns: (transfer none) (element-type Gst.TocEntry): A #GList of #GstTocEntry for @entry
+ * Returns: (transfer none) (element-type Gst.TocEntry): A [GList]() of [GstTocEntry]() for _entry_
  */
 GList *
 gst_toc_get_entries (const GstToc * toc)
@@ -287,9 +289,9 @@ gst_toc_entry_new_internal (GstTocEntryType type, const gchar * uid)
  * @type: entry type.
  * @uid: unique ID (UID) in the whole TOC.
  *
- * Create new #GstTocEntry structure.
+ * Create new [GstTocEntry]() structure.
  *
- * Returns: newly allocated #GstTocEntry structure, free it with gst_toc_entry_unref().
+ * Returns: newly allocated [GstTocEntry]() structure, free it with [gst_toc_entry_unref]().
  */
 GstTocEntry *
 gst_toc_entry_new (GstTocEntryType type, const gchar * uid)
@@ -355,13 +357,13 @@ gst_toc_entry_find_sub_entry (const GstTocEntry * entry, const gchar * uid)
 
 /**
  * gst_toc_find_entry:
- * @toc: #GstToc to search in.
- * @uid: UID to find #GstTocEntry with.
+ * @toc: [GstToc]() to search in.
+ * @uid: UID to find [GstTocEntry]() with.
  *
- * Find #GstTocEntry with given @uid in the @toc.
+ * Find [GstTocEntry]() with given _uid_ in the _toc_.
  *
- * Returns: (transfer none) (nullable): #GstTocEntry with specified
- * @uid from the @toc, or %NULL if not found.
+ * Returns: (transfer none) (nullable): [GstTocEntry]() with specified
+ * _uid_ from the _toc_, or [NULL]() if not found.
  */
 GstTocEntry *
 gst_toc_find_entry (const GstToc * toc, const gchar * uid)
@@ -402,13 +404,13 @@ gst_toc_deep_copy_toc_entries (GList * entry_list)
 
 /**
  * gst_toc_entry_copy:
- * @entry: #GstTocEntry to copy.
+ * @entry: [GstTocEntry]() to copy.
  *
- * Copy #GstTocEntry with all subentries (deep copy).
+ * Copy [GstTocEntry]() with all subentries (deep copy).
  *
- * Returns: (nullable): newly allocated #GstTocEntry in case of
- * success, %NULL otherwise; free it when done with
- * gst_toc_entry_unref().
+ * Returns: (nullable): newly allocated [GstTocEntry]() in case of
+ * success, [NULL]() otherwise; free it when done with
+ * [gst_toc_entry_unref]().
  */
 static GstTocEntry *
 gst_toc_entry_copy (const GstTocEntry * entry)
@@ -437,12 +439,12 @@ gst_toc_entry_copy (const GstTocEntry * entry)
 
 /**
  * gst_toc_copy:
- * @toc: #GstToc to copy.
+ * @toc: [GstToc]() to copy.
  *
- * Copy #GstToc with all subentries (deep copy).
+ * Copy [GstToc]() with all subentries (deep copy).
  *
- * Returns: (nullable): newly allocated #GstToc in case of success,
- * %NULL otherwise; free it when done with gst_toc_unref().
+ * Returns: (nullable): newly allocated [GstToc]() in case of success,
+ * [NULL]() otherwise; free it when done with [gst_toc_unref]().
  */
 static GstToc *
 gst_toc_copy (const GstToc * toc)
@@ -467,11 +469,11 @@ gst_toc_copy (const GstToc * toc)
 
 /**
  * gst_toc_entry_set_start_stop_times:
- * @entry: #GstTocEntry to set values.
+ * @entry: [GstTocEntry]() to set values.
  * @start: start value to set.
  * @stop: stop value to set.
  *
- * Set @start and @stop values for the @entry.
+ * Set _start_ and _stop_ values for the _entry_.
  */
 void
 gst_toc_entry_set_start_stop_times (GstTocEntry * entry, gint64 start,
@@ -485,17 +487,17 @@ gst_toc_entry_set_start_stop_times (GstTocEntry * entry, gint64 start,
 
 /**
  * gst_toc_entry_get_start_stop_times:
- * @entry: #GstTocEntry to get values from.
+ * @entry: [GstTocEntry]() to get values from.
  * @start: (out) (allow-none): the storage for the start value, leave
- *   %NULL if not need.
+ *   [NULL]() if not need.
  * @stop: (out) (allow-none): the storage for the stop value, leave
- *   %NULL if not need.
+ *   [NULL]() if not need.
  *
- * Get @start and @stop values from the @entry and write them into appropriate
+ * Get _start_ and _stop_ values from the _entry_ and write them into appropriate
  * storages.
  *
- * Returns: %TRUE if all non-%NULL storage pointers were filled with appropriate
- * values, %FALSE otherwise.
+ * Returns: [TRUE]() if all non-[NULL]() storage pointers were filled with appropriate
+ * values, [FALSE]() otherwise.
  */
 gboolean
 gst_toc_entry_get_start_stop_times (const GstTocEntry * entry, gint64 * start,
@@ -513,11 +515,11 @@ gst_toc_entry_get_start_stop_times (const GstTocEntry * entry, gint64 * start,
 
 /**
  * gst_toc_entry_set_loop:
- * @entry: #GstTocEntry to set values.
+ * @entry: [GstTocEntry]() to set values.
  * @loop_type: loop_type value to set.
  * @repeat_count: repeat_count value to set.
  *
- * Set @loop_type and @repeat_count values for the @entry.
+ * Set _loop_type_ and _repeat_count_ values for the _entry_.
  *
  * Since: 1.4
  */
@@ -533,20 +535,19 @@ gst_toc_entry_set_loop (GstTocEntry * entry, GstTocLoopType loop_type,
 
 /**
  * gst_toc_entry_get_loop:
- * @entry: #GstTocEntry to get values from.
+ * @entry: [GstTocEntry]() to get values from.
  * @loop_type: (out) (allow-none): the storage for the loop_type
- *             value, leave %NULL if not need.
+ *             value, leave [NULL]() if not need.
  * @repeat_count: (out) (allow-none): the storage for the repeat_count
- *                value, leave %NULL if not need.
+ *                value, leave [NULL]() if not need.
  *
- * Get @loop_type and @repeat_count values from the @entry and write them into
+ * Get _loop_type_ and _repeat_count_ values from the _entry_ and write them into
  * appropriate storages. Loops are e.g. used by sampled instruments. GStreamer
  * is not automatically applying the loop. The application can process this
  * meta data and use it e.g. to send a seek-event to loop a section.
  *
- * Returns: %TRUE if all non-%NULL storage pointers were filled with appropriate
- * values, %FALSE otherwise.
- *
+ * Returns: [TRUE]() if all non-[NULL]() storage pointers were filled with appropriate
+ * values, [FALSE]() otherwise.
  * Since: 1.4
  */
 gboolean
@@ -566,11 +567,11 @@ gst_toc_entry_get_loop (const GstTocEntry * entry, GstTocLoopType * loop_type,
 
 /**
  * gst_toc_entry_type_get_nick:
- * @type: a #GstTocEntryType.
+ * @type: a [GstTocEntryType]().
  *
- * Converts @type to a string representation.
+ * Converts _type_ to a string representation.
  *
- * Returns: Returns a human-readable string for @type. This string is
+ * Returns: Returns a human-readable string for _type_. This string is
  *    only for debugging purpose and should not be displayed in a user
  *    interface.
  */
@@ -598,9 +599,11 @@ gst_toc_entry_type_get_nick (GstTocEntryType type)
 
 /**
  * gst_toc_entry_get_entry_type:
- * @entry: a #GstTocEntry
+ * @entry: a [GstTocEntry]()
  *
- * Returns: @entry's entry type
+ *
+ *
+ * Returns: _entry_'s entry type
  */
 GstTocEntryType
 gst_toc_entry_get_entry_type (const GstTocEntry * entry)
@@ -612,9 +615,11 @@ gst_toc_entry_get_entry_type (const GstTocEntry * entry)
 
 /**
  * gst_toc_entry_is_alternative:
- * @entry: a #GstTocEntry
+ * @entry: a [GstTocEntry]()
  *
- * Returns: %TRUE if @entry's type is an alternative type, otherwise %FALSE
+ *
+ *
+ * Returns: [TRUE]() if _entry_'s type is an alternative type, otherwise [FALSE]()
  */
 gboolean
 gst_toc_entry_is_alternative (const GstTocEntry * entry)
@@ -626,9 +631,11 @@ gst_toc_entry_is_alternative (const GstTocEntry * entry)
 
 /**
  * gst_toc_entry_is_sequence:
- * @entry: a #GstTocEntry
+ * @entry: a [GstTocEntry]()
  *
- * Returns: %TRUE if @entry's type is a sequence type, otherwise %FALSE
+ *
+ *
+ * Returns: [TRUE]() if _entry_'s type is a sequence type, otherwise [FALSE]()
  */
 gboolean
 gst_toc_entry_is_sequence (const GstTocEntry * entry)
@@ -640,11 +647,11 @@ gst_toc_entry_is_sequence (const GstTocEntry * entry)
 
 /**
  * gst_toc_entry_get_uid:
- * @entry: A #GstTocEntry instance
+ * @entry: A [GstTocEntry]() instance
  *
- * Gets the UID of @entry.
+ * Gets the UID of _entry_.
  *
- * Returns: (transfer none): The UID of @entry
+ * Returns: (transfer none): The UID of _entry_
  */
 const gchar *
 gst_toc_entry_get_uid (const GstTocEntry * entry)
@@ -656,10 +663,10 @@ gst_toc_entry_get_uid (const GstTocEntry * entry)
 
 /**
  * gst_toc_entry_append_sub_entry:
- * @entry: A #GstTocEntry instance
- * @subentry: (transfer full): A #GstTocEntry
+ * @entry: A [GstTocEntry]() instance
+ * @subentry: (transfer full): A [GstTocEntry]()
  *
- * Appends the #GstTocEntry @subentry to @entry.
+ * Appends the [GstTocEntry]() _subentry_ to _entry_.
  */
 void
 gst_toc_entry_append_sub_entry (GstTocEntry * entry, GstTocEntry * subentry)
@@ -682,11 +689,11 @@ gst_toc_entry_append_sub_entry (GstTocEntry * entry, GstTocEntry * subentry)
 
 /**
  * gst_toc_entry_get_sub_entries:
- * @entry: A #GstTocEntry instance
+ * @entry: A [GstTocEntry]() instance
  *
- * Gets the sub-entries of @entry.
+ * Gets the sub-entries of _entry_.
  *
- * Returns: (transfer none) (element-type Gst.TocEntry): A #GList of #GstTocEntry of @entry
+ * Returns: (transfer none) (element-type Gst.TocEntry): A [GList]() of [GstTocEntry]() of _entry_
  */
 GList *
 gst_toc_entry_get_sub_entries (const GstTocEntry * entry)
@@ -698,10 +705,10 @@ gst_toc_entry_get_sub_entries (const GstTocEntry * entry)
 
 /**
  * gst_toc_entry_set_tags:
- * @entry: A #GstTocEntry instance
- * @tags: (allow-none) (transfer full): A #GstTagList or %NULL
+ * @entry: A [GstTocEntry]() instance
+ * @tags: (allow-none) (transfer full): A [GstTagList]() or [NULL]()
  *
- * Set a #GstTagList with tags for the complete @entry.
+ * Set a [GstTagList]() with tags for the complete _entry_.
  */
 void
 gst_toc_entry_set_tags (GstTocEntry * entry, GstTagList * tags)
@@ -716,11 +723,11 @@ gst_toc_entry_set_tags (GstTocEntry * entry, GstTagList * tags)
 
 /**
  * gst_toc_entry_merge_tags:
- * @entry: A #GstTocEntry instance
- * @tags: (allow-none): A #GstTagList or %NULL
- * @mode: A #GstTagMergeMode
+ * @entry: A [GstTocEntry]() instance
+ * @tags: (allow-none): A [GstTagList]() or [NULL]()
+ * @mode: A [GstTagMergeMode]()
  *
- * Merge @tags into the existing tags of @entry using @mode.
+ * Merge _tags_ into the existing tags of _entry_ using _mode_.
  */
 void
 gst_toc_entry_merge_tags (GstTocEntry * entry, GstTagList * tags,
@@ -740,11 +747,11 @@ gst_toc_entry_merge_tags (GstTocEntry * entry, GstTagList * tags,
 
 /**
  * gst_toc_entry_get_tags:
- * @entry: A #GstTocEntry instance
+ * @entry: A [GstTocEntry]() instance
  *
- * Gets the tags for @entry.
+ * Gets the tags for _entry_.
  *
- * Returns: (transfer none): A #GstTagList for @entry
+ * Returns: (transfer none): A [GstTagList]() for _entry_
  */
 GstTagList *
 gst_toc_entry_get_tags (const GstTocEntry * entry)
@@ -756,11 +763,11 @@ gst_toc_entry_get_tags (const GstTocEntry * entry)
 
 /**
  * gst_toc_entry_get_toc:
- * @entry: A #GstTocEntry instance
+ * @entry: A [GstTocEntry]() instance
  *
- * Gets the parent #GstToc of @entry.
+ * Gets the parent [GstToc]() of _entry_.
  *
- * Returns: (transfer none): The parent #GstToc of @entry
+ * Returns: (transfer none): The parent [GstToc]() of _entry_
  */
 GstToc *
 gst_toc_entry_get_toc (GstTocEntry * entry)
@@ -772,11 +779,11 @@ gst_toc_entry_get_toc (GstTocEntry * entry)
 
 /**
  * gst_toc_entry_get_parent:
- * @entry: A #GstTocEntry instance
+ * @entry: A [GstTocEntry]() instance
  *
- * Gets the parent #GstTocEntry of @entry.
+ * Gets the parent [GstTocEntry]() of _entry_.
  *
- * Returns: (transfer none): The parent #GstTocEntry of @entry
+ * Returns: (transfer none): The parent [GstTocEntry]() of _entry_
  */
 GstTocEntry *
 gst_toc_entry_get_parent (GstTocEntry * entry)

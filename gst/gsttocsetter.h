@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 /**
  * GstTocSetter:
  *
- * Opaque #GstTocSetter data structure.
+ * Opaque [GstTocSetter]() data structure.
  */
 typedef struct _GstTocSetter GstTocSetter;
 typedef struct _GstTocSetterInterface GstTocSetterInterface;
@@ -42,7 +42,7 @@ typedef struct _GstTocSetterInterface GstTocSetterInterface;
  * GstTocSetterInterface:
  * @g_iface: parent interface type.
  *
- * #GstTocSetterInterface interface.
+ * [GstTocSetterInterface]() interface.
  */
 
 struct _GstTocSetterInterface

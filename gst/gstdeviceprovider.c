@@ -22,16 +22,16 @@
 /**
  * SECTION:gstdeviceprovider
  * @short_description: A device provider
- * @see_also: #GstDevice, #GstDeviceMonitor
+ * @see_also: [GstDevice](), [GstDeviceMonitor]()
  *
- * A #GstDeviceProvider subclass is provided by a plugin that handles devices
+ * A [GstDeviceProvider]() subclass is provided by a plugin that handles devices
  * if there is a way to programatically list connected devices. It can also
  * optionally provide updates to the list of connected devices.
  *
- * Each #GstDeviceProvider subclass is a singleton, a plugin should
+ * Each [GstDeviceProvider]() subclass is a singleton, a plugin should
  * normally provide a single subclass for all devices.
  *
- * Applications would normally use a #GstDeviceMonitor to monitor devices
+ * Applications would normally use a [GstDeviceMonitor]() to monitor devices
  * from all relevant providers.
  *
  * Since: 1.4
@@ -180,7 +180,7 @@ gst_device_provider_finalize (GObject * object)
  * @key: the key to set
  * @value: the value to set
  *
- * Set @key with @value as metadata in @klass.
+ * Set _key_ with _value_ as metadata in _klass_.
  *
  * Since: 1.4
  */
@@ -202,9 +202,9 @@ gst_device_provider_class_add_metadata (GstDeviceProviderClass * klass,
  * @key: the key to set
  * @value: (transfer full): the value to set
  *
- * Set @key with @value as metadata in @klass.
+ * Set _key_ with _value_ as metadata in _klass_.
  *
- * Same as gst_device_provider_class_add_metadata(), but @value must be a static string
+ * Same as [gst_device_provider_class_add_metadata](), but _value_ must be a static string
  * or an inlined string, as it will not be copied. (GStreamer plugins will
  * be made resident once loaded, so this function can be used even from
  * dynamically loaded plugins.)
@@ -239,7 +239,7 @@ gst_device_provider_class_add_static_metadata (GstDeviceProviderClass * klass,
  * @author: Name and contact details of the author(s). Use \n to separate
  * multiple author metadata. E.g: "Joe Bloggs &lt;joe.blogs at foo.com&gt;"
  *
- * Sets the detailed information for a #GstDeviceProviderClass.
+ * Sets the detailed information for a [GstDeviceProviderClass]().
  * <note>This function is for use in _class_init functions only.</note>
  *
  * Since: 1.4
@@ -275,11 +275,11 @@ gst_device_provider_class_set_metadata (GstDeviceProviderClass * klass,
  * to separate multiple author metadata. E.g: "Joe Bloggs &lt;joe.blogs at
  * foo.com&gt;"
  *
- * Sets the detailed information for a #GstDeviceProviderClass.
+ * Sets the detailed information for a [GstDeviceProviderClass]().
  * <note>This function is for use in _class_init functions only.</note>
  *
- * Same as gst_device_provider_class_set_metadata(), but @longname, @classification,
- * @description, and @author must be static strings or inlined strings, as
+ * Same as [gst_device_provider_class_set_metadata](), but _longname_, _classification_,
+ * _description_, and _author_ must be static strings or inlined strings, as
  * they will not be copied. (GStreamer plugins will be made resident once
  * loaded, so this function can be used even from dynamically loaded plugins.)
  *
@@ -320,10 +320,9 @@ gst_device_provider_class_set_static_metadata (GstDeviceProviderClass * klass,
  * @klass: class to get metadata for
  * @key: the key to get
  *
- * Get metadata with @key in @klass.
+ * Get metadata with _key_ in _klass_.
  *
- * Returns: the metadata for @key.
- *
+ * Returns: the metadata for _key_.
  * Since: 1.4
  */
 const gchar *
@@ -338,14 +337,13 @@ gst_device_provider_class_get_metadata (GstDeviceProviderClass * klass,
 
 /**
  * gst_device_provider_get_devices:
- * @provider: A #GstDeviceProvider
+ * @provider: A [GstDeviceProvider]()
  *
  * Gets a list of devices that this provider understands. This may actually
  * probe the hardware if the provider is not currently started.
  *
- * Returns: (transfer full) (element-type GstDevice): a #GList of
- *   #GstDevice
- *
+ * Returns: (transfer full) (element-type GstDevice): a [GList]() of
+ *   [GstDevice]()
  * Since: 1.4
  */
 
@@ -378,19 +376,18 @@ gst_device_provider_get_devices (GstDeviceProvider * provider)
 
 /**
  * gst_device_provider_start:
- * @provider: A #GstDeviceProvider
+ * @provider: A [GstDeviceProvider]()
  *
- * Starts providering the devices. This will cause #GST_MESSAGE_DEVICE_ADDED
- * and #GST_MESSAGE_DEVICE_REMOVED messages to be posted on the provider's bus
+ * Starts providering the devices. This will cause [GST_MESSAGE_DEVICE_ADDED]()
+ * and [GST_MESSAGE_DEVICE_REMOVED]() messages to be posted on the provider's bus
  * when devices are added or removed from the system.
  *
- * Since the #GstDeviceProvider is a singleton,
- * gst_device_provider_start() may already have been called by another
- * user of the object, gst_device_provider_stop() needs to be called the same
+ * Since the [GstDeviceProvider]() is a singleton,
+ * [gst_device_provider_start]() may already have been called by another
+ * user of the object, [gst_device_provider_stop]() needs to be called the same
  * number of times.
  *
- * Returns: %TRUE if the device providering could be started
- *
+ * Returns: [TRUE]() if the device providering could be started
  * Since: 1.4
  */
 
@@ -427,11 +424,11 @@ started:
 
 /**
  * gst_device_provider_stop:
- * @provider: A #GstDeviceProvider
+ * @provider: A [GstDeviceProvider]()
  *
  * Decreases the use-count by one. If the use count reaches zero, this
- * #GstDeviceProvider will stop providering the devices. This needs to be
- * called the same number of times that gst_device_provider_start() was called.
+ * [GstDeviceProvider]() will stop providering the devices. This needs to be
+ * called the same number of times that [gst_device_provider_start]() was called.
  *
  * Since: 1.4
  */
@@ -467,13 +464,12 @@ gst_device_provider_stop (GstDeviceProvider * provider)
 
 /**
  * gst_device_provider_get_factory:
- * @provider: a #GstDeviceProvider to request the device provider factory of.
+ * @provider: a [GstDeviceProvider]() to request the device provider factory of.
  *
  * Retrieves the factory that was used to create this device provider.
  *
- * Returns: (transfer none): the #GstDeviceProviderFactory used for
+ * Returns: (transfer none): the [GstDeviceProviderFactory]() used for
  *     creating this device provider. no refcounting is needed.
- *
  * Since: 1.4
  */
 GstDeviceProviderFactory *
@@ -486,12 +482,12 @@ gst_device_provider_get_factory (GstDeviceProvider * provider)
 
 /**
  * gst_device_provider_can_provider:
- * @provider: a #GstDeviceProvider
+ * @provider: a [GstDeviceProvider]()
  *
- * If this function returns %TRUE, then the device provider can provider if
+ * If this function returns [TRUE](), then the device provider can provider if
  * devices are added or removed. Otherwise, it can only do static probing.
  *
- * Returns: %TRUE if the #GstDeviceProvider support providering, %FALSE otherwise
+ * Returns: [TRUE]() if the [GstDeviceProvider]() support providering, [FALSE]() otherwise
  */
 gboolean
 gst_device_provider_can_monitor (GstDeviceProvider * provider)
@@ -509,12 +505,11 @@ gst_device_provider_can_monitor (GstDeviceProvider * provider)
 
 /**
  * gst_device_provider_get_bus:
- * @provider: a #GstDeviceProvider
+ * @provider: a [GstDeviceProvider]()
  *
- * Gets the #GstBus of this #GstDeviceProvider
+ * Gets the [GstBus]() of this [GstDeviceProvider]()
  *
- * Returns: (transfer full): a #GstBus
- *
+ * Returns: (transfer full): a [GstBus]()
  * Since: 1.4
  */
 GstBus *
@@ -527,10 +522,10 @@ gst_device_provider_get_bus (GstDeviceProvider * provider)
 
 /**
  * gst_device_provider_device_add:
- * @provider: a #GstDeviceProvider
- * @device: (transfer full): a #GstDevice that has been added
+ * @provider: a [GstDeviceProvider]()
+ * @device: (transfer full): a [GstDevice]() that has been added
  *
- * Posts a message on the provider's #GstBus to inform applications that
+ * Posts a message on the provider's [GstBus]() to inform applications that
  * a new device has been added.
  *
  * This is for use by subclasses.
@@ -565,10 +560,10 @@ gst_device_provider_device_add (GstDeviceProvider * provider,
 
 /**
  * gst_device_provider_device_remove:
- * @provider: a #GstDeviceProvider
- * @device: a #GstDevice that has been removed
+ * @provider: a [GstDeviceProvider]()
+ * @device: a [GstDevice]() that has been removed
  *
- * Posts a message on the provider's #GstBus to inform applications that
+ * Posts a message on the provider's [GstBus]() to inform applications that
  * a device has been removed.
  *
  * This is for use by subclasses.
