@@ -1,0 +1,15 @@
+### GstPreset
+
+* [GstPreset]()
+* [GstPresetInterface]()
+* [gst_preset_get_preset_names]()
+* [gst_preset_get_property_names]()
+* [gst_preset_load_preset]()
+* [gst_preset_save_preset]()
+* [gst_preset_rename_preset]()
+* [gst_preset_delete_preset]()
+* [gst_preset_set_meta]()
+* [gst_preset_get_meta]()
+* [gst_preset_set_app_dir]()
+* [gst_preset_get_app_dir]()
+* [gst_preset_is_editable]()

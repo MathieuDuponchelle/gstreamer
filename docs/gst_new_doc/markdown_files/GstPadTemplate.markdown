@@ -1,0 +1,16 @@
+### GstPadTemplate
+
+* [GstStaticPadTemplate]()
+* [GST_STATIC_PAD_TEMPLATE]()
+* [gst_static_pad_template_get]()
+* [gst_static_pad_template_get_caps]()
+* [GstPadTemplate]()
+* [GstPadTemplateFlags]()
+* [GstPadPresence]()
+* [GST_PAD_TEMPLATE_NAME_TEMPLATE]()
+* [GST_PAD_TEMPLATE_DIRECTION]()
+* [GST_PAD_TEMPLATE_PRESENCE]()
+* [GST_PAD_TEMPLATE_CAPS]()
+* [GST_PAD_TEMPLATE_IS_FIXED]()
+* [gst_pad_template_new]()
+* [gst_pad_template_get_caps]()

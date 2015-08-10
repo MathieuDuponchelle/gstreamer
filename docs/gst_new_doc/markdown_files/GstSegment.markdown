@@ -1,0 +1,18 @@
+### GstSegment
+
+* [GstSegment]()
+* [GstSegmentFlags]()
+* [gst_segment_clip]()
+* [gst_segment_init]()
+* [gst_segment_new]()
+* [gst_segment_copy]()
+* [gst_segment_free]()
+* [gst_segment_do_seek]()
+* [gst_segment_to_running_time]()
+* [gst_segment_to_running_time_full]()
+* [gst_segment_to_stream_time]()
+* [gst_segment_to_position]()
+* [gst_segment_set_running_time]()
+* [gst_segment_copy_into]()
+* [gst_segment_offset_running_time]()
+* [gst_segment_is_equal]()

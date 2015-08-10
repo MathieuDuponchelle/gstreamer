@@ -163,6 +163,9 @@ AC_SUBST([BASH_COMPLETION_DIR])
 AC_SUBST([BASH_HELPERS_DIR])
 AM_CONDITIONAL([ENABLE_BASH_COMPLETION],[test "x$with_bash_completion_dir" != "xno"])
 
+have_new_doc_tool="xyes"
+AM_CONDITIONAL([ENABLE_NEW_DOC],[test "x$have_new_doc_tool" != "xno"])
+
 dnl build static plugins or not
 AC_MSG_CHECKING([whether to build static plugins or not])
 AC_ARG_ENABLE(
@@ -1003,6 +1006,7 @@ docs/pwg/Makefile
 docs/slides/Makefile
 docs/xsl/Makefile
 docs/version.entities
+docs/gst_new_doc/Makefile
 m4/Makefile
 pkgconfig/Makefile
 stamp.h

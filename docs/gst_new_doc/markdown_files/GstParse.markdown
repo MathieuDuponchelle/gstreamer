@@ -1,0 +1,16 @@
+### GstParse
+
+* [gst_parse_error_quark]()
+* [GST_PARSE_ERROR]()
+* [GstParseError]()
+* [GstParseContext]()
+* [GstParseFlags]()
+* [gst_parse_launch]()
+* [gst_parse_launch_full]()
+* [gst_parse_launchv]()
+* [gst_parse_launchv_full]()
+* [gst_parse_bin_from_description]()
+* [gst_parse_bin_from_description_full]()
+* [gst_parse_context_new]()
+* [gst_parse_context_free]()
+* [gst_parse_context_get_missing_elements]()

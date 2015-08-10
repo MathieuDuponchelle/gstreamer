@@ -1,0 +1,17 @@
+### GstPipeline
+
+* [GstPipeline]()
+* [GstPipelineFlags]()
+* [gst_pipeline_new]()
+* [gst_pipeline_get_bus]()
+* [gst_pipeline_set_clock]()
+* [gst_pipeline_get_pipeline_clock]()
+* [gst_pipeline_get_clock]()
+* [gst_pipeline_use_clock]()
+* [gst_pipeline_auto_clock]()
+* [gst_pipeline_set_auto_flush_bus]()
+* [gst_pipeline_get_auto_flush_bus]()
+* [gst_pipeline_set_delay]()
+* [gst_pipeline_get_delay]()
+* [gst_pipeline_set_latency]()
+* [gst_pipeline_get_latency]()

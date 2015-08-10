@@ -14,9 +14,15 @@ else
 PLUGIN_DOCS_DIRS = plugins
 endif
 
+if ENABLE_NEW_DOC
+GST_NEW_DOC_DIR = gst_new_doc
+else
+GST_NEW_DOC_DIR =
+endif
+
 BUILT_SOURCES = version.entities
 
-SUBDIRS = design gst libs $(PLUGIN_DOCS_DIRS) $(SUBDIRS_DOCBOOK)
+SUBDIRS = design gst libs $(PLUGIN_DOCS_DIRS) $(SUBDIRS_DOCBOOK) $(GST_NEW_DOC_DIR)
 DIST_SUBDIRS = design gst libs plugins faq manual pwg slides xsl
 
 EXTRA_DIST = \

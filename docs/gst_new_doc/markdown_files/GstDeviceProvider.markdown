@@ -1,0 +1,18 @@
+### GstDeviceProvider
+
+* [GstDeviceProvider]()
+* [GstDeviceProviderClass]()
+* [gst_device_provider_can_monitor]()
+* [gst_device_provider_class_add_metadata]()
+* [gst_device_provider_class_add_static_metadata]()
+* [gst_device_provider_class_get_metadata]()
+* [gst_device_provider_class_set_metadata]()
+* [gst_device_provider_class_set_static_metadata]()
+* [gst_device_provider_device_add]()
+* [gst_device_provider_device_remove]()
+* [gst_device_provider_get_bus]()
+* [gst_device_provider_get_devices]()
+* [gst_device_provider_get_factory]()
+* [gst_device_provider_register]()
+* [gst_device_provider_start]()
+* [gst_device_provider_stop]()

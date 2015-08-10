@@ -1,0 +1,16 @@
+### GstChildProxy
+
+* [GstChildProxy]()
+* [GstChildProxyInterface]()
+* [gst_child_proxy_get_children_count]()
+* [gst_child_proxy_get_child_by_name]()
+* [gst_child_proxy_get_child_by_index]()
+* [gst_child_proxy_lookup]()
+* [gst_child_proxy_get_property]()
+* [gst_child_proxy_get_valist]()
+* [gst_child_proxy_get]()
+* [gst_child_proxy_set_property]()
+* [gst_child_proxy_set_valist]()
+* [gst_child_proxy_set]()
+* [gst_child_proxy_child_added]()
+* [gst_child_proxy_child_removed]()

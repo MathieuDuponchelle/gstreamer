@@ -1,0 +1,17 @@
+### GstAllocator
+
+* [gst_memory_alignment]()
+* [GstAllocator]()
+* [GstAllocatorClass]()
+* [GstAllocatorFlags]()
+* [GstAllocationParams]()
+* [GST_ALLOCATOR_SYSMEM]()
+* [gst_allocator_find]()
+* [gst_allocator_register]()
+* [gst_allocator_set_default]()
+* [gst_allocation_params_init]()
+* [gst_allocation_params_copy]()
+* [gst_allocation_params_free]()
+* [gst_allocator_alloc]()
+* [gst_allocator_free]()
+* [gst_memory_new_wrapped]()

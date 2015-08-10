@@ -278,7 +278,8 @@ gir_sources=$(patsubst %,$(srcdir)/%, $(libgstreamer_@GST_API_VERSION@_la_SOURCE
 gir_sources+=$(patsubst %,$(builddir)/%, $(built_source_make))
 
 Gst-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstreamer-@GST_API_VERSION@.la
-	$(AM_V_GEN)GST_PLUGIN_SYSTEM_PATH_1_0="" GST_PLUGIN_PATH_1_0="" GST_REGISTRY_UPDATE=no GI_SCANNER_DISABLE_CACHE=yes\
+	rm -rf $(top_srcdir)/gst/tmp-introspect*
+	$(AM_V_GEN)GST_PLUGIN_SYSTEM_PATH_1_0="" GI_SCANNER_DEBUG="save-temps" GST_PLUGIN_PATH_1_0="" GST_REGISTRY_UPDATE=no GI_SCANNER_DISABLE_CACHE=yes\
 		$(INTROSPECTION_SCANNER) -v --namespace Gst \
 		--nsversion=@GST_API_VERSION@ \
 		--warn-all \

@@ -1,0 +1,17 @@
+### GstPluginFeature
+
+* [GstPluginFeature]()
+* [GstPluginFeatureFilter]()
+* [GstRank]()
+* [gst_plugin_feature_set_rank]()
+* [gst_plugin_feature_set_name]()
+* [gst_plugin_feature_get_rank]()
+* [gst_plugin_feature_get_name]()
+* [gst_plugin_feature_get_plugin]()
+* [gst_plugin_feature_get_plugin_name]()
+* [gst_plugin_feature_load]()
+* [gst_plugin_feature_list_copy]()
+* [gst_plugin_feature_list_free]()
+* [GST_PLUGIN_FEATURE_LIST_DEBUG]()
+* [gst_plugin_feature_check_version]()
+* [gst_plugin_feature_rank_compare_func]()

@@ -1,0 +1,18 @@
+### GstGhostPad
+
+* [GstProxyPad]()
+* [GstGhostPad]()
+* [gst_ghost_pad_new]()
+* [gst_ghost_pad_new_no_target]()
+* [gst_ghost_pad_new_from_template]()
+* [gst_ghost_pad_new_no_target_from_template]()
+* [gst_ghost_pad_set_target]()
+* [gst_ghost_pad_get_target]()
+* [gst_ghost_pad_construct]()
+* [gst_ghost_pad_activate_mode_default]()
+* [gst_ghost_pad_internal_activate_mode_default]()
+* [gst_proxy_pad_get_internal]()
+* [gst_proxy_pad_iterate_internal_links_default]()
+* [gst_proxy_pad_chain_default]()
+* [gst_proxy_pad_chain_list_default]()
+* [gst_proxy_pad_getrange_default]()
