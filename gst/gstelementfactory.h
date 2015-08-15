@@ -79,23 +79,6 @@ gboolean                gst_element_register                    (GstPlugin *plug
 
 /**
  * GstFactoryListType:
- * @GST_ELEMENT_FACTORY_TYPE_DECODER: Decoder elements
- * @GST_ELEMENT_FACTORY_TYPE_ENCODER: Encoder elements
- * @GST_ELEMENT_FACTORY_TYPE_SINK: Sink elements
- * @GST_ELEMENT_FACTORY_TYPE_SRC: Source elements
- * @GST_ELEMENT_FACTORY_TYPE_MUXER: Muxer elements
- * @GST_ELEMENT_FACTORY_TYPE_DEMUXER: Demuxer elements
- * @GST_ELEMENT_FACTORY_TYPE_PARSER: Parser elements
- * @GST_ELEMENT_FACTORY_TYPE_PAYLOADER: Payloader elements
- * @GST_ELEMENT_FACTORY_TYPE_DEPAYLOADER: Depayloader elements
- * @GST_ELEMENT_FACTORY_TYPE_DECRYPTOR: Elements handling decryption (Since 1.6)
- * @GST_ELEMENT_FACTORY_TYPE_ENCRYPTOR: Elements handling encryption (Since 1.6)
- * @GST_ELEMENT_FACTORY_TYPE_MAX_ELEMENTS: Private, do not use
- * @GST_ELEMENT_FACTORY_TYPE_MEDIA_VIDEO: Elements handling video media types
- * @GST_ELEMENT_FACTORY_TYPE_MEDIA_AUDIO: Elements handling audio media types
- * @GST_ELEMENT_FACTORY_TYPE_MEDIA_IMAGE: Elements handling image media types
- * @GST_ELEMENT_FACTORY_TYPE_MEDIA_SUBTITLE: Elements handling subtitle media types
- * @GST_ELEMENT_FACTORY_TYPE_MEDIA_METADATA: Elements handling metadata media types
  *
  * The type of #GstElementFactory to filter.
  *
@@ -107,25 +90,110 @@ gboolean                gst_element_register                    (GstPlugin *plug
 
 typedef guint64 GstElementFactoryListType;
 
+/**
+ * GST_ELEMENT_FACTORY_TYPE_DECODER:
+ *
+ * Decoder elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_DECODER        (G_GUINT64_CONSTANT (1) << 0)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_ENCODER:
+ *
+ * Encoder elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_ENCODER        (G_GUINT64_CONSTANT (1) << 1)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_SINK:
+ *
+ * Sink elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_SINK           (G_GUINT64_CONSTANT (1) << 2)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_SRC:
+ *
+ * Source elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_SRC            (G_GUINT64_CONSTANT (1) << 3)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_MUXER:
+ *
+ * Muxer elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_MUXER          (G_GUINT64_CONSTANT (1) << 4)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_DEMUXER:
+ *
+ * Demuxer elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_DEMUXER        (G_GUINT64_CONSTANT (1) << 5)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_PARSER:
+ *
+ * Parser elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_PARSER         (G_GUINT64_CONSTANT (1) << 6)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_PAYLOADER:
+ *
+ * Payloader elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_PAYLOADER      (G_GUINT64_CONSTANT (1) << 7)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_DEPAYLOADER:
+ *
+ * Depayloader elements
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_DEPAYLOADER    (G_GUINT64_CONSTANT (1) << 8)
 #define  GST_ELEMENT_FACTORY_TYPE_FORMATTER      (G_GUINT64_CONSTANT (1) << 9)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_DECRYPTOR:
+ *
+ * Elements handling decryption (Since 1.6)
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_DECRYPTOR      (G_GUINT64_CONSTANT (1) << 10)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_ENCRYPTOR:
+ *
+ * Elements handling encryption (Since 1.6)
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_ENCRYPTOR      (G_GUINT64_CONSTANT (1) << 11)
 
+/**
+ * GST_ELEMENT_FACTORY_TYPE_MAX_ELEMENTS:
+ *
+ * Private, do not use
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_MAX_ELEMENTS   (G_GUINT64_CONSTANT (1) << 48)
 
+/**
+ * GST_ELEMENT_FACTORY_TYPE_MEDIA_VIDEO:
+ *
+ * Elements handling video media types
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_MEDIA_VIDEO    (G_GUINT64_CONSTANT (1) << 49)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_MEDIA_AUDIO:
+ *
+ * Elements handling audio media types
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_MEDIA_AUDIO    (G_GUINT64_CONSTANT (1) << 50)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_MEDIA_IMAGE:
+ *
+ * Elements handling image media types
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_MEDIA_IMAGE    (G_GUINT64_CONSTANT (1) << 51)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_MEDIA_SUBTITLE:
+ *
+ * Elements handling subtitle media types
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_MEDIA_SUBTITLE (G_GUINT64_CONSTANT (1) << 52)
+/**
+ * GST_ELEMENT_FACTORY_TYPE_MEDIA_METADATA:
+ *
+ * Elements handling metadata media types
+ */
 #define  GST_ELEMENT_FACTORY_TYPE_MEDIA_METADATA (G_GUINT64_CONSTANT (1) << 53)
 
 /**

@@ -20,7 +20,7 @@ CFILES=$(wildcard $(top_srcdir)/gst/*.c)
 MARKDOWN_FILES=$(wildcard $(srcdir)/markdown_files/*.markdown)
 MARKDOWN_INDEX=$(srcdir)/markdown_files/index.markdown
 
-CLANG_OPTIONS='-isystem /usr/include/glib-2.0 -isystem /usr/lib64/glib-2.0/include -I$(top_srcdir)/libs -I$(top_srcdir) -D_GNU_SOURCE -DGST_EXPORTS -DGST_API_VERSION=\\""1.0"\\" -DGST_DISABLE_DEPRECATED -DHAVE_CONFIG_H'
+CLANG_OPTIONS='-isystem /usr/include/glib-2.0 -isystem /usr/lib64/glib-2.0/include -I$(top_srcdir)/libs -I$(top_srcdir) -D_GNU_SOURCE -DGST_EXPORTS -DGST_API_VERSION=\\""1.0"\\" -DGST_DISABLE_DEPRECATED -DHAVE_CONFIG_H -D_IN_NEW_DOC_'
 
 doc.stamp: $(HFILES) $(CFILES) $(MARKDOWN_FILES)
 	@echo "Generating documentation with new tool"

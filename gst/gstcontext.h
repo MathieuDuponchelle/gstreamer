@@ -28,6 +28,11 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GstContext:
+ *
+ * Opaque #GstContext structure.
+ */
 typedef struct _GstContext GstContext;
 
 #include <gst/gstminiobject.h>

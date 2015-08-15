@@ -506,7 +506,7 @@ gst_device_provider_get_factory (GstDeviceProvider * provider)
 }
 
 /**
- * gst_device_provider_can_provider:
+ * gst_device_provider_can_monitor:
  * @provider: a #GstDeviceProvider
  *
  * If this function returns %TRUE, then the device provider can provider if

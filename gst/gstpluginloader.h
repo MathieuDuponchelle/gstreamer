@@ -26,6 +26,11 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GstPluginLoader:
+ *
+ * Opaque #GstPluginLoader structure.
+ */
 typedef struct _GstPluginLoader GstPluginLoader;
 
 typedef struct _GstPluginLoaderFuncs {

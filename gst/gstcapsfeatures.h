@@ -28,6 +28,11 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GstCapsFeatures:
+ *
+ * Opaque #GstCapsFeatures structure.
+ */
 typedef struct _GstCapsFeatures GstCapsFeatures;
 
 GST_EXPORT GType _gst_caps_features_type;

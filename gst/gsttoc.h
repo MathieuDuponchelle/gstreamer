@@ -36,7 +36,19 @@ GST_EXPORT GType _gst_toc_entry_type;
 #define GST_TYPE_TOC (_gst_toc_type)
 #define GST_TYPE_TOC_ENTRY (_gst_toc_entry_type)
 
+/**
+ * GstTocEntry:
+ *
+ * Opaque #GstTocEntry structure.
+ */
 typedef struct _GstTocEntry GstTocEntry;
+
+
+/**
+ * GstToc:
+ *
+ * Opaque #GstToc structure.
+ */
 typedef struct _GstToc GstToc;
 
 /**

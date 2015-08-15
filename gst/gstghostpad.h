@@ -37,6 +37,11 @@ G_BEGIN_DECLS
 #define GST_PROXY_PAD(obj)              (G_TYPE_CHECK_INSTANCE_CAST ((obj), GST_TYPE_PROXY_PAD, GstProxyPad))
 #define GST_PROXY_PAD_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), GST_TYPE_PROXY_PAD, GstProxyPadClass))
 
+/**
+ * GstProxyPad:
+ *
+ * Opaque #GstProxyPad structure.
+ */
 typedef struct _GstProxyPad GstProxyPad;
 typedef struct _GstProxyPadPrivate GstProxyPadPrivate;
 typedef struct _GstProxyPadClass GstProxyPadClass;

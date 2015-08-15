@@ -26,6 +26,12 @@
 
 /* These enums need to match the number and order
  * of strings declared in _quark_table, in gstquark.c */
+
+/*
+ * GstQuarkId:
+ *
+ * Various values a GstQuark can have
+ */
 typedef enum _GstQuarkId
 {
   GST_QUARK_FORMAT = 0,

@@ -483,6 +483,7 @@ __gst_element_factory_add_static_pad_template (GstElementFactory * factory,
  * Get the #GType for elements managed by this factory. The type can
  * only be retrieved if the element factory is loaded, which can be
  * assured with gst_plugin_feature_load().
+ * bitch
  *
  * Returns: the #GType for elements managed by this factory or 0 if
  * the factory is not loaded.

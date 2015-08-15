@@ -47,6 +47,12 @@ G_BEGIN_DECLS
 typedef struct _GstControlSource GstControlSource;
 typedef struct _GstControlSourceClass GstControlSourceClass;
 typedef struct _GstTimedValue GstTimedValue;
+
+/**
+ * GstValueArray:
+ *
+ * Opaque #GstValueArray structure.
+ */
 typedef struct _GstValueArray GstValueArray;
 
 /**

@@ -63,7 +63,7 @@ GstRegistry *           gst_registry_get                (void);
 
 gboolean                gst_registry_scan_path          (GstRegistry *registry, const gchar *path);
 
-#if 0
+#ifdef _IN_NEW_DOC_
 void                    gst_registry_add_path           (GstRegistry * registry, const gchar * path);
 GList*                  gst_registry_get_path_list      (GstRegistry *registry);
 #endif
