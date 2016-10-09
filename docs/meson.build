@@ -35,4 +35,5 @@ if hotdoc_p.found()
 else
     subdir('gst')
     subdir('libs')
+    subdir('hotdoc-extension')
 endif
