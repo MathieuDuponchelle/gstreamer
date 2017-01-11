@@ -268,7 +268,7 @@ if libtype != 'static'
     endif
 
     gst_incdirs += [configinc]
-    gst_gen_sources += [gnome.generate_gir(libgst_shared,
+    gst_gir = gnome.generate_gir(libgst_shared,
       sources : gst_sources + gst_headers + gst_enums + [gst_version_h],
       namespace : 'Gst',
       nsversion : apiversion,
@@ -278,7 +278,9 @@ if libtype != 'static'
       includes : ['GLib-2.0', 'GObject-2.0', 'GModule-2.0' ],
       install : true,
       extra_args : gst_gir_extra_args,
-    )]
+      sources_top_dir: meson.current_source_dir()
+    )
+    gst_gen_sources += gst_gir
   endif
 endif
 

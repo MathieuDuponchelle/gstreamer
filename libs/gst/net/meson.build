@@ -58,6 +58,7 @@ if libtype != 'static'
       includes : ['GLib-2.0', 'GObject-2.0', 'GModule-2.0', 'Gio-2.0', 'Gst-1.0'],
       install : true,
       extra_args : gst_gir_extra_args,
+      sources_top_dir: meson.current_source_dir()
     )
     gst_net_gen_sources += [gst_net_gir]
   endif

@@ -1,0 +1,7 @@
+index.md
+        libgstreamer-doc.json
+        GStreamer-core-plugins-doc.json
+        libgstbase-doc.json
+        libgstcontroller-doc.json
+        libgstnet-doc.json
+        libgstcheck-doc.json

@@ -1,6 +1,7 @@
 option('build_tools', type : 'boolean', value : true)
 option('poisoning', type : 'boolean', value : false)
-option('disable_gtkdoc', type : 'boolean', value : false)
+option('disable_doc', type : 'boolean', value : false)
+option('disable_install_doc', type : 'boolean', value : false)
 option('disable_examples', type : 'boolean', value : false)
 option('disable_gst_debug', type : 'boolean', value : false)
 option('disable_registry', type : 'boolean', value : false)

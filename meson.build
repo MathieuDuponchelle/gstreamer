@@ -429,6 +429,20 @@ if bashcomp_found
   endif
 endif
 
+build_hotdoc = false
+if build_machine.system() == 'windows'
+  message('Disabling doc while building on Windows')
+elif get_option('disable_doc')
+  message('Documentation is disabled via options')
+else
+  hotdoc_p = find_program('hotdoc', required : false)
+  if hotdoc_p.found() or build_gir
+    build_hotdoc = true
+  else
+    message('Not building documentation as hotdoc was not found')
+  endif
+endif
+
 plugins_component = component('plugins')
 subdir('gst')
 subdir('libs')
@@ -441,17 +455,7 @@ subdir('data')
 
 configure_file(output : 'config.h', configuration : cdata)
 
-if build_machine.system() == 'windows'
-  message('Disabling gtk-doc while building on Windows')
-elif get_option('disable_gtkdoc')
-  message('gtk-doc is disabled via options')
-else
-  if find_program('gtkdoc-scan', required : false).found()
-    subdir('docs')
-  else
-    message('Not building documentation as gtk-doc was not found')
-  endif
-endif
+subdir('docs')
 
 run_command(python3, '-c', 'import shutil; shutil.copy("hooks/pre-commit.hook", ".git/hooks/pre-commit")')
 
