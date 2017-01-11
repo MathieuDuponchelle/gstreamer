@@ -384,7 +384,9 @@ if build_machine.system() == 'windows'
 elif get_option('disable_gtkdoc')
   message('gtk-doc is disabled via options')
 else
-  if find_program('gtkdoc-scan', required : false).found()
+  gtkdoc_p = find_program('gtkdoc-scan', required : false)
+  hotdoc_p = find_program('gtkdoc-scan', required : false)
+  if hotdoc_p.found() or gtkdoc_p.found()
     subdir('docs')
   else
     message('Not building documentation as gtk-doc was not found')
