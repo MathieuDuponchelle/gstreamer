@@ -20,8 +20,8 @@ foreach h: ['gettext.h', 'glib-compat-private.h', 'glib-compat.h',
 endforeach
 
 if hotdoc_p.found()
-    subdir('hotdoc')
     subdir('hotdoc-extension')
+    subdir('hotdoc')
 else
     subdir('gst')
     subdir('libs')

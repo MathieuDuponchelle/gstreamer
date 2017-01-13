@@ -6,6 +6,7 @@ from hotdoc_c_extension.c_formatter import CFormatter
 import subprocess
 import json
 
+SCANNER_PATH = r"@SCANNER_PATH@"
 DESCRIPTION=\
         """
 Extract gstreamer plugin documentation from sources and
@@ -44,8 +45,7 @@ class GstExtension(Extension):
 
         for dl in stale_dl:
             try:
-                data = subprocess.check_output(['/home/thiblahute/devel/gstreamer/gst-build/gstreamer/build/docs/hotdoc-extension/hotdoc-plugin-scanner',
-                                                dl])
+                data = subprocess.check_output([SCANNER_PATH, dl])
                 self.__parse_plugin(dl, data)
             except subprocess.CalledProcessError as _:
                 print(_)

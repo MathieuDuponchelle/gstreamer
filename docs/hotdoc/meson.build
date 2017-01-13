@@ -18,6 +18,8 @@ hotdoc.generate_doc('gstreamer-1.0',
     gst_smart_index: true,
     gst_c_sources: ['../plugins/elements/*.c', '../plugins/elements/*.h'],
     gst_dl_sources: gst_elements.full_path(),
-    dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep],
+    dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep, hotdoc_plugin_scanner,
+        gst_elements],
+    extra_extensions_paths: hotdoc_extension_dir
 )
 
