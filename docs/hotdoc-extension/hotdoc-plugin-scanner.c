@@ -35,6 +35,9 @@ main (int argc, char *argv[])
   GstPlugin *plugin;
   gboolean f = TRUE;
   GList *features, *tmp;
+  gint nargs = 2;
+  static gchar *args[] =
+      { "hotdoc-plugin-scanner", "--gst-disable-registry-fork", NULL };
 
   g_assert (argc == 2);
 
@@ -44,7 +47,7 @@ main (int argc, char *argv[])
   g_setenv ("GST_PLUGIN_SYSTEM_PATH_1_0", NULL, TRUE);
   g_setenv ("GST_PLUGIN_PATH_1_0", NULL, TRUE);
 
-  gst_init (0, NULL);
+  gst_init (&nargs, (gchar ***) & args);
   libfile = argv[1];
   plugin = gst_plugin_load_file (libfile, &error);
   if (!plugin) {
