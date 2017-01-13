@@ -47,7 +47,7 @@ main (int argc, char *argv[])
   g_unsetenv ("GST_PLUGIN_SYSTEM_PATH_1_0");
   g_unsetenv ("GST_PLUGIN_PATH_1_0");
 
-  gst_init (&nargs, (gchar ***) & args);
+  gst_init (NULL, NULL);
   libfile = argv[1];
   plugin = gst_plugin_load_file (libfile, &error);
   if (!plugin) {
