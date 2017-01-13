@@ -34,11 +34,9 @@ class GstExtension(Extension):
         comments = []
 
         for source_file in stale_c:
-            print("C is %s" % source_file)
             comments.extend(extract_comments(source_file))
 
         for c in comments:
-            print(c)
             block = self.__raw_comment_parser.parse_comment(*c)
             if block is not None:
                 self.doc_repo.doc_database.add_comment(block)
@@ -54,13 +52,6 @@ class GstExtension(Extension):
     def _get_smart_index_title(self):
         return 'GStreamer plugins documentation'
 
-    def _get_user_index_path(self):
-        return GstExtension.index
-
-    def _get_all_sources(self):
-        print("Yers")
-        return ["identity"]
-
     @staticmethod
     def add_arguments (parser):
         group = parser.add_argument_group('Gst extension', DESCRIPTION)
@@ -70,22 +61,9 @@ class GstExtension(Extension):
 
     @staticmethod
     def parse_config(doc_repo, config):
-        print("Parsing config! %s" % config)
         GstExtension.parse_standard_config(config)
         GstExtension.c_sources = config.get_sources('gst-c_')
         GstExtension.dl_sources = config.get_sources('gst-dl_')
-
-    def __smart_filter(self, *args, **kwargs):
-        name = kwargs['display_name']
-        type_ = args[0]
-
-    def get_or_create_symbol(self, *args, **kwargs):
-        print("Creating %s %s" % (args, kwargs))
-        kwargs['language'] = 'c'
-        if GstExtension.smart_index:
-            return self.__smart_filter(*args, **kwargs)
-
-        return super().get_or_create_symbol(*args, **kwargs)
 
     def __parse_plugin(self, dl_path, data):
         plugin = json.loads(data.decode())
@@ -95,5 +73,4 @@ class GstExtension(Extension):
                     filename=dl_path)
 
 def get_extension_classes():
-    print("Got %s" % GstExtension)
     return [GstExtension]
