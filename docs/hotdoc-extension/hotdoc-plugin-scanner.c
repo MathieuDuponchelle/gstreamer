@@ -41,11 +41,11 @@ main (int argc, char *argv[])
 
   g_assert (argc == 2);
 
-  g_setenv ("GST_PLUGIN_SYSTEM_PATH", NULL, TRUE);
-  g_setenv ("GST_REGISTRY", NULL, TRUE);
-  g_setenv ("GST_PLUGIN_PATH", NULL, TRUE);
-  g_setenv ("GST_PLUGIN_SYSTEM_PATH_1_0", NULL, TRUE);
-  g_setenv ("GST_PLUGIN_PATH_1_0", NULL, TRUE);
+  g_unsetenv ("GST_PLUGIN_SYSTEM_PATH");
+  g_unsetenv ("GST_REGISTRY");
+  g_unsetenv ("GST_PLUGIN_PATH");
+  g_unsetenv ("GST_PLUGIN_SYSTEM_PATH_1_0");
+  g_unsetenv ("GST_PLUGIN_PATH_1_0");
 
   gst_init (&nargs, (gchar ***) & args);
   libfile = argv[1];
