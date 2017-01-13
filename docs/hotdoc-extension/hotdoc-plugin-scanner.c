@@ -38,6 +38,12 @@ main (int argc, char *argv[])
 
   g_assert (argc == 2);
 
+  g_setenv ("GST_PLUGIN_SYSTEM_PATH", NULL, TRUE);
+  g_setenv ("GST_REGISTRY", NULL, TRUE);
+  g_setenv ("GST_PLUGIN_PATH", NULL, TRUE);
+  g_setenv ("GST_PLUGIN_SYSTEM_PATH_1_0", NULL, TRUE);
+  g_setenv ("GST_PLUGIN_PATH_1_0", NULL, TRUE);
+
   gst_init (0, NULL);
   libfile = argv[1];
   plugin = gst_plugin_load_file (libfile, &error);
