@@ -65,12 +65,15 @@ class GstExtension(Extension):
         GstExtension.c_sources = config.get_sources('gst-c_')
         GstExtension.dl_sources = config.get_sources('gst-dl_')
 
+    def _get_smart_key(self, symbol):
+        return symbol.extra.get('gst-element-name')
+
     def __parse_plugin(self, dl_path, data):
         plugin = json.loads(data.decode())
         for element in plugin.get('elements') or []:
             self.get_or_create_symbol(ClassSymbol, display_name=element['name'],
                 unique_name='%s::%s' % (element['name'], element['name']),
-                    filename=dl_path)
+                filename=dl_path, extra={'gst-element-name': element['name']})
 
 def get_extension_classes():
     return [GstExtension]
