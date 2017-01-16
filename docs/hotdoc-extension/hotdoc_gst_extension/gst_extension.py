@@ -1,6 +1,8 @@
+import cchardet
 from hotdoc.core.extension import Extension
 from hotdoc.core.symbols import ClassSymbol
 from hotdoc.parsers.gtk_doc import GtkDocParser
+from hotdoc_c_extension.c_extension import extract_comments
 from hotdoc_c_extension.c_comment_scanner.c_comment_scanner import extract_comments
 from hotdoc_c_extension.c_formatter import CFormatter
 import subprocess
@@ -13,6 +15,10 @@ Extract gstreamer plugin documentation from sources and
 built plugins.
 """
 
+def force_unicode(data):
+    encoding = cchardet.detect(data)['encoding']
+    return data.decode(encoding, errors='replace')
+
 class GstExtension(Extension):
     extension_name = 'gst-extension'
     argument_prefix = 'gst'
@@ -22,6 +28,7 @@ class GstExtension(Extension):
 
     def __init__(self, doc_repo):
         super().__init__(doc_repo)
+        self.__elements = {}
         self.__raw_comment_parser = GtkDocParser(doc_repo)
         self.formatters['html'] = CFormatter()
 
@@ -33,14 +40,6 @@ class GstExtension(Extension):
 
         comments = []
 
-        for source_file in stale_c:
-            comments.extend(extract_comments(source_file))
-
-        for c in comments:
-            block = self.__raw_comment_parser.parse_comment(*c)
-            if block is not None:
-                self.doc_repo.doc_database.add_comment(block)
-
         for dl in stale_dl:
             try:
                 data = subprocess.check_output([SCANNER_PATH, dl])
@@ -48,6 +47,29 @@ class GstExtension(Extension):
             except subprocess.CalledProcessError as _:
                 print(_)
                 continue
+
+        for source_file in stale_c:
+            with open (source_file, 'rb') as f:
+                lines = [force_unicode(l) for l in f.readlines()]
+                comments = extract_comments(''.join(lines))
+
+                current_element = None
+                for c in comments:
+                    if c[3]:
+                        line = lines[c[1] - 1]
+
+                        comment = (len(line) - len(line.lstrip(' '))) * ' ' + c[0]
+                        block = self.__raw_comment_parser.parse_comment(comment,
+                            source_file, c[1], c[2], self.project.include_paths)
+
+                        if block is not None:
+                            # Handle Element description SECTION
+                            if block.name.startswith("element-"):
+                                element_name = block.name[8:]
+                                element = self.__elements.get(element_name)
+                                if element:
+                                    block.name = element_name
+                            self.project.database.add_comment(block)
 
     def _get_smart_index_title(self):
         return 'GStreamer plugins documentation'
@@ -71,7 +93,8 @@ class GstExtension(Extension):
     def __parse_plugin(self, dl_path, data):
         plugin = json.loads(data.decode())
         for element in plugin.get('elements') or []:
-            self.get_or_create_symbol(ClassSymbol, display_name=element['name'],
+            self.__elements[element['name']] = self.get_or_create_symbol(
+                ClassSymbol, display_name=element['name'],
                 unique_name='%s::%s' % (element['name'], element['name']),
                 filename=dl_path, extra={'gst-element-name': element['name']})
 
