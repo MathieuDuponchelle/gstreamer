@@ -63,12 +63,6 @@ class GstExtension(Extension):
                             source_file, c[1], c[2], self.project.include_paths)
 
                         if block is not None:
-                            # Handle Element description SECTION
-                            if block.name.startswith("element-"):
-                                element_name = block.name[8:]
-                                element = self.__elements.get(element_name)
-                                if element:
-                                    block.name = element_name
                             self.project.database.add_comment(block)
 
     def _get_smart_index_title(self):
