@@ -1,10 +1,12 @@
 import cchardet
+import tempfile
 import os
+from sqlalchemy import Column, ForeignKey, Integer, PickleType, String
 import hotdoc_c_extension
 from hotdoc.core.links import Link
 from hotdoc.utils.loggable import warn, Logger
 from hotdoc.core.extension import Extension
-from hotdoc.core.symbols import ClassSymbol, QualifiedSymbol, PropertySymbol, SignalSymbol, ReturnItemSymbol, ParameterSymbol
+from hotdoc.core.symbols import ClassSymbol, QualifiedSymbol, PropertySymbol, SignalSymbol, ReturnItemSymbol, ParameterSymbol, Symbol
 from hotdoc.parsers.gtk_doc import GtkDocParser
 from hotdoc_c_extension.c_extension import extract_comments
 from hotdoc.core.exceptions import HotdocSourceException
@@ -34,11 +36,76 @@ def force_unicode(data):
     return data.decode(encoding, errors='replace')
 
 
+class GstPadTemplateSymbol(Symbol):
+    __tablename__ = 'pad_templates'
+    id_ = Column(Integer, ForeignKey('symbols.id_'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'fields',
+    }
+    qtype = Column(PickleType)
+    name = Column(String)
+    direction = Column(String)
+    presence = Column(String)
+    caps = Column(String)
+
+    def __init__(self, **kwargs):
+        self.qtype = None
+        # self.name = kwargs.pop("name")
+        # self.direction = kwargs.pop("direction")
+        # self.presence = kwargs.pop("presence")
+        Symbol.__init__(self, **kwargs)
+
+    def get_children_symbols(self):
+        return [self.qtype]
+
+    # pylint: disable=no-self-use
+    def get_type_name(self):
+        """
+        Banana banana
+        """
+        return "GstPadTemplate"
+
+
+GST_PAD_TEMPLATE_TEMPLATE = """
+@extends('base_symbol.html')
+@require(symbol)
+
+@def header():
+<h3>
+    @symbol.name:
+</h3>
+<table>
+    <tbody>
+        <tr><td><b>Presence:</b></td><td>@symbol.presence</td></tr>
+        <tr><td><b>Direction:</b></td><td>@symbol.direction</td></tr>
+        <tr><td><b>Capabilities:</b></td><td>@symbol.caps</td></tr>
+    </tbody>
+</table>
+@end
+"""
+
+
 class GstFormatter(CFormatter):
     def __init__(self):
         c_extension_path = hotdoc_c_extension.__path__[0]
         searchpath = [os.path.join(c_extension_path, "templates")]
+
+        self.__tmpdir = tempfile.TemporaryDirectory()
+        with open(os.path.join(self.__tmpdir.name, "padtemplate.html"), "w") as f:
+            f.write(GST_PAD_TEMPLATE_TEMPLATE)
+        searchpath.append(self.__tmpdir.name)
         Formatter.__init__(self, searchpath)
+        self._ordering.insert(self._ordering.index(ClassSymbol) + 1, GstPadTemplateSymbol)
+
+    def __del__(self):
+        self.__tmpdir.cleanup()
+
+    def _format_symbol(self, symbol):
+        if type(symbol) == GstPadTemplateSymbol:
+            template = self.engine.get_template('padtemplate.html')
+            return (template.render ({'symbol': symbol}), False)
+        else:
+            return super()._format_symbol(symbol)
 
     def _format_flags (self, flags):
         template = self.engine.get_template('gi_flags.html')
@@ -187,6 +254,18 @@ class GstExtension(Extension):
             extra_content = self.get_formatter(self.project.output_format)._format_flags (flags)
             res.extension_contents['Flags'] = extra_content
 
+    def __create_pad_template_symbols(self, element):
+        for template in element.get('pad-templates', []):
+            name = template['name']
+            unique_name = '%s->%s' % (element['hierarchy'][0], name)
+            res = self.get_or_create_symbol(GstPadTemplateSymbol,
+                    name=name,
+                    direction=template["direction"],
+                    presence=template["presence"],
+                    caps=template["caps"],
+                    display_name=name, unique_name=unique_name,
+                    extra={'gst-element-name': element['name']})
+
     def __parse_plugin(self, dl_path, data):
         plugin = json.loads(data.decode())
         for element in plugin.get('elements') or []:
@@ -197,6 +276,7 @@ class GstExtension(Extension):
                 filename=dl_path, extra={'gst-element-name': element['name']})
             self.__create_property_symbols(element)
             self.__create_signal_symbols(element)
+            self.__create_pad_template_symbols(element)
 
 
 def get_extension_classes():

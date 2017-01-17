@@ -151,6 +151,46 @@ _add_element_properties (GString * json, GstElement * element)
 }
 
 static void
+_add_element_pad_templates (GString * json, GstElementFactory * factory)
+{
+  gboolean opened = FALSE;
+  const GList *pads;
+  GstStaticPadTemplate *padtemplate;
+  GRegex *re = g_regex_new ("%", 0, 0, NULL);
+
+  pads = gst_element_factory_get_static_pad_templates (factory);
+  while (pads) {
+    gchar *name, *caps;
+    padtemplate = (GstStaticPadTemplate *) (pads->data);
+    pads = g_list_next (pads);
+
+    name = g_regex_replace (re, padtemplate->name_template,
+        -1, 0, "%%", 0, NULL);;
+    caps = gst_caps_to_string (gst_static_caps_get (&padtemplate->static_caps));
+    g_string_append_printf (json, "%s"
+        "{\"name\": \"%s\","
+        "\"caps\": \"%s\","
+        "\"direction\": \"%s\","
+        "\"presence\": \"%s\"}",
+        opened ? "," : ",\"pad-templates\": [",
+        name, caps,
+        padtemplate->direction ==
+        GST_PAD_SRC ? "src" : padtemplate->direction ==
+        GST_PAD_SINK ? "sink" : "unknown",
+        padtemplate->presence ==
+        GST_PAD_ALWAYS ? "always" : padtemplate->presence ==
+        GST_PAD_SOMETIMES ? "sometimes" : padtemplate->presence ==
+        GST_PAD_REQUEST ? "request" : "unknown");
+    opened = TRUE;
+    g_free (name);
+  }
+  if (opened)
+    g_string_append (json, "]");
+
+  g_regex_unref (re);
+}
+
+static void
 _add_element_details (GString * json, GstPluginFeature * feature)
 {
   GType type;
@@ -174,6 +214,7 @@ _add_element_details (GString * json, GstPluginFeature * feature)
   g_string_append (json, "],");
   _add_element_properties (json, element);
   _add_element_signals (json, element);
+  _add_element_pad_templates (json, GST_ELEMENT_FACTORY (feature));
 
   g_string_append (json, "}");
 }
