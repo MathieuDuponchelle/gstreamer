@@ -23,6 +23,7 @@
 
 /**
  * SECTION:gstcheckconsistencychecker
+ * @title: GstStreamConsistency
  * @short_description: Data flow consistency checker for GStreamer unit tests.
  *
  * These macros and functions are for internal use of the unit tests found

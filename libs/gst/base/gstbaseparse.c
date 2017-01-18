@@ -23,6 +23,7 @@
 
 /**
  * SECTION:gstbaseparse
+ * @title: GstBaseParse
  * @short_description: Base class for stream parsers
  * @see_also: #GstBaseTransform
  *
@@ -30,56 +31,44 @@
  * into separate audio/video/whatever frames.
  *
  * It provides for:
- * <itemizedlist>
- *   <listitem><para>provides one sink pad and one source pad</para></listitem>
- *   <listitem><para>handles state changes</para></listitem>
- *   <listitem><para>can operate in pull mode or push mode</para></listitem>
- *   <listitem><para>handles seeking in both modes</para></listitem>
- *   <listitem><para>handles events (SEGMENT/EOS/FLUSH)</para></listitem>
- *   <listitem><para>
- *        handles queries (POSITION/DURATION/SEEKING/FORMAT/CONVERT)
- *   </para></listitem>
- *   <listitem><para>handles flushing</para></listitem>
- * </itemizedlist>
+ *
+ *   * provides one sink pad and one source pad
+ *   * handles state changes
+ *   * can operate in pull mode or push mode
+ *   * handles seeking in both modes
+ *   * handles events (SEGMENT/EOS/FLUSH)
+ *   * handles queries (POSITION/DURATION/SEEKING/FORMAT/CONVERT)
+ *
+ *   * handles flushing
  *
  * The purpose of this base class is to provide the basic functionality of
  * a parser and share a lot of rather complex code.
  *
  * Description of the parsing mechanism:
  * <orderedlist>
- * <listitem>
- *   <itemizedlist><title>Set-up phase</title>
- *   <listitem><para>
- *     #GstBaseParse calls @start to inform subclass that data processing is
+ * * ## Set-up phase
+ *   * #GstBaseParse calls @start to inform subclass that data processing is
  *     about to start now.
- *   </para></listitem>
- *   <listitem><para>
- *     #GstBaseParse class calls @set_sink_caps to inform the subclass about
+ *
+ *   * #GstBaseParse class calls @set_sink_caps to inform the subclass about
  *     incoming sinkpad caps. Subclass could already set the srcpad caps
  *     accordingly, but this might be delayed until calling
  *     gst_base_parse_finish_frame() with a non-queued frame.
- *   </para></listitem>
- *   <listitem><para>
- *      At least at this point subclass needs to tell the #GstBaseParse class
+ *
+ *   * At least at this point subclass needs to tell the #GstBaseParse class
  *      how big data chunks it wants to receive (min_frame_size). It can do
  *      this with gst_base_parse_set_min_frame_size().
- *   </para></listitem>
- *   <listitem><para>
- *      #GstBaseParse class sets up appropriate data passing mode (pull/push)
+ *
+ *   * #GstBaseParse class sets up appropriate data passing mode (pull/push)
  *      and starts to process the data.
- *   </para></listitem>
- *   </itemizedlist>
- * </listitem>
- * <listitem>
- *   <itemizedlist>
- *   <title>Parsing phase</title>
- *     <listitem><para>
- *       #GstBaseParse gathers at least min_frame_size bytes of data either
+ *
+ * *
+ *   ## Parsing phase
+ *     * #GstBaseParse gathers at least min_frame_size bytes of data either
  *       by pulling it from upstream or collecting buffers in an internal
  *       #GstAdapter.
- *     </para></listitem>
- *     <listitem><para>
- *       A buffer of (at least) min_frame_size bytes is passed to subclass with
+ *
+ *     * A buffer of (at least) min_frame_size bytes is passed to subclass with
  *       @handle_frame. Subclass checks the contents and can optionally
  *       return GST_FLOW_OK along with an amount of data to be skipped to find
  *       a valid frame (which will result in a subsequent DISCONT).
@@ -98,7 +87,7 @@
  *       overall consumed data rate versus duration) for each finished frame,
  *       but other state is only updated upon each call to @handle_frame
  *       (such as tracking upstream input timestamp).
- *       </para><para>
+ *
  *       Subclass is also responsible for setting the buffer metadata
  *       (e.g. buffer timestamp and duration, or keyframe if applicable).
  *       (although the latter can also be done by #GstBaseParse if it is
@@ -106,32 +95,24 @@
  *       timestamp derived from upstream (as much as generally possible),
  *       duration obtained from configuration (see below), and offset
  *       if meaningful (in pull mode).
- *       </para><para>
+ *
  *       Note that @check_valid_frame might receive any small
  *       amount of input data when leftover data is being drained (e.g. at EOS).
- *     </para></listitem>
- *     <listitem><para>
- *       As part of finish frame processing,
+ *
+ *     * As part of finish frame processing,
  *       just prior to actually pushing the buffer in question,
  *       it is passed to @pre_push_frame which gives subclass yet one
  *       last chance to examine buffer metadata, or to send some custom (tag)
  *       events, or to perform custom (segment) filtering.
- *     </para></listitem>
- *     <listitem><para>
- *       During the parsing process #GstBaseParseClass will handle both srcpad
+ *
+ *     * During the parsing process #GstBaseParseClass will handle both srcpad
  *       and sinkpad events. They will be passed to subclass if @event or
  *       @src_event callbacks have been provided.
- *     </para></listitem>
- *   </itemizedlist>
- * </listitem>
- * <listitem>
- *   <itemizedlist><title>Shutdown phase</title>
- *   <listitem><para>
- *     #GstBaseParse class calls @stop to inform the subclass that data
+ *
+ * * ## Shutdown phase
+ *   * #GstBaseParse class calls @stop to inform the subclass that data
  *     parsing will be stopped.
- *   </para></listitem>
- *   </itemizedlist>
- * </listitem>
+ *
  * </orderedlist>
  *
  * Subclass is responsible for providing pad template caps for
@@ -151,34 +132,27 @@
  * and end of data processing.
  *
  * Things that subclass need to take care of:
- * <itemizedlist>
- *   <listitem><para>Provide pad templates</para></listitem>
- *   <listitem><para>
- *      Fixate the source pad caps when appropriate
- *   </para></listitem>
- *   <listitem><para>
- *      Inform base class how big data chunks should be retrieved. This is
+ *
+ *   * Provide pad templates
+ *   * Fixate the source pad caps when appropriate
+ *
+ *   * Inform base class how big data chunks should be retrieved. This is
  *      done with gst_base_parse_set_min_frame_size() function.
- *   </para></listitem>
- *   <listitem><para>
- *      Examine data chunks passed to subclass with @handle_frame and pass
+ *
+ *   * Examine data chunks passed to subclass with @handle_frame and pass
  *      proper frame(s) to gst_base_parse_finish_frame(), and setting src pad
  *      caps and timestamps on frame.
- *   </para></listitem>
- *   <listitem><para>Provide conversion functions</para></listitem>
- *   <listitem><para>
- *      Update the duration information with gst_base_parse_set_duration()
- *   </para></listitem>
- *   <listitem><para>
- *      Optionally passthrough using gst_base_parse_set_passthrough()
- *   </para></listitem>
- *   <listitem><para>
- *      Configure various baseparse parameters using
+ *
+ *   * Provide conversion functions
+ *   * Update the duration information with gst_base_parse_set_duration()
+ *
+ *   * Optionally passthrough using gst_base_parse_set_passthrough()
+ *
+ *   * Configure various baseparse parameters using
  *      gst_base_parse_set_average_bitrate(), gst_base_parse_set_syncable()
  *      and gst_base_parse_set_frame_rate().
- *   </para></listitem>
- *   <listitem><para>
- *      In particular, if subclass is unable to determine a duration, but
+ *
+ *   * In particular, if subclass is unable to determine a duration, but
  *      parsing (or specs) yields a frames per seconds rate, then this can be
  *      provided to #GstBaseParse to enable it to cater for
  *      buffer time metadata (which will be taken from upstream as much as
@@ -187,8 +161,6 @@
  *      bitrate. A default @convert (used if not overridden) will then use these
  *      rates to perform obvious conversions.  These rates are also used to
  *      update (estimated) duration at regular frame intervals.
- *   </para></listitem>
- * </itemizedlist>
  *
  */
 

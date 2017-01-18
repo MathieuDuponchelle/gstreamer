@@ -23,6 +23,7 @@
 
 /**
  * SECTION:gsttestclock
+ * @title: GstTestClock
  * @short_description: Controllable, deterministic clock for GStreamer unit tests
  * @see_also: #GstSystemClock, #GstClock
  *
@@ -34,9 +35,8 @@
  * precisely advance the time in a deterministic manner, independent of the
  * system time or any other external factors.
  *
- * <example>
- * <title>Advancing the time of a #GstTestClock</title>
- *   <programlisting language="c">
+ * ## Advancing the time of a #GstTestClock
+ *   |[<!-- language="C" -->
  *   #include &lt;gst/gst.h&gt;
  *   #include &lt;gst/check/gsttestclock.h&gt;
  *
@@ -53,8 +53,7 @@
  *   gst_test_clock_set_time (test_clock, 42 * GST_SECOND);
  *   GST_INFO ("Time: %" GST_TIME_FORMAT, GST_TIME_ARGS (gst_clock_get_time (clock)));
  *   ...
- *   </programlisting>
- * </example>
+ *   ]|
  *
  * #GstClock allows for setting up single shot or periodic clock notifications
  * as well as waiting for these notifications synchronously (using
@@ -93,9 +92,8 @@
  * second buffer will arrive a little late (7ms) due to simulated jitter in the
  * clock notification.
  *
- * <example>
- * <title>Demonstration of how to work with clock notifications and #GstTestClock</title>
- *   <programlisting language="c">
+ * ## Demonstration of how to work with clock notifications and #GstTestClock
+ *   |[<!-- language="C" -->
  *   #include &lt;gst/gst.h&gt;
  *   #include &lt;gst/check/gstcheck.h&gt;
  *   #include &lt;gst/check/gsttestclock.h&gt;
@@ -166,8 +164,7 @@
  *   GST_INFO ("Check that element does not wait for any clock notification\n");
  *   g_assert (!gst_test_clock_peek_next_pending_id (test_clock, NULL));
  *   ...
- *   </programlisting>
- * </example>
+ *   ]|
  *
  * Since #GstTestClock is only supposed to be used in unit tests it calls
  * g_assert(), g_assert_cmpint() or g_assert_cmpuint() to validate all function

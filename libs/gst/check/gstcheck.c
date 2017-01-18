@@ -22,6 +22,7 @@
  */
 /**
  * SECTION:gstcheck
+ * @title: GstCheckABIStruct
  * @short_description: Common code for GStreamer unit tests
  *
  * These macros and functions are for internal use of the unit tests found
