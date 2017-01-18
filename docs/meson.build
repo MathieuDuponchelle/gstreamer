@@ -21,7 +21,31 @@ endforeach
 
 if hotdoc_p.found()
     subdir('hotdoc-extension')
-    subdir('hotdoc')
+
+    hotdoc = import('hotdoc')
+
+    hotdoc.generate_doc('gstreamer-' + apiversion,
+        c_sources: ['../gst/gst.h', '../gst/*.h', '../gst/*.c'],
+        gi_sources: [gst_gir[0].full_path()],
+        c_source_filters: libs_excludes,
+        sitemap: 'gst-sitemap.txt',
+        index: 'gst-index.md',
+        gi_smart_index: true,
+        dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep],
+        install: true,
+    )
+
+    hotdoc.generate_doc('gstreamer-plugins-' + apiversion,
+        sitemap: 'plugins-sitemap.txt',
+        index: 'plugins-index.md',
+        gst_smart_index: true,
+        gst_c_sources: ['../plugins/elements/*.c', '../plugins/elements/*.h'],
+        gst_dl_sources: gst_elements.full_path(),
+        dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep, hotdoc_plugin_scanner,
+            gst_elements],
+        extra_extensions_paths: hotdoc_extension_dir,
+        install: true,
+    )
 else
     subdir('gst')
     subdir('libs')

@@ -1,0 +1,2 @@
+gst-index.md
+        gi-index

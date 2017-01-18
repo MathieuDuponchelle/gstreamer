@@ -1,3 +1,2 @@
-index.md
+plugins-index.md
         gst-index
-
