@@ -37,14 +37,22 @@ if hotdoc_p.found()
     )
 
     hotdoc.generate_doc('gstreamer-libs-' + apiversion,
-        c_sources: ['../libs/gst/base/*.[ch]'],
-        gi_sources: [gst_base_gir[0].full_path()],
+        c_sources: ['../libs/gst/base/*.[ch]',
+                    '../libs/gst/controller/*.[ch]',
+                    '../libs/gst/net/*.[ch]',
+                    '../libs/gst/check/*.[ch]',
+                   ],
+        gi_sources: [gst_base_gir[0].full_path(),
+                     gst_controller_gir[0].full_path(),
+                     gst_net_gir[0].full_path(),
+                    ],
         c_source_filters: libs_excludes,
         sitemap: 'gst-libs-sitemap.txt',
         index: 'gst-libs-index.md',
         gi_smart_index: true,
         dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep,
-                       gst_base_dep],
+                       gst_base_dep, gst_net_dep, gst_controller_dep,
+                       gst_check_dep],
         install: true,
     )
 
