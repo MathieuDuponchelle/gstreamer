@@ -15,7 +15,8 @@ foreach h: ['gettext.h', 'glib-compat-private.h', 'glib-compat.h',
             'math-compat.h', 'parse/grammar.tab.h',
             'parser/grammar.tab.pre.h', 'parse/parse_lex.h', 'types.h',
             'gst-printf.h', 'printf-args.h', 'printf-extension.h',
-            'printf-parse.h', 'vasnprintf.h',]
+            'printf-parse.h', 'vasnprintf.h', 'gstregistrybinary.c',
+            'gstregistrybinary.h', 'gstpluginloader.h', 'gstpluginloader.c']
     libs_excludes += [join_paths(meson.current_source_dir(), '..', 'gst', h)]
 endforeach
 
@@ -25,13 +26,25 @@ if hotdoc_p.found()
     hotdoc = import('hotdoc')
 
     hotdoc.generate_doc('gstreamer-' + apiversion,
-        c_sources: ['../gst/gst.h', '../gst/*.h', '../gst/*.c'],
+        c_sources: ['../gst/gst.h', '../gst/*.[hc]'],
         gi_sources: [gst_gir[0].full_path()],
         c_source_filters: libs_excludes,
         sitemap: 'gst-sitemap.txt',
         index: 'gst-index.md',
         gi_smart_index: true,
         dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep],
+        install: true,
+    )
+
+    hotdoc.generate_doc('gstreamer-libs-' + apiversion,
+        c_sources: ['../libs/gst/base/*.[ch]'],
+        gi_sources: [gst_base_gir[0].full_path()],
+        c_source_filters: libs_excludes,
+        sitemap: 'gst-libs-sitemap.txt',
+        index: 'gst-libs-index.md',
+        gi_smart_index: true,
+        dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep,
+                       gst_base_dep],
         install: true,
     )
 
