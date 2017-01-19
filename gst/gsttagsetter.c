@@ -21,7 +21,7 @@
 
 /**
  * SECTION:gsttagsetter
- * @title: GstTagsetter
+ * @title: GstTagSetter
  * @short_description: Element interface that allows setting and retrieval
  *                     of media metadata
  *

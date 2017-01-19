@@ -25,7 +25,7 @@
 
 /**
  * SECTION:gsturihandler
- * @title: GstUriHandler
+ * @title: GstURIHandler
  * @short_description: Interface to ease URI handling in plugins.
  *
  * The #GstURIHandler is an interface that is implemented by Source and Sink
@@ -961,7 +961,7 @@ beach:
 
 /**
  * SECTION:gsturi
- * @title: GstUri
+ * @title: GstURIHandler
  * @short_description: URI parsing and manipulation.
  *
  * A #GstUri object can be used to parse and split a URI string into its

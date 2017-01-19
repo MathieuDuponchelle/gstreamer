@@ -21,7 +21,7 @@
 
 /**
  * SECTION:gstmemory
- * @title: GstMemory
+ * @title: GstAllocator
  * @short_description: refcounted wrapper for memory blocks
  * @see_also: #GstBuffer
  *

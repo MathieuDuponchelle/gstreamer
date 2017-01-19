@@ -1363,7 +1363,7 @@ gst_element_class_add_static_metadata (GstElementClass * klass,
  * @description: Sentence describing the purpose of the element.
  * E.g: "Write stream to a file"
  * @author: Name and contact details of the author(s). Use \n to separate
- * multiple author metadata. E.g: "Joe Bloggs &lt;joe.blogs at foo.com&gt;"
+ * multiple author metadata. E.g: "Joe Bloggs <joe.blogs at foo.com>"
  *
  * Sets the detailed information for a #GstElementClass.
  * > This function is for use in _class_init functions only.
@@ -1396,7 +1396,7 @@ gst_element_class_set_metadata (GstElementClass * klass,
  * @description: Sentence describing the purpose of the element.
  * E.g: "Write stream to a file"
  * @author: Name and contact details of the author(s). Use \n to separate
- * multiple author metadata. E.g: "Joe Bloggs &lt;joe.blogs at foo.com&gt;"
+ * multiple author metadata. E.g: "Joe Bloggs <joe.blogs at foo.com>"
  *
  * Sets the detailed information for a #GstElementClass.
  *

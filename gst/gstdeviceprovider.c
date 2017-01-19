@@ -250,7 +250,7 @@ gst_device_provider_class_add_static_metadata (GstDeviceProviderClass * klass,
  * @description: Sentence describing the purpose of the device provider.
  * E.g: "Write stream to a file"
  * @author: Name and contact details of the author(s). Use \n to separate
- * multiple author metadata. E.g: "Joe Bloggs &lt;joe.blogs at foo.com&gt;"
+ * multiple author metadata. E.g: "Joe Bloggs <joe.blogs at foo.com>"
  *
  * Sets the detailed information for a #GstDeviceProviderClass.
  *
@@ -286,8 +286,8 @@ gst_device_provider_class_set_metadata (GstDeviceProviderClass * klass,
  * @description: (transfer full): Sentence describing the purpose of the
  * element.  E.g: "Write stream to a file"
  * @author: (transfer full): Name and contact details of the author(s). Use \n
- * to separate multiple author metadata. E.g: "Joe Bloggs &lt;joe.blogs at
- * foo.com&gt;"
+ * to separate multiple author metadata. E.g: "Joe Bloggs <joe.blogs at
+ * foo.com>"
  *
  * Sets the detailed information for a #GstDeviceProviderClass.
  *

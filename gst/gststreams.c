@@ -26,7 +26,7 @@
 
 /**
  * SECTION:gststreams
- * @title: GstStreams
+ * @title: GstStream
  * @short_description: Base class for stream objects
  *
  * A #GstStream is a high-level object defining a stream of data which is, or

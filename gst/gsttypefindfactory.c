@@ -43,7 +43,7 @@
  *   my_peek (gpointer data, gint64 offset, guint size)
  *   {
  *     MyTypeFind *find = (MyTypeFind *) data;
- *     if (offset &gt;= 0 &amp;&amp; offset + size &lt;= find->size) {
+ *     if (offset >= 0 &amp;&amp; offset + size <= find->size) {
  *       return find->data + offset;
  *     }
  *     return NULL;
@@ -52,7 +52,7 @@
  *   my_suggest (gpointer data, guint probability, GstCaps *caps)
  *   {
  *     MyTypeFind *find = (MyTypeFind *) data;
- *     if (probability &gt; find->probability) {
+ *     if (probability > find->probability) {
  *       find->probability = probability;
  *       gst_caps_replace (&amp;find->caps, caps);
  *     }

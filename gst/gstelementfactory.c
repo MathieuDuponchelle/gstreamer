@@ -39,7 +39,7 @@
  *
  * ## Using an element factory
  * |[<!-- language="C" -->
- *   #include &lt;gst/gst.h&gt;
+ *   #include <gst/gst.h>
  *
  *   GstElement *src;
  *   GstElementFactory *srcfactory;

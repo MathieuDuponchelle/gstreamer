@@ -19,7 +19,7 @@
 
 /**
  * SECTION:gstvalue
- * @title: GstValue
+ * @title: GstValueTable
  * @short_description: GValue implementations specific
  * to GStreamer
  *

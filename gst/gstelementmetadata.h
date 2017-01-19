@@ -54,7 +54,7 @@ G_BEGIN_DECLS
  *
  * Name and contact details of the author(s). Use \n to separate
  * multiple author details.
- * E.g: "Joe Bloggs &lt;joe.blogs at foo.com&gt;"
+ * E.g: "Joe Bloggs <joe.blogs at foo.com>"
  */
 #define GST_ELEMENT_METADATA_AUTHOR        "author"
 

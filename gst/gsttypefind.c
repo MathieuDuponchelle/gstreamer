@@ -21,7 +21,7 @@
 
 /**
  * SECTION:gsttypefind
- * @title: GstTypefind
+ * @title: GstTypeFind
  * @short_description: Stream type detection
  *
  * The following functions allow you to detect the media type of an unknown
