@@ -8,7 +8,7 @@ version_entities = configure_file(input : 'version.entities.in',
   output : 'version.entities',
   configuration : docconf)
 
-libs_excludes = []
+gst_excludes = []
 foreach h: ['gettext.h', 'glib-compat-private.h', 'glib-compat.h',
             'gst-i18n-app.h', 'gst-i18n-lib.h', 'gst_private.h',
             'gstelementdetails.h', 'gstmacros.h', 'gstmarshal.h',
@@ -17,7 +17,12 @@ foreach h: ['gettext.h', 'glib-compat-private.h', 'glib-compat.h',
             'gst-printf.h', 'printf-args.h', 'printf-extension.h',
             'printf-parse.h', 'vasnprintf.h', 'gstregistrybinary.c',
             'gstregistrybinary.h', 'gstpluginloader.h', 'gstpluginloader.c']
-    libs_excludes += [join_paths(meson.current_source_dir(), '..', 'gst', h)]
+    gst_excludes += [join_paths(meson.current_source_dir(), '..', 'gst', h)]
+endforeach
+
+libs_excludes = []
+foreach h: ['net/gstntppacket.*']
+    libs_excludes += [join_paths(meson.current_source_dir(), '..', 'libs', 'gst', h)]
 endforeach
 
 if hotdoc_p.found()
@@ -28,7 +33,7 @@ if hotdoc_p.found()
     hotdoc.generate_doc('gstreamer-' + apiversion,
         c_sources: ['../gst/gst.h', '../gst/*.[hc]'],
         gi_sources: [gst_gir[0].full_path()],
-        c_source_filters: libs_excludes,
+        c_source_filters: gst_excludes,
         sitemap: 'gst-sitemap.txt',
         index: 'gst-index.md',
         gi_smart_index: true,
