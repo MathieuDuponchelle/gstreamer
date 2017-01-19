@@ -21,16 +21,16 @@
  */
 /**
  * SECTION:element-filesrc
+ * @title: filesrc
  * @see_also: #GstFileSrc
  *
  * Read data from a file in the local file system.
  *
- * <refsect2>
- * <title>Example launch line</title>
+ * ## Example launch line
  * |[
  * gst-launch-1.0 filesrc location=song.ogg ! decodebin ! audioconvert ! audioresample ! autoaudiosink
  * ]| Play song.ogg audio file which must be in the current working directory.
- * </refsect2>
+ *
  */
 
 #ifdef HAVE_CONFIG_H

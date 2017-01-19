@@ -24,6 +24,7 @@
 
 /**
  * SECTION:multiqueue
+ * @title: GstMultiqueue.h
  * @see_also: #GstQueue
  *
  * Multiqueue is similar to a normal #GstQueue with the following additional
@@ -58,17 +59,14 @@
  * non-linked pad any sooner than buffers in any other stream which were received
  * before it.
  *
- *
  * Data is queued until one of the limits specified by the
  * #GstMultiQueue:max-size-buffers, #GstMultiQueue:max-size-bytes and/or
  * #GstMultiQueue:max-size-time properties has been reached. Any attempt to push
  * more buffers into the queue will block the pushing thread until more space
  * becomes available. #GstMultiQueue:extra-size-buffers,
  *
- *
  * #GstMultiQueue:extra-size-bytes and #GstMultiQueue:extra-size-time are
  * currently unused.
- *
  *
  * The default queue size limits are 5 buffers, 10MB of data, or
  * two second worth of data, whichever is reached first. Note that the number

@@ -20,6 +20,7 @@
 
 /**
  * SECTION:element-dataurisrc
+ * @title: dataurisrc
  *
  * dataurisrc handles data: URIs, see [RFC 2397](http://tools.ietf.org/html/rfc2397) for more information.
  *

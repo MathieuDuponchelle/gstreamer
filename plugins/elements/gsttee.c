@@ -23,6 +23,7 @@
 
 /**
  * SECTION:element-tee
+ * @title: tee
  * @see_also: #GstIdentity
  *
  * Split data to multiple pads. Branching the data flow is useful when e.g.
