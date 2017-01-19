@@ -1,2 +1,3 @@
 gst-libs-index.md
         gi-index
+                gstbitreader.h.md
