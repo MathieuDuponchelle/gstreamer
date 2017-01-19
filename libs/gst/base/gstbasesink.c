@@ -52,7 +52,7 @@
  *       "Sink name",
  *       "Sink",
  *       "My Sink element",
- *       "The author &lt;my.sink@my.email&gt;");
+ *       "The author <my.sink@my.email>");
  * }
  * ]|
  *

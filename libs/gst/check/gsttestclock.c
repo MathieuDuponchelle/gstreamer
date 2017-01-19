@@ -37,8 +37,8 @@
  *
  * ## Advancing the time of a #GstTestClock
  *   |[<!-- language="C" -->
- *   #include &lt;gst/gst.h&gt;
- *   #include &lt;gst/check/gsttestclock.h&gt;
+ *   #include <gst/gst.h>
+ *   #include <gst/check/gsttestclock.h>
  *
  *   GstClock *clock;
  *   GstTestClock *test_clock;
@@ -94,9 +94,9 @@
  *
  * ## Demonstration of how to work with clock notifications and #GstTestClock
  *   |[<!-- language="C" -->
- *   #include &lt;gst/gst.h&gt;
- *   #include &lt;gst/check/gstcheck.h&gt;
- *   #include &lt;gst/check/gsttestclock.h&gt;
+ *   #include <gst/gst.h>
+ *   #include <gst/check/gstcheck.h>
+ *   #include <gst/check/gsttestclock.h>
  *
  *   GstClockTime latency;
  *   GstElement *element;

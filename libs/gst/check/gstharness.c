@@ -57,8 +57,8 @@
  *
  * ## A simple buffer-in buffer-out example
  *   |[<!-- language="C" -->
- *   #include &lt;gst/gst.h&gt;
- *   #include &lt;gst/check/gstharness.h&gt;
+ *   #include <gst/gst.h>
+ *   #include <gst/check/gstharness.h>
  *   GstHarness *h;
  *   GstBuffer *in_buf;
  *   GstBuffer *out_buf;

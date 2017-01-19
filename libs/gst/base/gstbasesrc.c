@@ -118,7 +118,7 @@
  *      "Source name",
  *      "Source",
  *      "My Source element",
- *      "The author &lt;my.sink@my.email&gt;");
+ *      "The author <my.sink@my.email>");
  * }
  * ]|
  *
