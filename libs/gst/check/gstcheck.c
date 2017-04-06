@@ -125,8 +125,8 @@ gst_check_free_log_filter (GstCheckLogFilter * filter)
 
 
 /**
- * gst_check_add_log_filter:
- * @log_domain: the log domain of the message
+ * gst_check_add_log_filter: (skip):
+ * @log: the log domain of the message
  * @log_level: the log level of the message
  * @regex: (transfer full): a #GRegex to match the message
  * @func: the function to call for matching messages
@@ -426,6 +426,12 @@ gst_check_message_error (GstMessage * message, GstMessageType type,
 }
 
 /* helper functions */
+/**
+ * gst_check_chain_func:
+ *
+ * A fake chain function that appends the buffer to the internal list of
+ * buffers.
+ */
 GstFlowReturn
 gst_check_chain_func (GstPad * pad, GstObject * parent, GstBuffer * buffer)
 {
@@ -993,6 +999,15 @@ gst_check_element_push_buffer (const gchar * element_name,
       GST_FLOW_OK);
 }
 
+/**
+ * gst_check_abi_list:
+ * @list: A list of GstCheckABIStruct to be verified
+ * @have_abi_sizes: Whether there is a reference ABI size already specified,
+ * if it is %FALSE and the `GST_ABI` environment variable is set, usable code
+ * for @list will be printed.
+ *
+ * Verifies that reference values and current values are equals in @list.
+ */
 void
 gst_check_abi_list (GstCheckABIStruct list[], gboolean have_abi_sizes)
 {
