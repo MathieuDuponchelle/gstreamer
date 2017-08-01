@@ -206,7 +206,7 @@
                         "writable": true
                     },
                     "typefind": {
-                        "blurb": "Run typefind before negotiating",
+                        "blurb": "Run typefind before negotiating (deprecated, non-functional)",
                         "construct": false,
                         "construct-only": false,
                         "default": "false",
@@ -898,7 +898,7 @@
                         "writable": true
                     },
                     "typefind": {
-                        "blurb": "Run typefind before negotiating",
+                        "blurb": "Run typefind before negotiating (deprecated, non-functional)",
                         "construct": false,
                         "construct-only": false,
                         "default": "false",
@@ -1151,7 +1151,7 @@
                         "writable": true
                     },
                     "typefind": {
-                        "blurb": "Run typefind before negotiating",
+                        "blurb": "Run typefind before negotiating (deprecated, non-functional)",
                         "construct": false,
                         "construct-only": false,
                         "default": "false",
@@ -1429,7 +1429,7 @@
                         "writable": true
                     },
                     "typefind": {
-                        "blurb": "Run typefind before negotiating",
+                        "blurb": "Run typefind before negotiating (deprecated, non-functional)",
                         "construct": false,
                         "construct-only": false,
                         "default": "false",

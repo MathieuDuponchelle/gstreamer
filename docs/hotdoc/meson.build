@@ -34,7 +34,7 @@ libs_doc = [hotdoc.generate_doc('libgstreamer',
     index: 'gst/index.md',
     gi_index: 'gst/index.md',
     gi_smart_index: true,
-    dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep],
+    dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep, cfile],
     disable_incremental_build: true,
 )]
 
@@ -48,7 +48,7 @@ libs_doc += [hotdoc.generate_doc('libgstbase',
     gi_smart_index: true,
     include_paths: join_paths(meson.current_source_dir(), 'libs/'),
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep,
-                    gst_base_dep],
+                    gst_base_dep, cfile],
     disable_incremental_build: true,
 )]
 
@@ -66,7 +66,7 @@ libs_doc += [hotdoc.generate_doc('libgstcheck',
     gi_index: 'libs/check/index.md',
     gi_smart_index: true,
     gi_sources: [gst_check_gir[0].full_path()],
-    dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep, gst_check_dep] + gst_check_gir,
+    dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep, gst_check_dep, cfile] + gst_check_gir,
     disable_incremental_build: true,
 )]
 
@@ -79,7 +79,7 @@ libs_doc += [hotdoc.generate_doc('libgstcontroller',
     gi_index: 'libs/controller/index.md',
     gi_smart_index: true,
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep,
-                    gst_controller_dep,],
+                    gst_controller_dep, cfile,],
     disable_incremental_build: true,
 )]
 
@@ -92,7 +92,7 @@ libs_doc += [hotdoc.generate_doc('libgstnet',
     gi_index: 'libs/net/index.md',
     gi_smart_index: true,
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep,
-                    gst_net_dep,],
+                    gst_net_dep, cfile,],
     disable_incremental_build: true,
 )]
 
@@ -105,7 +105,7 @@ plugins_doc = [hotdoc.generate_doc('GStreamer-core-plugins',
     gst_c_sources: ['../../plugins/elements/*.c', '../../plugins/elements/*.h'],
     gst_dl_sources: gst_elements.full_path(),
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep, hotdoc_plugin_scanner,
-        gst_elements],
+        gst_elements, cfile],
     extra_extensions_paths: hotdoc_extension_dir,
     disable_incremental_build: true,
     gst_cache_file: join_paths(meson.current_source_dir(), 'plugins', 'cache.json')

@@ -491,12 +491,12 @@ print_field (GQuark field, const GValue * value, GString * jcaps)
     g_free (tmp);
   }
 
-  g_string_append_printf (jcaps, "%15s: ", g_quark_to_string (field));
+  g_string_append_printf (jcaps, "%10s: ", g_quark_to_string (field));
   tmp = str;
   for (i = tmp, n = 0; *i != '\0'; i++, n++) {
-    if (*i == ' ' && n > 75) {
+    if (*i == ' ') {
       g_string_append_len (jcaps, tmp, n);
-      g_string_append_printf (jcaps, "\n%18s", "");
+      g_string_append_printf (jcaps, "\n%8s", "");
       tmp = i;
       n = 0;
     }

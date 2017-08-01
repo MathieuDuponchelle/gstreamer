@@ -6,7 +6,7 @@ import hotdoc_c_extension
 from sqlalchemy import Column, ForeignKey, Integer, PickleType, String
 from hotdoc_c_extension.gi_extension import GIExtension
 from hotdoc.core.links import Link
-from hotdoc.utils.loggable import warn, Logger
+from hotdoc.utils.loggable import warn, info, Logger
 from hotdoc.core.extension import Extension
 from hotdoc.core.symbols import ClassSymbol, QualifiedSymbol, PropertySymbol, SignalSymbol, ReturnItemSymbol, ParameterSymbol, Symbol, EnumSymbol
 from hotdoc.parsers.gtk_doc import GtkDocParser
@@ -28,7 +28,6 @@ DESCRIPTION=\
 Extract gstreamer plugin documentation from sources and
 built plugins.
 """
-
 FUNDAMENTAL_TYPES = {
     "gchararray *": "gchar *",
     "gchararray": "gchar *"
@@ -36,12 +35,39 @@ FUNDAMENTAL_TYPES = {
 
 
 class GstPluginsSymbol(Symbol):
+    TEMPLATE = """
+        @require(symbol)
+        <div class="base_symbol_container">
+        <table class="table table-striped table-hover">
+            <tbody>
+                <tr>
+                    <th><b>Plugin name</b></th>
+                    <th><b>License</b></th>
+                    <th><b>Element name</b></th>
+                    <th><b>Element description</b></th>
+                </tr>
+                @for plugin in symbol.plugins:
+                    @for elem in plugin.elements:
+                        <tr>
+                            <td class="min">@plugin.display_name</td>
+                            <td>@plugin.license</td>
+                            <td>@elem.rendered_link</td>
+                            <td>@elem.desc</td>
+                        </tr>
+                    @end
+                @end
+            </tbody>
+        </table>
+        </div>
+        @end
+        """
     __tablename__ = 'gst_plugins'
     id_ = Column(Integer, ForeignKey('symbols.id_'), primary_key=True)
     __mapper_args__ = {
         'polymorphic_identity': 'gst_plugins',
     }
     name = Column(String)
+    description = Column(String)
     plugins = Column(PickleType)
 
     def get_children_symbols(self):
@@ -52,8 +78,33 @@ class GstPluginsSymbol(Symbol):
         return ""
 
 
-
 class GstElementSymbol(ClassSymbol):
+    TEMPLATE = """
+        @require(symbol)
+        <h3 class="symbol_section">Factory Details</h3>
+        <div class="base_symbol_container">
+        <table class="table table-striped table-hover">
+            <tbody>
+                <tr>
+                    <th>Authors:</th>
+                    <td>@symbol.author</td>
+                </tr>
+                <tr>
+                    <th>Classification:</th>
+                    <td>@symbol.classification</td>
+                </tr>
+                <tr>
+                    <th>Rank:</th>
+                    <td>@symbol.rank</td>
+                </tr>
+                <tr>
+                    <th>Plugin:</th>
+                    <td>@symbol.plugin</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+        """
     __tablename__ = 'gst_element'
     id_ = Column(Integer, ForeignKey('classes.id_'), primary_key=True)
     __mapper_args__ = {
@@ -66,6 +117,28 @@ class GstElementSymbol(ClassSymbol):
 
 
 class GstPluginSymbol(Symbol):
+    TEMPLATE = """
+        @require(symbol)
+        <div class="base_symbol_container">
+        <table class="table table-striped table-hover">
+            <tbody>
+                <tr>
+                    <th><b>License</b></th>
+                    <th><b>Element name</b></th>
+                    <th><b>Element description</b></th>
+                </tr>
+                @for elem in symbol.elements:
+                    <tr>
+                        <td>@symbol.license</td>
+                        <td>@elem.rendered_link</td>
+                        <td>@elem.desc</td>
+                    </tr>
+                @end
+            </tbody>
+        </table>
+        </div>
+        @end
+        """
     __tablename__ = 'gst_plugin'
     id_ = Column(Integer, ForeignKey('symbols.id_'), primary_key=True)
     __mapper_args__ = {
@@ -73,6 +146,7 @@ class GstPluginSymbol(Symbol):
     }
     name = Column(String)
     license = Column(String)
+    description = Column(String)
     elements = Column(PickleType)
 
     def get_children_symbols(self):
@@ -80,6 +154,26 @@ class GstPluginSymbol(Symbol):
 
 
 class GstPadTemplateSymbol(Symbol):
+    TEMPLATE = """
+        @extends('base_symbol.html')
+        @require(symbol)
+
+        @def header():
+        <h4>
+            @symbol.name
+        </h4>
+        @end
+        @def content():
+        <table class="table table-striped">
+            <tbody>
+                <tr><td><b>Presence:</b></td><td>@symbol.presence</td></tr>
+                <tr><td><b>Direction:</b></td><td>@symbol.direction</td></tr>
+                <tr><td><b>Capabilities:</b></td><td><pre><code>@symbol.caps</code></pre></td></tr>
+            </tbody>
+        </table>
+        @end
+        """
+
     __tablename__ = 'pad_templates'
     id_ = Column(Integer, ForeignKey('symbols.id_'), primary_key=True)
     __mapper_args__ = {
@@ -109,24 +203,6 @@ class GstPadTemplateSymbol(Symbol):
         return "GstPadTemplate"
 
 
-GST_PAD_TEMPLATE_TEMPLATE = """
-@extends('base_symbol.html')
-@require(symbol)
-
-@def header():
-<h3>
-    @symbol.name:
-</h3>
-<table class="table table-striped">
-    <tbody>
-        <tr><td><b>Presence:</b></td><td>@symbol.presence</td></tr>
-        <tr><td><b>Direction:</b></td><td>@symbol.direction</td></tr>
-        <tr><td><b>Capabilities:</b></td><td><pre><code>@symbol.caps</code></pre></td></tr>
-    </tbody>
-</table>
-@end
-"""
-
 ENUM_TEMPLATE = """
 @require(values)
 <table class="table table-striped">
@@ -148,62 +224,6 @@ ENUM_TEMPLATE = """
 @end
 """
 
-PLUGIN_TEMPLATE = """
-@require(symbol)
-<h3 class="symbol_section">@symbol.display_name</h3>
-<div class="base_symbol_container">
-<table class="table table-striped table-hover">
-    <tbody>
-        <tr>
-            <th><b>Plugin name</b></th>
-            <th><b>License</b></th>
-            <th><b>Element name</b></th>
-            <th><b>Element description</b></th>
-        </tr>
-        @for plugin in symbol.plugins:
-            @for elem in plugin.elements:
-                <tr>
-                    <td class="min">@plugin.display_name</td>
-                    <td>@plugin.license</td>
-                    <td>@elem.rendered_link</td>
-                    <td>@elem.desc</td>
-                </tr>
-            @end
-        @end
-    </tbody>
-</table>
-</div>
-@end
-"""
-
-ELEMENT_TEMPLATE = """
-@require(symbol)
-<h3 class="symbol_section">Information</h3>
-<div class="base_symbol_container">
-<table class="table table-striped table-hover">
-    <tbody>
-        <tr>
-            <th>Authors:</th>
-            <td>@symbol.author</td>
-        </tr>
-        <tr>
-            <th>Classification:</th>
-            <td>@symbol.classification</td>
-        </tr>
-        <tr>
-            <th>Rank:</th>
-            <td>@symbol.rank</td>
-        </tr>
-        <tr>
-            <th>Plugin:</th>
-            <td>@symbol.plugin</td>
-        </tr>
-    </tbody>
-</table>
-</div>
-"""
-
-
 class GstFormatter(Formatter):
     def __init__(self, extension):
         c_extension_path = hotdoc_c_extension.__path__[0]
@@ -211,16 +231,19 @@ class GstFormatter(Formatter):
 
         self.__tmpdir = tempfile.TemporaryDirectory()
         with open(os.path.join(self.__tmpdir.name, "padtemplate.html"), "w") as f:
-            f.write(GST_PAD_TEMPLATE_TEMPLATE)
+            f.write(GstPadTemplateSymbol.TEMPLATE)
         with open(os.path.join(self.__tmpdir.name, "enumtemplate.html"), "w") as f:
             f.write(ENUM_TEMPLATE)
         with open(os.path.join(self.__tmpdir.name, "plugins.html"), "w") as f:
-            f.write(PLUGIN_TEMPLATE)
+            f.write(GstPluginsSymbol.TEMPLATE)
+        with open(os.path.join(self.__tmpdir.name, "plugin.html"), "w") as f:
+            f.write(GstPluginSymbol.TEMPLATE)
         with open(os.path.join(self.__tmpdir.name, "element.html"), "w") as f:
-            f.write(ELEMENT_TEMPLATE)
+            f.write(GstElementSymbol.TEMPLATE)
         searchpath.append(self.__tmpdir.name)
         Formatter.__init__(self, extension, searchpath)
-        self._ordering.insert(0, GstElementSymbol)
+        self._ordering.insert(0, GstPluginSymbol)
+        self._ordering.insert(1, GstElementSymbol)
         self._ordering.insert(self._ordering.index(ClassSymbol) + 1, GstPadTemplateSymbol)
         self._ordering.insert(self._ordering.index(GstPadTemplateSymbol) + 1,
                               GstPluginsSymbol)
@@ -228,25 +251,33 @@ class GstFormatter(Formatter):
     def __del__(self):
         self.__tmpdir.cleanup()
 
+    def __populate_plugin_infos(self, plugin):
+        if not plugin.description:
+            comment = self.extension.app.database.get_comment(plugin.unique_name)
+            plugin.description = comment.description if comment else ''
+        for element in plugin.elements:
+            comment = self.extension.app.database.get_comment(
+                'element-' + element.unique_name);
+            element.rendered_link = self._format_linked_symbol(element)
+            if not comment:
+                element.desc  = "%s element" % element.display_name
+                continue
+
+            if not comment.short_description:
+                desc = "%s element" % (element.display_name)
+            else:
+                desc = comment.short_description.description
+            element.desc = desc
+
     def _format_symbol(self, symbol):
         if isinstance(symbol, GstPluginsSymbol):
             for plugin in symbol.plugins:
-                for element in plugin.elements:
-                    comment = self.extension.app.database.get_comment(
-                        'element-' + element.unique_name);
-                    element.rendered_link = self._format_linked_symbol(element)
-                    if not comment:
-                        element.desc  = "%s element" % element.display_name
-                        continue
-
-                    if not comment.short_description:
-                        desc = "%s element" % (element.display_name)
-                    else:
-                        desc = comment.short_description.description
-
-                    element.desc = desc
-
+                self.__populate_plugin_infos(plugin)
             template = self.engine.get_template('plugins.html')
+            return (template.render ({'symbol': symbol}), False)
+        elif isinstance(symbol, GstPluginSymbol):
+            self.__populate_plugin_infos(symbol)
+            template = self.engine.get_template('plugin.html')
             return (template.render ({'symbol': symbol}), False)
         elif type(symbol) == GstPadTemplateSymbol:
             template = self.engine.get_template('padtemplate.html')
@@ -272,6 +303,9 @@ class GstExtension(Extension):
     extension_name = 'gst-extension'
     argument_prefix = 'gst'
     __dual_links = {} # Maps myelement:XXX to GstMyElement:XXX
+    __parsed_cfiles = set()
+    __caches = {} # cachefile -> dict
+    __apps_sigs = set()
 
     def __init__(self, app, project):
         super().__init__(app, project)
@@ -279,9 +313,25 @@ class GstExtension(Extension):
         self.__raw_comment_parser = GtkDocParser(project, section_file_matching=False)
         self.__plugins = None
         self.__list_all_plugins = False
+        # If we have a plugin with only one element, we render it on the plugin
+        # page.
+        self.__has_one_item = False
+        self.__on_index_symbols = []
+
+    def __main_project_done_cb(self, app):
+        print("Dumping it once! %s" % self.cache_file)
+        with open(self.cache_file, 'w') as f:
+            json.dump(self.cache, f, indent=4, sort_keys=True)
 
     def _make_formatter(self):
         return GstFormatter(self)
+
+    def get_or_create_symbol(self, *args, **kwargs):
+        sym = super().get_or_create_symbol(*args, **kwargs)
+        if self.__has_one_item:
+            self.__on_index_symbols.append(sym)
+
+        return sym
 
     def setup(self):
         stale_c, unlisted_c = self.get_stale_files(self.c_sources,
@@ -289,6 +339,12 @@ class GstExtension(Extension):
         stale_dl, unlisted_dl = self.get_stale_files(self.dl_sources,
             'gst_dl')
         self.project.tree.update_signal.connect(self.__update_tree_cb)
+
+        # Make sure the cache file is save when the whole project
+        # is done.
+        if self.app not in GstExtension.__apps_sigs and self.cache_file:
+            GstExtension.__apps_sigs.add(self.app)
+            self.app.formatted_signal.connect(self.__main_project_done_cb)
 
         cmd = [SCANNER_PATH]
         for dl in list(stale_dl):
@@ -303,7 +359,9 @@ class GstExtension(Extension):
             return
 
         comment_parser = GtkDocParser(self.project, False)
+        stale_c = GstExtension.__parsed_cfiles - set(stale_c)
         CCommentExtractor(self, comment_parser).parse_comments(stale_c)
+        GstExtension.__parsed_cfiles.update(stale_c)
 
         subenv = os.environ.copy()
         registry = tempfile.NamedTemporaryFile()
@@ -318,18 +376,20 @@ class GstExtension(Extension):
             self.cache.update(plugins)
 
         plugins = []
-        for libfile, plugin in self.cache.items():
+        if self.plugin:
+            plugin_node = {self.plugin: self.cache[self.plugin]}
+        else:
+            plugin_node = self.cache
+
+        for libfile, plugin in plugin_node.items():
             plugins.append(self.__parse_plugin(libfile, plugin))
 
-        self.__plugins = self.get_or_create_symbol(
-                GstPluginsSymbol,
-                display_name=self.project.project_name.replace("-", " ").title(),
-                unique_name=self.project.project_name + "gst-plugins",
-                plugins=plugins)
-
-        if self.cache_file:
-            with open(self.cache_file, 'w') as f:
-                json.dump(self.cache, f, indent=4, sort_keys=True)
+        if not self.plugin:
+            self.__plugins = self.get_or_create_symbol(
+                    GstPluginsSymbol,
+                    display_name=self.project.project_name.replace("-", " ").title(),
+                    unique_name=self.project.project_name + "-gst-plugins",
+                    plugins=plugins)
 
         super().setup()
 
@@ -345,10 +405,14 @@ class GstExtension(Extension):
 
         if not self.__list_all_plugins:
             index.symbol_names.add(self.__plugins.unique_name)
+            for sym in self.__on_index_symbols:
+                index.symbol_names.add(sym.unique_name)
         else:
             index.symbol_names |= self.project.database.list_symbols(GstPluginsSymbol)
 
     def _get_smart_index_title(self):
+        if self.plugin:
+            return self.__plugins.display_name
         return 'GStreamer plugins documentation'
 
     @staticmethod
@@ -361,25 +425,41 @@ class GstExtension(Extension):
         group.add_argument('--gst-cache-file', default=None)
         group.add_argument('--gst-list-all-plugins', action='store_true',
                            default=False)
+        group.add_argument('--gst-plugin-name', default=None)
 
     def parse_config(self, config):
         self.c_sources = config.get_sources('gst_c')
         self.dl_sources = config.get_sources('gst_dl')
         self.cache_file = config.get('gst_cache_file')
+        self.plugin = config.get('gst_plugin_name')
         self.__list_all_plugins = config.get('gst_list_all_plugins', False)
+        info('Parsing config!')
 
         self.cache = {}
         if self.cache_file:
-            try:
-                with open(self.cache_file) as f:
-                    self.cache = json.load(f)
-            except FileNotFoundError:
-                pass
+            self.cache = GstExtension.__caches.get(self.cache_file)
+            if not self.cache:
+                try:
+                    print("Loading %s once" % self.cache_file)
+                    with open(self.cache_file) as f:
+                        self.cache = json.load(f)
+                except FileNotFoundError:
+                    pass
+                GstExtension.__caches[self.cache_file] = self.cache
 
         super().parse_config(config)
 
     def _get_smart_key(self, symbol):
-        return symbol.extra.get('gst-element-name')
+        if self.__has_one_item:
+            return None
+
+        if isinstance(symbol, GstPluginSymbol) and not self.plugin:
+            return symbol.unique_name.replace("plugin-", "'Plugin ")
+        res = symbol.extra.get('gst-element-name')
+        if res:
+            res = res.replace("element-", "Element ")
+
+        return res
 
     def __create_hierarchy(self, element_dict):
         hierarchy = []
@@ -432,7 +512,7 @@ class GstExtension(Extension):
             parameters=params, return_value=retval,
             display_name=name, unique_name=unique_name,
              extra={'gst-element-name': 'element-' + element_name},
-            aliases=aliases)
+            aliases=aliases, parent_name=element_name)
 
     def __create_signal_symbols(self, element):
         signals = element.get('signals', {})
@@ -473,8 +553,7 @@ class GstExtension(Extension):
                 PropertySymbol,
                 prop_type=type_,
                 display_name=name, unique_name=unique_name,
-                what="Nothing",
-                aliases=aliases,
+                aliases=aliases, parent_name=element['name'],
                 extra={'gst-element-name': 'element-' + element['name']},
             )
 
@@ -493,7 +572,7 @@ class GstExtension(Extension):
         symbol = self.get_or_create_symbol(
             EnumSymbol, anonymous=False,
             raw_text=None, display_name=type_name,
-            unique_name=type_name,
+            unique_name=type_name, parent_name=element_name,
             extra={'gst-element-name': 'element-' + element_name})
         symbol.values = enum
         return symbol
@@ -510,12 +589,15 @@ class GstExtension(Extension):
                 name=name,
                 direction=template["direction"],
                 presence=template["presence"],
-                caps=template["caps"],
+                caps=template["caps"], parent_name=element['name'],
                 display_name=name, unique_name=unique_name,
                 extra={'gst-element-name': 'element-' + element['name']})
 
     def __parse_plugin(self, libfile, plugin):
         elements = []
+        if self.plugin and len(plugin.get('elements', {}).items()) == 1:
+            self.__has_one_item = True
+
         for ename, element in plugin.get('elements', {}).items():
             comment = None
             element['name'] = ename
@@ -544,17 +626,21 @@ class GstExtension(Extension):
             self.__create_property_symbols(element)
             self.__create_signal_symbols(element)
             self.__create_pad_template_symbols(element)
-
             elements.append(sym)
 
-        return self.get_or_create_symbol(
+        plugin = self.get_or_create_symbol(
                 GstPluginSymbol,
-                display_name=plugin['filename'],
+                description=plugin['description'],
+                display_name="Plugin " + plugin['filename'],
                 unique_name='plugin-' + plugin['filename'],
                 license=plugin['license'],
                 filename=libfile,
                 elements=elements,
-                extra={'gst-plugins': 'plugins-' + plugin['filename']})
+                extra= {'gst-plugins': 'plugins-' + plugin['filename']})
+
+        if self.plugin:
+            self.__plugins = plugin
+        return plugin
 
 
     def __get_link_cb(self, resolver, name):
