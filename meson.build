@@ -429,6 +429,7 @@ if bashcomp_found
   endif
 endif
 
+plugins_component = component('plugins')
 subdir('gst')
 subdir('libs')
 subdir('plugins')
