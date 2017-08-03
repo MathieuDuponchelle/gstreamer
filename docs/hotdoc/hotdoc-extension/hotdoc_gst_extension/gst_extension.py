@@ -6,7 +6,7 @@ import hotdoc_c_extension
 from sqlalchemy import Column, ForeignKey, Integer, PickleType, String
 from hotdoc_c_extension.gi_extension import GIExtension
 from hotdoc.core.links import Link
-from hotdoc.utils.loggable import warn, info, Logger
+from hotdoc.utils.loggable import warn, info, Logger, error
 from hotdoc.core.extension import Extension
 from hotdoc.core.symbols import ClassSymbol, QualifiedSymbol, PropertySymbol, SignalSymbol, ReturnItemSymbol, ParameterSymbol, Symbol, EnumSymbol
 from hotdoc.parsers.gtk_doc import GtkDocParser
@@ -364,7 +364,6 @@ class GstExtension(Extension):
         GstExtension.__parsed_cfiles.update(stale_c)
 
         subenv = os.environ.copy()
-        registry = tempfile.NamedTemporaryFile()
         if subenv.get('GST_REGISTRY_UPDATE') != 'no':
             data = subprocess.check_output(cmd, env=subenv)
             try:
@@ -377,7 +376,10 @@ class GstExtension(Extension):
 
         plugins = []
         if self.plugin:
-            plugin_node = {self.plugin: self.cache[self.plugin]}
+            try:
+                plugin_node = {self.plugin: self.cache[self.plugin]}
+            except KeyError:
+                error('setup-issue', "Plugin %s not found" % self.plugin)
         else:
             plugin_node = self.cache
 
@@ -453,11 +455,12 @@ class GstExtension(Extension):
         if self.__has_one_item:
             return None
 
-        if isinstance(symbol, GstPluginSymbol) and not self.plugin:
-            return symbol.unique_name.replace("plugin-", "'Plugin ")
+        if isinstance(symbol, GstPluginSymbol):
+            # PluginSymbol are rendered on the index page
+            return None
         res = symbol.extra.get('gst-element-name')
         if res:
-            res = res.replace("element-", "Element ")
+            res = res.replace("element-", "")
 
         return res
 
@@ -631,7 +634,7 @@ class GstExtension(Extension):
         plugin = self.get_or_create_symbol(
                 GstPluginSymbol,
                 description=plugin['description'],
-                display_name="Plugin " + plugin['filename'],
+                display_name=plugin['filename'],
                 unique_name='plugin-' + plugin['filename'],
                 license=plugin['license'],
                 filename=libfile,

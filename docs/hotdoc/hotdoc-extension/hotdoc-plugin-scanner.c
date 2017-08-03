@@ -646,6 +646,7 @@ main (int argc, char *argv[])
 
   g_assert (argc >= 2);
 
+  g_setenv ("GST_REGISTRY_FORK", "no", TRUE);
   gst_init (NULL, NULL);
 
   json = g_string_new ("{");
