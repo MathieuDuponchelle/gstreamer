@@ -286,9 +286,10 @@ class GstFormatter(Formatter):
             template = self.engine.get_template('padtemplate.html')
             return (template.render ({'symbol': symbol}), False)
         elif type(symbol) == GstElementSymbol:
-            out = self._format_class_symbol(symbol)
+            out = "<h1>%s</h1>\n" % (symbol.display_name)
+            out += self._format_class_symbol(symbol)[0]
             template = self.engine.get_template('element.html')
-            return (out[0] + template.render ({'symbol': symbol}), False)
+            return (out + template.render ({'symbol': symbol}), False)
         else:
             return super()._format_symbol(symbol)
 
@@ -362,7 +363,7 @@ class GstExtension(Extension):
             return
 
         comment_parser = GtkDocParser(self.project, False)
-        stale_c = GstExtension.__parsed_cfiles - set(stale_c)
+        stale_c = set(stale_c) - GstExtension.__parsed_cfiles
         CCommentExtractor(self, comment_parser).parse_comments(stale_c)
         GstExtension.__parsed_cfiles.update(stale_c)
 
@@ -607,8 +608,8 @@ class GstExtension(Extension):
         for ename, element in plugin.get('elements', {}).items():
             comment = None
             element['name'] = ename
-            for comment_name in [element['name'], element['hierarchy'][0],
-                                 'element-' + element['name']]:
+            for comment_name in ['element-' + element['name'],
+                                 element['name'], element['hierarchy'][0]]:
                 comment = self.app.database.get_comment(comment_name)
 
             if not comment:
@@ -624,7 +625,7 @@ class GstExtension(Extension):
             sym = self.__elements[element['name']] = self.get_or_create_symbol(
                 GstElementSymbol, display_name=element['name'],
                 hierarchy=self.__create_hierarchy(element),
-                unique_name=element['name'],
+                unique_name='element-' + element['name'],
                 filename=libfile, extra={'gst-element-name': 'element-' + element['name']},
                 rank=str(element['rank']), author=element['author'],
                 classification=element['classification'], plugin=plugin['filename'],
