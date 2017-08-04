@@ -1,5 +1,5 @@
 ---
-short-description: GStreamer plugins from GStreamer core
+short-description: GStreamer plugin from GStreamer core
 ...
 
-# Core Plugins
+# Core Plugin

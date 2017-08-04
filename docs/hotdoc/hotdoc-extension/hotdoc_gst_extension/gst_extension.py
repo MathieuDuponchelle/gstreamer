@@ -1,5 +1,6 @@
 import tempfile
 import os
+from collections import Mapping
 from collections import OrderedDict
 
 import hotdoc_c_extension
@@ -32,6 +33,16 @@ FUNDAMENTAL_TYPES = {
     "gchararray *": "gchar *",
     "gchararray": "gchar *"
 }
+
+
+def dict_recursive_update(d, u):
+    for k, v in u.items():
+        if isinstance(v, Mapping):
+            r = dict_recursive_update(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+    return d
 
 
 class GstPluginsSymbol(Symbol):
@@ -122,7 +133,7 @@ class GstElementSymbol(ClassSymbol):
 class GstPluginSymbol(Symbol):
     TEMPLATE = """
         @require(symbol)
-        <h1>@symbol.display_name<h1>
+        <h1>@symbol.display_name</h1>
         <div class="base_symbol_container">
         <table class="table table-striped table-hover">
             <tbody>
@@ -383,7 +394,7 @@ class GstExtension(Extension):
                 print("Could not decode:\n%s" % data.decode())
                 raise
 
-            self.cache.update(plugins)
+            self.cache = dict_recursive_update(self.cache, plugins)
 
         plugins = []
         if self.plugin:
