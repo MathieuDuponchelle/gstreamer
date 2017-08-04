@@ -122,6 +122,7 @@ class GstElementSymbol(ClassSymbol):
 class GstPluginSymbol(Symbol):
     TEMPLATE = """
         @require(symbol)
+        <h1>@symbol.display_name<h1>
         <div class="base_symbol_container">
         <table class="table table-striped table-hover">
             <tbody>
@@ -154,6 +155,10 @@ class GstPluginSymbol(Symbol):
 
     def get_children_symbols(self):
         return self.elements
+
+    @classmethod
+    def get_plural_name(cls):
+        return ""
 
 
 class GstPadTemplateSymbol(Symbol):
@@ -286,7 +291,9 @@ class GstFormatter(Formatter):
             template = self.engine.get_template('padtemplate.html')
             return (template.render ({'symbol': symbol}), False)
         elif type(symbol) == GstElementSymbol:
-            out = "<h1>%s</h1>\n" % (symbol.display_name)
+            out = ""
+            if not self.extension.has_unique_feature:
+                out = "<h1>%s</h1>\n" % (symbol.display_name)
             out += self._format_class_symbol(symbol)[0]
             template = self.engine.get_template('element.html')
             return (out + template.render ({'symbol': symbol}), False)
@@ -319,7 +326,7 @@ class GstExtension(Extension):
         self.__list_all_plugins = False
         # If we have a plugin with only one element, we render it on the plugin
         # page.
-        self.__has_one_item = False
+        self.has_unique_feature = False
         self.__on_index_symbols = []
 
     def __main_project_done_cb(self, app):
@@ -332,7 +339,7 @@ class GstExtension(Extension):
 
     def get_or_create_symbol(self, *args, **kwargs):
         sym = super().get_or_create_symbol(*args, **kwargs)
-        if self.__has_one_item:
+        if self.has_unique_feature:
             self.__on_index_symbols.append(sym)
 
         return sym
@@ -456,7 +463,7 @@ class GstExtension(Extension):
         super().parse_config(config)
 
     def _get_smart_key(self, symbol):
-        if self.__has_one_item:
+        if self.has_unique_feature:
             return None
 
         if isinstance(symbol, GstPluginSymbol):
@@ -603,7 +610,7 @@ class GstExtension(Extension):
     def __parse_plugin(self, libfile, plugin):
         elements = []
         if self.plugin and len(plugin.get('elements', {}).items()) == 1:
-            self.__has_one_item = True
+            self.has_unique_feature = True
 
         for ename, element in plugin.get('elements', {}).items():
             comment = None
@@ -625,11 +632,11 @@ class GstExtension(Extension):
             sym = self.__elements[element['name']] = self.get_or_create_symbol(
                 GstElementSymbol, display_name=element['name'],
                 hierarchy=self.__create_hierarchy(element),
-                unique_name='element-' + element['name'],
+                unique_name=element['name'],
                 filename=libfile, extra={'gst-element-name': 'element-' + element['name']},
                 rank=str(element['rank']), author=element['author'],
                 classification=element['classification'], plugin=plugin['filename'],
-                aliases=[element['hierarchy'][0]])
+                aliases=['element-' + element['name'], element['hierarchy'][0]])
             self.__create_property_symbols(element)
             self.__create_signal_symbols(element)
             self.__create_pad_template_symbols(element)
