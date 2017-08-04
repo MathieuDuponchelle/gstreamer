@@ -81,7 +81,7 @@ class GstPluginsSymbol(Symbol):
 class GstElementSymbol(ClassSymbol):
     TEMPLATE = """
         @require(symbol)
-        <h3 class="symbol_section">Factory Details</h3>
+        <h2 class="symbol_section">Factory details</h2>
         <div class="base_symbol_container">
         <table class="table table-striped table-hover">
             <tbody>
@@ -115,6 +115,9 @@ class GstElementSymbol(ClassSymbol):
     author = Column(String)
     plugin = Column(String)
 
+    @classmethod
+    def get_plural_name(cls):
+        return ""
 
 class GstPluginSymbol(Symbol):
     TEMPLATE = """
