@@ -651,7 +651,7 @@ main (int argc, char *argv[])
 
   json = g_string_new ("{");
   for (i = 1; i < argc; i++) {
-    gchar *tmpstr;
+    gchar *tmpstr, **stmpstr;
     libfile = argv[i];
     plugin = gst_plugin_load_file (libfile, &error);
     if (!plugin) {
@@ -663,6 +663,7 @@ main (int argc, char *argv[])
     }
 
     tmpstr = g_filename_display_basename (libfile);
+    stmpstr = g_strsplit (tmpstr, ".", 2);
     g_string_append_printf (json,
         "%s\"%s\": {"
         "\"description\":\"%s\","
@@ -673,13 +674,14 @@ main (int argc, char *argv[])
         "\"url\":\"%s\","
         "\"elements\":{",
         first ? "" : ",",
-        tmpstr,
+        stmpstr[0],
         gst_plugin_get_description (plugin),
         gst_plugin_get_name (plugin),
         gst_plugin_get_source (plugin),
         gst_plugin_get_package (plugin),
         gst_plugin_get_license (plugin), gst_plugin_get_origin (plugin));
     g_free (tmpstr);
+    g_strfreev (stmpstr);
     first = FALSE;
 
     features =

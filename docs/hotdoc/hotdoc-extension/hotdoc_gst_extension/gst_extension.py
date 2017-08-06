@@ -91,7 +91,15 @@ class GstPluginsSymbol(Symbol):
 
 class GstElementSymbol(ClassSymbol):
     TEMPLATE = """
-        @require(symbol)
+        @require(symbol, hierarchy, desc)
+        @desc
+
+        @if hierarchy:
+        <h2>Hierarchy</h2>
+        <div class="hierarchy_container">
+            @hierarchy
+        </div>
+        @end
         <h2 class="symbol_section">Factory details</h2>
         <div class="base_symbol_container">
         <table class="table table-striped table-hover">
@@ -115,6 +123,7 @@ class GstElementSymbol(ClassSymbol):
             </tbody>
         </table>
         </div>
+        @end
         """
     __tablename__ = 'gst_element'
     id_ = Column(Integer, ForeignKey('classes.id_'), primary_key=True)
@@ -134,7 +143,9 @@ class GstPluginSymbol(Symbol):
     TEMPLATE = """
         @require(symbol)
         <h1>@symbol.display_name</h1>
+        <i>(from @symbol.package)</i>
         <div class="base_symbol_container">
+        @symbol.formatted_doc
         <table class="table table-striped table-hover">
             <tbody>
                 <tr>
@@ -162,6 +173,7 @@ class GstPluginSymbol(Symbol):
     name = Column(String)
     license = Column(String)
     description = Column(String)
+    package = Column(String)
     elements = Column(PickleType)
 
     def get_children_symbols(self):
@@ -302,12 +314,17 @@ class GstFormatter(Formatter):
             template = self.engine.get_template('padtemplate.html')
             return (template.render ({'symbol': symbol}), False)
         elif type(symbol) == GstElementSymbol:
-            out = ""
-            if not self.extension.has_unique_feature:
-                out = "<h1>%s</h1>\n" % (symbol.display_name)
-            out += self._format_class_symbol(symbol)[0]
+            hierarchy = self._format_hierarchy(symbol)
+
+            desc = ''
+            if self.extension.has_unique_feature:
+                desc = symbol.formatted_doc
+
             template = self.engine.get_template('element.html')
-            return (out + template.render ({'symbol': symbol}), False)
+            return (template.render({'symbol': symbol,
+                                     'hierarchy': hierarchy,
+                                     'desc': desc}),
+                    False)
         else:
             return super()._format_symbol(symbol)
 
@@ -341,7 +358,6 @@ class GstExtension(Extension):
         self.__on_index_symbols = []
 
     def __main_project_done_cb(self, app):
-        print("Dumping it once! %s" % self.cache_file)
         with open(self.cache_file, 'w') as f:
             json.dump(self.cache, f, indent=4, sort_keys=True)
 
@@ -362,10 +378,11 @@ class GstExtension(Extension):
             'gst_dl')
         self.project.tree.update_signal.connect(self.__update_tree_cb)
 
+
         # Make sure the cache file is save when the whole project
         # is done.
-        if self.app not in GstExtension.__apps_sigs and self.cache_file:
-            GstExtension.__apps_sigs.add(self.app)
+        if self.cache_file not in GstExtension.__apps_sigs and self.cache_file:
+            GstExtension.__apps_sigs.add(self.cache_file)
             self.app.formatted_signal.connect(self.__main_project_done_cb)
 
         cmd = [SCANNER_PATH]
@@ -382,6 +399,7 @@ class GstExtension(Extension):
 
         comment_parser = GtkDocParser(self.project, False)
         stale_c = set(stale_c) - GstExtension.__parsed_cfiles
+
         CCommentExtractor(self, comment_parser).parse_comments(stale_c)
         GstExtension.__parsed_cfiles.update(stale_c)
 
@@ -398,8 +416,9 @@ class GstExtension(Extension):
 
         plugins = []
         if self.plugin:
+            pname = self.plugin.split('.')[0]
             try:
-                plugin_node = {self.plugin: self.cache[self.plugin]}
+                plugin_node = {pname: self.cache[pname]}
             except KeyError:
                 error('setup-issue', "Plugin %s not found" % self.plugin)
         else:
@@ -464,11 +483,13 @@ class GstExtension(Extension):
             self.cache = GstExtension.__caches.get(self.cache_file)
             if not self.cache:
                 try:
-                    print("Loading %s once" % self.cache_file)
                     with open(self.cache_file) as f:
                         self.cache = json.load(f)
                 except FileNotFoundError:
                     pass
+
+                if self.cache is None:
+                    self.cache = {}
                 GstExtension.__caches[self.cache_file] = self.cache
 
         super().parse_config(config)
@@ -659,6 +680,7 @@ class GstExtension(Extension):
                 display_name=plugin['filename'],
                 unique_name='plugin-' + plugin['filename'],
                 license=plugin['license'],
+                package=plugin['package'],
                 filename=libfile,
                 elements=elements,
                 extra= {'gst-plugins': 'plugins-' + plugin['filename']})
@@ -666,7 +688,6 @@ class GstExtension(Extension):
         if self.plugin:
             self.__plugins = plugin
         return plugin
-
 
     def __get_link_cb(self, resolver, name):
         link = self.__dual_links.get(name)

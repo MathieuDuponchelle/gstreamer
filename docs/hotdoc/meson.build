@@ -8,6 +8,8 @@ version_entities = configure_file(input : 'version.in',
     output : 'gst_api_version.md',
     configuration : docconf)
 
+html_theme = 'https://github.com/thiblahute/hotdoc-gnome-theme/releases/download/0.3/hotdoc-gnome-theme-0.3.tar.xz?sha256=84675ba05a11a3807a388ead1bda695c87a5eb2d858770562e9d3a1cce02f35e'
+
 gst_excludes = []
 foreach h: ['gettext.h', 'glib-compat-private.h', 'glib-compat.h',
             'gst-i18n-app.h', 'gst-i18n-lib.h', 'gst_private.h',
@@ -36,6 +38,7 @@ libs_doc = [hotdoc.generate_doc('libgstreamer',
     gi_smart_index: true,
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep, cfile],
     disable_incremental_build: true,
+    html_theme: html_theme,
 )]
 
 libs_doc += [hotdoc.generate_doc('libgstbase',
@@ -50,6 +53,7 @@ libs_doc += [hotdoc.generate_doc('libgstbase',
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep,
                     gst_base_dep, cfile],
     disable_incremental_build: true,
+    html_theme: html_theme,
 )]
 
 check_source_files = []
@@ -68,6 +72,7 @@ libs_doc += [hotdoc.generate_doc('libgstcheck',
     gi_sources: [gst_check_gir[0].full_path()],
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep, gst_check_dep, cfile] + gst_check_gir,
     disable_incremental_build: true,
+    html_theme: html_theme,
 )]
 
 libs_doc += [hotdoc.generate_doc('libgstcontroller',
@@ -81,6 +86,7 @@ libs_doc += [hotdoc.generate_doc('libgstcontroller',
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep,
                     gst_controller_dep, cfile,],
     disable_incremental_build: true,
+    html_theme: html_theme,
 )]
 
 libs_doc += [hotdoc.generate_doc('libgstnet',
@@ -94,6 +100,7 @@ libs_doc += [hotdoc.generate_doc('libgstnet',
     dependencies: [gst_dep, glib_dep, gobject_dep, gmodule_dep,
                     gst_net_dep, cfile,],
     disable_incremental_build: true,
+    html_theme: html_theme,
 )]
 
 plugins_doc = [hotdoc.generate_doc('GStreamer-core-plugins',
@@ -108,7 +115,8 @@ plugins_doc = [hotdoc.generate_doc('GStreamer-core-plugins',
         gst_elements, cfile],
     extra_extensions_paths: hotdoc_extension_dir,
     disable_incremental_build: true,
-    gst_cache_file: join_paths(meson.current_source_dir(), 'plugins', 'cache.json')
+    gst_cache_file: join_paths(meson.current_source_dir(), 'plugins', 'cache.json'),
+    html_theme: html_theme,
 )]
 
 doc = hotdoc.generate_doc('gstreamer',
@@ -119,4 +127,5 @@ doc = hotdoc.generate_doc('gstreamer',
     disable_incremental_build: true,
     subprojects: libs_doc + plugins_doc,
     extra_assets: join_paths(meson.current_source_dir(), 'images'),
+    html_theme: html_theme,
 )
