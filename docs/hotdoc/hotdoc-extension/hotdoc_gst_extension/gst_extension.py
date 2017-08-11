@@ -552,7 +552,17 @@ class GstExtension(Extension):
 
         for _type, argname in args_type_names:
             params.append(ParameterSymbol (argname=argname, type_tokens=_type))
-        retval = [ReturnItemSymbol (type_tokens=signal['retval'])]
+
+        type_name = signal['retval']
+        tokens = type_name.split(" ")
+        tokens[0] = Link (None, tokens[0], tokens[0])
+        type_ = QualifiedSymbol(type_tokens=tokens)
+
+        enum = signal.get('return-values')
+        if enum:
+            self.__create_enum_symbol(type_name, enum, element['name'])
+
+        retval = [ReturnItemSymbol(type_tokens=tokens)]
 
         self.get_or_create_symbol(SignalSymbol,
             parameters=params, return_value=retval,

@@ -81,6 +81,111 @@ json_strescape (const gchar * str)
   return g_string_free (output, FALSE);
 }
 
+static gchar *
+flags_to_string (GFlagsValue * values, guint flags)
+{
+  GString *s = NULL;
+  guint flags_left, i;
+
+  /* first look for an exact match and count the number of values */
+  for (i = 0; values[i].value_name != NULL; ++i) {
+    if (values[i].value == flags)
+      return g_strdup (values[i].value_nick);
+  }
+
+  s = g_string_new (NULL);
+
+  /* we assume the values are sorted from lowest to highest value */
+  flags_left = flags;
+  while (i > 0) {
+    --i;
+    if (values[i].value != 0
+        && (flags_left & values[i].value) == values[i].value) {
+      if (s->len > 0)
+        g_string_append_c (s, '+');
+      g_string_append (s, values[i].value_nick);
+      flags_left -= values[i].value;
+      if (flags_left == 0)
+        break;
+    }
+  }
+
+  if (s->len == 0)
+    g_string_assign (s, "(none)");
+
+  return g_string_free (s, FALSE);
+}
+
+
+static void
+_serialize_flags (GString * json, const gchar * key_name, GType gtype,
+    GValue * value)
+{
+  GFlagsValue *values = G_FLAGS_CLASS (g_type_class_ref (gtype))->values;
+
+  if (value) {
+    gchar *cur;
+
+    cur = flags_to_string (values, g_value_get_flags (value));
+    g_string_append_printf (json, ",\"default\": \"%s\",", cur);
+    g_free (cur);
+  }
+
+  g_string_append_printf (json, "\"%s\": [", key_name);
+
+  while (values[0].value_name) {
+    gchar *value_name = json_strescape (values[0].value_name);
+    g_string_append_printf (json, "{\"name\": \"%s\","
+        "\"value\": \"0x%08x\","
+        "\"desc\": \"%s\"}", values[0].value_nick, values[0].value, value_name);
+    ++values;
+
+    if (values[0].value_name)
+      g_string_append_c (json, ',');
+  }
+  g_string_append_c (json, ']');
+}
+
+static void
+_serialize_enum (GString * json, const gchar * key_name, GType gtype,
+    GValue * value)
+{
+  GEnumValue *values;
+  guint j = 0;
+  gint enum_value;
+  const gchar *value_nick = "";
+
+  values = G_ENUM_CLASS (g_type_class_ref (gtype))->values;
+
+  if (value) {
+    enum_value = g_value_get_enum (value);
+    while (values[j].value_name) {
+      if (values[j].value == enum_value)
+        value_nick = values[j].value_nick;
+      j++;
+    }
+    g_string_append_printf (json, ",\"default\": \"%s (%d)\","
+        "\"enum\": true,", value_nick, enum_value);;
+  }
+
+  g_string_append_printf (json, "\"%s\": [", key_name);
+
+  j = 0;
+  while (values[j].value_name) {
+    gchar *value_name = json_strescape (values[j].value_name);
+
+    g_string_append_printf (json, "{\"name\": \"%s\","
+        "\"value\": \"0x%08x\","
+        "\"desc\": \"%s\"}", values[j].value_nick, values[j].value, value_name);
+    j++;
+    if (values[j].value_name)
+      g_string_append_c (json, ',');
+  }
+
+  g_string_append_c (json, ']');
+}
+
+
 static void
 _add_element_signals (GString * json, GstElement * element)
 {
@@ -152,8 +257,17 @@ _add_element_signals (GString * json, GstElement * element)
             g_type_name (query->param_types[j]),
             gtype_needs_ptr_marker (query->param_types[j]) ? " *" : "");
       }
-      g_string_append (json, "]}");
+      g_string_append_c (json, ']');
 
+      if (g_type_is_a (query->return_type, G_TYPE_ENUM)) {
+        g_string_append_c (json, ',');
+        _serialize_enum (json, "return-values", query->return_type, NULL);
+      } else if (g_type_is_a (query->return_type, G_TYPE_FLAGS)) {
+        g_string_append_c (json, ',');
+        _serialize_flags (json, "return-values", query->return_type, NULL);
+      }
+
+      g_string_append_c (json, '}');
     }
 
     g_slist_foreach (found_signals, (GFunc) g_free, NULL);
@@ -163,41 +277,6 @@ _add_element_signals (GString * json, GstElement * element)
 
   if (opened)
     g_string_append (json, "}");
-}
-
-static gchar *
-flags_to_string (GFlagsValue * values, guint flags)
-{
-  GString *s = NULL;
-  guint flags_left, i;
-
-  /* first look for an exact match and count the number of values */
-  for (i = 0; values[i].value_name != NULL; ++i) {
-    if (values[i].value == flags)
-      return g_strdup (values[i].value_nick);
-  }
-
-  s = g_string_new (NULL);
-
-  /* we assume the values are sorted from lowest to highest value */
-  flags_left = flags;
-  while (i > 0) {
-    --i;
-    if (values[i].value != 0
-        && (flags_left & values[i].value) == values[i].value) {
-      if (s->len > 0)
-        g_string_append_c (s, '+');
-      g_string_append (s, values[i].value_nick);
-      flags_left -= values[i].value;
-      if (flags_left == 0)
-        break;
-    }
-  }
-
-  if (s->len == 0)
-    g_string_assign (s, "(none)");
-
-  return g_string_free (s, FALSE);
 }
 
 static void
@@ -380,63 +459,9 @@ _add_element_properties (GString * json, GstElement * element)
             g_free (tmpcapsstr);
           }
         } else if (G_IS_PARAM_SPEC_ENUM (spec)) {
-          GEnumValue *values;
-          guint j = 0;
-          gint enum_value;
-          const gchar *value_nick = "";
-
-          values = G_ENUM_CLASS (g_type_class_ref (spec->value_type))->values;
-          enum_value = g_value_get_enum (&value);
-
-          while (values[j].value_name) {
-            if (values[j].value == enum_value)
-              value_nick = values[j].value_nick;
-            j++;
-          }
-
-          g_string_append_printf (json, ",\"default\": \"%s (%d)\","
-              "\"enum\": true," "\"values\": [", value_nick, enum_value);;
-
-          j = 0;
-          while (values[j].value_name) {
-            gchar *value_name = json_strescape (values[j].value_name);
-
-            g_string_append_printf (json, "{\"name\": \"%s\","
-                "\"value\": \"0x%08x\","
-                "\"desc\": \"%s\"}",
-                values[j].value_nick, values[j].value, value_name);
-            j++;
-            if (values[j].value_name)
-              g_string_append_c (json, ',');
-          }
-
-          g_string_append_c (json, ']');
+          _serialize_enum (json, "values", spec->value_type, &value);
         } else if (G_IS_PARAM_SPEC_FLAGS (spec)) {
-          GParamSpecFlags *pflags = G_PARAM_SPEC_FLAGS (spec);
-          GFlagsValue *values;
-          gchar *cur;
-
-          values = pflags->flags_class->values;
-
-          cur = flags_to_string (values, g_value_get_flags (&value));
-
-          g_string_append_printf (json, ",\"default\": \"%s\", \"values\": [",
-              cur);
-
-          while (values[0].value_name) {
-            gchar *value_name = json_strescape (values[0].value_name);
-            g_string_append_printf (json, "{\"name\": \"%s\","
-                "\"value\": \"0x%08x\","
-                "\"desc\": \"%s\"}",
-                values[0].value_nick, values[0].value, value_name);
-            ++values;
-
-            if (values[0].value_name)
-              g_string_append_c (json, ',');
-          }
-          g_string_append_c (json, ']');
-
-          g_free (cur);
+          _serialize_flags (json, "values", spec->value_type, &value);
         } else if (G_IS_PARAM_SPEC_BOXED (spec)) {
           if (spec->value_type == GST_TYPE_STRUCTURE) {
             const GstStructure *s = gst_value_get_structure (&value);
