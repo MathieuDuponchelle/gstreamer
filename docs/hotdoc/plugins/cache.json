@@ -1,5 +1,5 @@
 {
-    "libgstcoreelements": {
+    "coreelements": {
         "description": "GStreamer core elements",
         "elements": {
             "capsfilter": {
@@ -2846,7 +2846,7 @@
                 "rank": 0
             }
         },
-        "filename": "coreelements",
+        "filename": "libgstcoreelements.so",
         "license": "LGPL",
         "package": "GStreamer git",
         "source": "gstreamer",

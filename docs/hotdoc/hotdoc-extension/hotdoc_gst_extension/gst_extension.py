@@ -392,7 +392,7 @@ class GstExtension(Extension):
                     cmd.append(dl)
                     break
 
-        if len(cmd) < 2:
+        if not self.dl_sources:
             if self.__list_all_plugins:
                 super().setup()
             return
@@ -416,11 +416,19 @@ class GstExtension(Extension):
 
         plugins = []
         if self.plugin:
-            pname = self.plugin.split('.')[0]
+            pname = self.plugin
+            dot_idx = pname.rfind('.')
+            if dot_idx > 0:
+                pname = self.plugin[:dot_idx]
+            if pname.startswith('libgst'):
+                pname = pname[6:]
+            elif pname.startswith('gst'):
+                pname = pname[3:]
             try:
                 plugin_node = {pname: self.cache[pname]}
             except KeyError:
-                error('setup-issue', "Plugin %s not found" % self.plugin)
+                self.__main_project_done_cb(None) # Save the cache
+                error('setup-issue', "Plugin %s not found" % pname)
         else:
             plugin_node = self.cache
 
@@ -649,7 +657,7 @@ class GstExtension(Extension):
                 display_name=name, unique_name=unique_name,
                 extra={'gst-element-name': 'element-' + element['name']})
 
-    def __parse_plugin(self, libfile, plugin):
+    def __parse_plugin(self, plugin_name, plugin):
         elements = []
         if self.plugin and len(plugin.get('elements', {}).items()) == 1:
             self.has_unique_feature = True
@@ -675,7 +683,8 @@ class GstExtension(Extension):
                 GstElementSymbol, display_name=element['name'],
                 hierarchy=self.__create_hierarchy(element),
                 unique_name=element['name'],
-                filename=libfile, extra={'gst-element-name': 'element-' + element['name']},
+                filename=plugin_name,
+                extra={'gst-element-name': 'element-' + element['name']},
                 rank=str(element['rank']), author=element['author'],
                 classification=element['classification'], plugin=plugin['filename'],
                 aliases=['element-' + element['name'], element['hierarchy'][0]])
@@ -687,11 +696,11 @@ class GstExtension(Extension):
         plugin = self.get_or_create_symbol(
                 GstPluginSymbol,
                 description=plugin['description'],
-                display_name=plugin['filename'],
+                display_name=plugin_name,
                 unique_name='plugin-' + plugin['filename'],
                 license=plugin['license'],
                 package=plugin['package'],
-                filename=libfile,
+                filename=plugin['filename'],
                 elements=elements,
                 extra= {'gst-plugins': 'plugins-' + plugin['filename']})
 
