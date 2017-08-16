@@ -52,17 +52,19 @@ class GstPluginsSymbol(Symbol):
         <table class="table table-striped table-hover">
             <tbody>
                 <tr>
-                    <th><b>Plugin name</b></th>
-                    <th><b>License</b></th>
-                    <th><b>Element name</b></th>
-                    <th><b>Element description</b></th>
+                    <th class="col-md-2"><b>Element name</b></th>
+                    <th class="col-md-2"><b>Plugin name</b></th>
+                    <th class="col-md-2"><b>License</b></th>
+                    <th class="col-md-2"><b>Element classification</b></th>
+                    <th class="col-md-4"><b>Element description</b></th>
                 </tr>
                 @for plugin in symbol.plugins:
                     @for elem in plugin.elements:
                         <tr>
+                            <td>@elem.rendered_link</td>
                             <td class="min">@plugin.display_name</td>
                             <td>@plugin.license</td>
-                            <td>@elem.rendered_link</td>
+                            <td>@elem.classification</td>
                             <td>@elem.desc</td>
                         </tr>
                     @end
@@ -149,14 +151,16 @@ class GstPluginSymbol(Symbol):
         <table class="table table-striped table-hover">
             <tbody>
                 <tr>
-                    <th><b>License</b></th>
                     <th><b>Element name</b></th>
+                    <th><b>License</b></th>
+                    <th><b>Element classification</b></th>
                     <th><b>Element description</b></th>
                 </tr>
                 @for elem in symbol.elements:
                     <tr>
-                        <td>@symbol.license</td>
                         <td>@elem.rendered_link</td>
+                        <td>@symbol.license</td>
+                        <td>@elem.classification</td>
                         <td>@elem.desc</td>
                     </tr>
                 @end
@@ -343,6 +347,7 @@ class GstExtension(Extension):
     argument_prefix = 'gst'
     __dual_links = {} # Maps myelement:XXX to GstMyElement:XXX
     __parsed_cfiles = set()
+    __inspected_plugins = set()
     __caches = {} # cachefile -> dict
     __apps_sigs = set()
 
@@ -388,8 +393,9 @@ class GstExtension(Extension):
         cmd = [SCANNER_PATH]
         for dl in list(stale_dl):
             for ext in ['.dll', '.so', '.dylib']:
-                if dl.endswith(ext):
+                if dl.endswith(ext) and dl not in self.__inspected_plugins:
                     cmd.append(dl)
+                    self.__inspected_plugins.add(dl)
                     break
 
         if not self.dl_sources:
@@ -404,7 +410,7 @@ class GstExtension(Extension):
         GstExtension.__parsed_cfiles.update(stale_c)
 
         subenv = os.environ.copy()
-        if subenv.get('GST_REGISTRY_UPDATE') != 'no':
+        if subenv.get('GST_REGISTRY_UPDATE') != 'no' and len(cmd) >= 2:
             data = subprocess.check_output(cmd, env=subenv)
             try:
                 plugins = json.loads(data.decode(), object_pairs_hook=OrderedDict)
@@ -413,6 +419,9 @@ class GstExtension(Extension):
                 raise
 
             self.cache = dict_recursive_update(self.cache, plugins)
+
+        if not self.cache:
+            error('setup-issue', "No cache loaded or created for %s" % pname)
 
         plugins = []
         if self.plugin:
