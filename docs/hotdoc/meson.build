@@ -8,7 +8,7 @@ version_entities = configure_file(input : 'version.in',
     output : 'gst_api_version.md',
     configuration : docconf)
 
-html_theme = 'https://github.com/thiblahute/hotdoc-gnome-theme/releases/download/0.4/hotdoc-gnome-theme-0.4.tar.xz?sha256=8bdd91994dccda3c58a084630ebb5954eca16267c48533ea4398371f3b120912'
+html_theme = 'https://github.com/hotdoc/hotdoc_lumen_theme/releases/download/0.2/hotdoc_lumen_theme-0.2.tar.xz?sha256=db36a64e489c123481c380086dc8ff19e85e45ca6eeb428864d80fb82be8511a'
 
 gst_excludes = []
 foreach h: ['gettext.h', 'glib-compat-private.h', 'glib-compat.h',
