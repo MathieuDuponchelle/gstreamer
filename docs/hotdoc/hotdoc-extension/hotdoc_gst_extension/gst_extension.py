@@ -4,7 +4,6 @@ from collections import Mapping
 from collections import OrderedDict
 
 import hotdoc_c_extension
-from sqlalchemy import Column, ForeignKey, Integer, PickleType, String
 from hotdoc_c_extension.gi_extension import GIExtension
 from hotdoc.core.links import Link
 from hotdoc.utils.loggable import warn, info, Logger, error
@@ -75,13 +74,12 @@ class GstPluginsSymbol(Symbol):
         @end
         """
     __tablename__ = 'gst_plugins'
-    id_ = Column(Integer, ForeignKey('symbols.id_'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'gst_plugins',
-    }
-    name = Column(String)
-    description = Column(String)
-    plugins = Column(PickleType)
+
+    def __init__(self, **kwargs):
+        self.name = None
+        self.description = None
+        self.plugins = []
+        Symbol.__init__(self, **kwargs)
 
     def get_children_symbols(self):
         return self.plugins
@@ -128,14 +126,13 @@ class GstElementSymbol(ClassSymbol):
         @end
         """
     __tablename__ = 'gst_element'
-    id_ = Column(Integer, ForeignKey('classes.id_'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'gst_element',
-    }
-    classification = Column(String)
-    rank = Column(String)
-    author = Column(String)
-    plugin = Column(String)
+
+    def __init__ (self, **kwargs):
+        self.classification = None
+        self.rank = None
+        self.author = None
+        self.plugin = None
+        ClassSymbol.__init__(self, **kwargs)
 
     @classmethod
     def get_plural_name(cls):
@@ -170,15 +167,14 @@ class GstPluginSymbol(Symbol):
         @end
         """
     __tablename__ = 'gst_plugin'
-    id_ = Column(Integer, ForeignKey('symbols.id_'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'gst_plugin',
-    }
-    name = Column(String)
-    license = Column(String)
-    description = Column(String)
-    package = Column(String)
-    elements = Column(PickleType)
+
+    def __init__ (self, **kwargs):
+        self.name = None
+        self.license = None
+        self.description = None
+        self.package = None
+        self.elements = []
+        Symbol.__init__ (self, **kwargs)
 
     def get_children_symbols(self):
         return self.elements
@@ -210,21 +206,13 @@ class GstPadTemplateSymbol(Symbol):
         """
 
     __tablename__ = 'pad_templates'
-    id_ = Column(Integer, ForeignKey('symbols.id_'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'pad_templates',
-    }
-    qtype = Column(PickleType)
-    name = Column(String)
-    direction = Column(String)
-    presence = Column(String)
-    caps = Column(String)
 
     def __init__(self, **kwargs):
         self.qtype = None
-        # self.name = kwargs.pop("name")
-        # self.direction = kwargs.pop("direction")
-        # self.presence = kwargs.pop("presence")
+        self.name = None
+        self.direction = None
+        self.presence = None
+        self.caps = None
         Symbol.__init__(self, **kwargs)
 
     def get_children_symbols(self):
