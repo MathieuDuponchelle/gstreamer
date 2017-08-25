@@ -3,6 +3,11 @@ import os
 from collections import Mapping
 from collections import OrderedDict
 
+import html
+from wheezy.template.engine import Engine
+from wheezy.template.ext.core import CoreExtension
+from wheezy.template.ext.code import CodeExtension
+from wheezy.template.loader import FileLoader
 import hotdoc_c_extension
 from hotdoc_c_extension.gi_extension import GIExtension
 from hotdoc.core.links import Link
@@ -248,10 +253,9 @@ ENUM_TEMPLATE = """
 """
 
 class GstFormatter(Formatter):
-    def __init__(self, extension):
-        c_extension_path = hotdoc_c_extension.__path__[0]
-        searchpath = [os.path.join(c_extension_path, "templates")]
+    engine = None
 
+    def __init__(self, extension):
         self.__tmpdir = tempfile.TemporaryDirectory()
         with open(os.path.join(self.__tmpdir.name, "padtemplate.html"), "w") as f:
             f.write(GstPadTemplateSymbol.TEMPLATE)
@@ -263,13 +267,25 @@ class GstFormatter(Formatter):
             f.write(GstPluginSymbol.TEMPLATE)
         with open(os.path.join(self.__tmpdir.name, "element.html"), "w") as f:
             f.write(GstElementSymbol.TEMPLATE)
-        searchpath.append(self.__tmpdir.name)
-        Formatter.__init__(self, extension, searchpath)
+        Formatter.__init__(self, extension)
         self._ordering.insert(0, GstPluginSymbol)
         self._ordering.insert(1, GstElementSymbol)
         self._ordering.insert(self._ordering.index(ClassSymbol) + 1, GstPadTemplateSymbol)
         self._ordering.insert(self._ordering.index(GstPadTemplateSymbol) + 1,
                               GstPluginsSymbol)
+
+    def get_template(self, name):
+        return GstFormatter.engine.get_template(name)
+
+    def parse_toplevel_config(self, config):
+        super().parse_toplevel_config(config)
+        if GstFormatter.engine is None:
+            c_extension_path = hotdoc_c_extension.__path__[0]
+            searchpath = [os.path.join(c_extension_path, "templates"), self.__tmpdir.name] + Formatter.engine.loader.searchpath
+            GstFormatter.engine = Engine(
+                    loader=FileLoader(searchpath, encoding='UTF-8'),
+                    extensions=[CoreExtension(), CodeExtension()])
+            GstFormatter.engine.global_vars.update({'e': html.escape})
 
     def __del__(self):
         self.__tmpdir.cleanup()
