@@ -4,19 +4,6 @@
 static GRegex *cleanup_caps_field = NULL;
 
 static gboolean
-gtype_needs_ptr_marker (GType type)
-{
-  if (type == G_TYPE_POINTER)
-    return FALSE;
-
-  if (G_TYPE_FUNDAMENTAL (type) == G_TYPE_POINTER || G_TYPE_IS_BOXED (type)
-      || G_TYPE_IS_OBJECT (type))
-    return TRUE;
-
-  return FALSE;
-}
-
-static gboolean
 has_sometimes_template (GstElement * element)
 {
   GstElementClass *klass = GST_ELEMENT_GET_CLASS (element);
@@ -252,10 +239,8 @@ _add_element_signals (GString * json, GstElement * element)
 
       opened = TRUE;
       for (j = 0; j < query->n_params; j++) {
-        g_string_append_printf (json, "%s\"%s%s\"",
-            j ? "," : "",
-            g_type_name (query->param_types[j]),
-            gtype_needs_ptr_marker (query->param_types[j]) ? " *" : "");
+        g_string_append_printf (json, "%s\"%s\"",
+            j ? "," : "", g_type_name (query->param_types[j]));
       }
       g_string_append_c (json, ']');
 
@@ -315,15 +300,13 @@ _add_element_properties (GString * json, GstElement * element)
         "\"construct\": %s,"
         "\"writable\": %s,"
         "\"blurb\": \"%s\","
-        "\"type-name\": \"%s%s\"",
+        "\"type-name\": \"%s\"",
         opened ? "," : "",
         spec->name,
         spec->flags & G_PARAM_CONSTRUCT_ONLY ? "true" : "false",
         spec->flags & G_PARAM_CONSTRUCT ? "true" : "false",
         spec->flags & G_PARAM_WRITABLE ? "true" : "false",
-        tmpstr,
-        g_type_name (G_PARAM_SPEC_VALUE_TYPE (spec)),
-        gtype_needs_ptr_marker (spec->value_type) ? " *" : "");
+        tmpstr, g_type_name (G_PARAM_SPEC_VALUE_TYPE (spec)));
     g_free (tmpstr);
 
     switch (G_VALUE_TYPE (&value)) {

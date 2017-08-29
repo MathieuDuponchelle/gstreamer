@@ -20,6 +20,7 @@ from hotdoc.core.exceptions import HotdocSourceException
 from hotdoc.core.formatter import Formatter
 from hotdoc.core.comment import Comment
 from hotdoc_c_extension.gi_extension import WritableFlag, ReadableFlag, ConstructFlag, ConstructOnlyFlag
+from hotdoc_c_extension.fundamentals import FUNDAMENTALS
 
 import subprocess
 import json
@@ -33,10 +34,6 @@ DESCRIPTION=\
 Extract gstreamer plugin documentation from sources and
 built plugins.
 """
-FUNDAMENTAL_TYPES = {
-    "gchararray *": "gchar *",
-    "gchararray": "gchar *"
-}
 
 
 def dict_recursive_update(d, u):
@@ -252,6 +249,9 @@ ENUM_TEMPLATE = """
 @end
 """
 
+
+
+
 class GstFormatter(Formatter):
     engine = None
 
@@ -273,6 +273,12 @@ class GstFormatter(Formatter):
         self._ordering.insert(self._ordering.index(ClassSymbol) + 1, GstPadTemplateSymbol)
         self._ordering.insert(self._ordering.index(GstPadTemplateSymbol) + 1,
                               GstPluginsSymbol)
+        self._symbol_formatters.update(
+                {GstPluginsSymbol: self._format_plugins_symbol,
+                 GstPluginSymbol: self._format_plugin_symbol,
+                 GstPadTemplateSymbol: self._format_pad_template_symbol,
+                 GstElementSymbol: self._format_element_symbol,
+                })
 
     def get_template(self, name):
         return GstFormatter.engine.get_template(name)
@@ -308,33 +314,54 @@ class GstFormatter(Formatter):
                 desc = comment.short_description.description
             element.desc = desc
 
-    def _format_symbol(self, symbol):
-        if isinstance(symbol, GstPluginsSymbol):
-            for plugin in symbol.plugins:
-                self.__populate_plugin_infos(plugin)
-            template = self.engine.get_template('plugins.html')
-            return (template.render ({'symbol': symbol}), False)
-        elif isinstance(symbol, GstPluginSymbol):
-            self.__populate_plugin_infos(symbol)
-            template = self.engine.get_template('plugin.html')
-            return (template.render ({'symbol': symbol}), False)
-        elif type(symbol) == GstPadTemplateSymbol:
-            template = self.engine.get_template('padtemplate.html')
-            return (template.render ({'symbol': symbol}), False)
-        elif type(symbol) == GstElementSymbol:
-            hierarchy = self._format_hierarchy(symbol)
+    def _format_prototype (self, func, is_pointer, title):
+        c_proto = Formatter._format_prototype (self, func, is_pointer, title)
+        template = self.get_template('python_prototype.html')
+        python_proto = template.render(
+                {'function_name': title,
+                 'parameters': func.parameters,
+                 'throws': False,
+                 'comment': "python callback for the '%s' signal" % func._make_name(),
+                 'is_method': False})
+        template = self.get_template('javascript_prototype.html')
+        for param in func.parameters:
+            param.extension_contents['type-link'] = self._format_linked_symbol (param)
+        js_proto = template.render(
+                {'function_name': title,
+                 'parameters': func.parameters,
+                 'throws': False,
+                 'comment': "javascript callback for the '%s' signal" % func._make_name(),
+                 'is_method': False})
+        for param in func.parameters:
+            param.extension_contents.pop('type-link', None)
+        return '%s%s%s' % (c_proto, python_proto, js_proto)
 
-            desc = ''
-            if self.extension.has_unique_feature:
-                desc = symbol.formatted_doc
+    def _format_plugins_symbol(self, symbol):
+        for plugin in symbol.plugins:
+            self.__populate_plugin_infos(plugin)
+        template = self.engine.get_template('plugins.html')
+        return template.render ({'symbol': symbol})
 
-            template = self.engine.get_template('element.html')
-            return (template.render({'symbol': symbol,
-                                     'hierarchy': hierarchy,
-                                     'desc': desc}),
-                    False)
-        else:
-            return super()._format_symbol(symbol)
+    def _format_plugin_symbol(self, symbol):
+        self.__populate_plugin_infos(symbol)
+        template = self.engine.get_template('plugin.html')
+        return template.render ({'symbol': symbol})
+
+    def _format_pad_template_symbol(self, symbol):
+        template = self.engine.get_template('padtemplate.html')
+        return template.render ({'symbol': symbol})
+
+    def _format_element_symbol(self, symbol):
+        hierarchy = self._format_hierarchy(symbol)
+
+        desc = ''
+        if self.extension.has_unique_feature:
+            desc = symbol.formatted_doc
+
+        template = self.engine.get_template('element.html')
+        return template.render({'symbol': symbol,
+                                 'hierarchy': hierarchy,
+                                 'desc': desc})
 
     def _format_enum(self, symbol):
         template = self.engine.get_template('enumtemplate.html')
@@ -539,7 +566,13 @@ class GstExtension(Extension):
         hierarchy.reverse()
         return hierarchy
 
-    def __create_signal_symbol(self, element, name, signal, block=None):
+    def __type_tokens_from_type_name (self, type_name):
+        res = [Link(None, type_name, type_name)]
+        if type_name not in FUNDAMENTALS['python']:
+            res.append('<span class="pointer-token">*</span>')
+        return res
+
+    def __create_signal_symbol(self, element, name, signal):
         atypes = signal['args']
         instance_type = element['hierarchy'][0]
         element_name = element['name']
@@ -547,22 +580,11 @@ class GstExtension(Extension):
         aliases = ["%s::%s" % (element_name, name)]
 
         args_type_names = []
-        if block:
-            param_names = [p for p in block.params.keys()]
-            if len(param_names) == len(atypes) + 1:
-                args_type_names = [(instance_type + " *", param_names[0])]
-                for i, _type in enumerate(atypes):
-                    args_type_names.append((_type, param_names[i + 1]))
-            else:
-                warn('signal-arguments-mismatch', "Expected arguments with types '%s', got '%s'"
-                     % (signal['args'],  param_names))
+        args_type_names = [(self.__type_tokens_from_type_name('GstElement'), 'param_0')]
+        for i in range(len(atypes)):
+            args_type_names.append((self.__type_tokens_from_type_name(atypes[i]), 'param_%s' % (i + 1)))
 
-        if not args_type_names:
-            args_type_names = [(instance_type + " *", 'param_0')]
-            for i in range(len(atypes)):
-                args_type_names.append((atypes[i], 'param_%s' % (i + 1)))
-
-        args_type_names.append(("gpointer", "udata"))
+        args_type_names.append((self.__type_tokens_from_type_name('gpointer'), "udata"))
         params = []
 
         for comment_name in [unique_name] + aliases:
@@ -571,19 +593,20 @@ class GstExtension(Extension):
                 for i, argname in enumerate(comment.params.keys()):
                     args_type_names[i] = (args_type_names[i][0], argname)
 
-        for _type, argname in args_type_names:
-            params.append(ParameterSymbol (argname=argname, type_tokens=_type))
+        for tokens, argname in args_type_names:
+            params.append(ParameterSymbol (argname=argname, type_tokens=tokens))
 
         type_name = signal['retval']
-        tokens = type_name.split(" ")
-        tokens[0] = Link (None, tokens[0], tokens[0])
-        type_ = QualifiedSymbol(type_tokens=tokens)
+        if type_name == 'void':
+            retval = [None]
+        else:
+            tokens = self.__type_tokens_from_type_name(type_name)
 
-        enum = signal.get('return-values')
-        if enum:
-            self.__create_enum_symbol(type_name, enum, element['name'])
+            enum = signal.get('return-values')
+            if enum:
+                self.__create_enum_symbol(type_name, enum, element['name'])
 
-        retval = [ReturnItemSymbol(type_tokens=tokens)]
+            retval = [ReturnItemSymbol(type_tokens=tokens)]
 
         self.get_or_create_symbol(SignalSymbol,
             parameters=params, return_value=retval,
@@ -614,10 +637,9 @@ class GstExtension(Extension):
             elif prop['construct']:
                 flags += [ConstructFlag()]
 
-            type_name = FUNDAMENTAL_TYPES.get(prop['type-name'], prop['type-name'])
+            type_name = prop['type-name']
 
-            tokens = type_name.split(" ")
-            tokens[0] = Link (None, tokens[0], tokens[0])
+            tokens = self.__type_tokens_from_type_name(type_name)
             type_ = QualifiedSymbol(type_tokens=tokens)
 
             default = prop.get('default')
